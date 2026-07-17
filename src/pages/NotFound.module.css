@@ -1,0 +1,42 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.content {
+  text-align: center;
+}
+
+.code {
+  font-family: var(--font-display);
+  font-size: 80px;
+  font-weight: 700;
+  color: var(--color-gold);
+  opacity: 0.35;
+  line-height: 1;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.message {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-gold);
+}

@@ -1,0 +1,23 @@
+.root {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.main {
+  flex: 1;
+  margin-top: var(--navbar-height);
+  padding: var(--space-8);
+  /* On desktop, push content right of the sidebar */
+  margin-left: var(--sidebar-width);
+  min-height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .main {
+    /* On mobile the sidebar overlays, so no left margin */
+    margin-left: 0;
+    padding: var(--space-5);
+  }
+}

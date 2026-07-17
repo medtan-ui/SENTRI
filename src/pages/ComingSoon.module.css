@@ -1,0 +1,41 @@
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: var(--space-4);
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.message {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  background: var(--color-gold-muted);
+  padding: 5px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(184,134,11,0.2);
+}
