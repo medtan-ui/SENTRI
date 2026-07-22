@@ -1,0 +1,351 @@
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px;
+}
+
+.tabBtn {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  background: var(--color-surface);
+  color: var(--color-gold-dark);
+  box-shadow: var(--shadow-input);
+}
+
+/* ── Banners ── */
+.errorBanner,
+.successBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  margin-bottom: var(--space-5);
+}
+
+.errorBanner {
+  background: var(--color-error-bg);
+  border: 1px solid rgba(192,57,43,0.2);
+  border-left: 3px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.successBanner {
+  background: var(--color-success-bg);
+  border: 1px solid rgba(30,126,52,0.2);
+  border-left: 3px solid var(--color-success);
+  color: var(--color-success);
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 220px;
+  margin-bottom: 0;
+}
+
+.roleSelect {
+  height: 42px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13.5px;
+}
+
+/* ── Create form ── */
+.formCard {
+  margin-bottom: var(--space-6);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+}
+
+.selectLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Password toggle (mirrors LoginPage) ── */
+.toggleBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+.toggleBtn:hover {
+  opacity: 1;
+}
+
+/* ── Password strength (mirrors ResetPasswordPage) ── */
+.strengthRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: -8px 0 var(--space-3);
+}
+
+.strengthTrack {
+  flex: 1;
+  height: 5px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--transition-med);
+  background: var(--color-error);
+}
+.strengthFill[data-score="2"] { background: #C99A2E; }
+.strengthFill[data-score="3"] { background: var(--color-gold); }
+.strengthFill[data-score="4"] { background: var(--color-success); }
+
+.strengthLabel {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.policyList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  font-size: 12px;
+  margin-bottom: var(--space-4);
+}
+
+.policyMet {
+  color: var(--color-success);
+}
+
+.policyPending {
+  color: var(--color-text-muted);
+}
+
+/* ── Table ── */
+.tableCard {
+  padding: var(--space-5);
+}
+
+.tableScroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mutedCell {
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+}
+
+.roleBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+.roleAdmin {
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.roleStudent {
+  background: rgba(46,134,171,0.12);
+  color: #2E86AB;
+}
+
+.statusBadge {
+  font-size: 12px;
+  color: var(--color-success);
+}
+
+.actionsCell {
+  display: flex;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+
+.linkBtn {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-gold-dark);
+  cursor: pointer;
+}
+
+.linkBtn:hover {
+  text-decoration: underline;
+}
+
+.linkBtn:disabled {
+  color: var(--color-text-light);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.linkDanger {
+  color: var(--color-error);
+}
+
+.emptyState {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-8) 0;
+}
+
+/* ── Inline reset-password row ── */
+.resetRow td {
+  background: var(--color-bg);
+  white-space: normal;
+}
+
+.resetForm {
+  max-width: 360px;
+  padding: var(--space-2) 0;
+}
+
+.resetActions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+/* ── Audit tab ── */
+.auditHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.auditHeader .cardTitle {
+  margin-bottom: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .formRow { grid-template-columns: 1fr; }
+  .policyList { grid-template-columns: 1fr; }
+}

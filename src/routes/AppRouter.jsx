@@ -3,13 +3,20 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import LoadingScreen from '../components/LoadingScreen/LoadingScreen'
 import EmailVerificationGate from '../components/EmailVerificationGate/EmailVerificationGate'
+import ForcedPasswordChangeGate from '../components/ForcedPasswordChangeGate/ForcedPasswordChangeGate'
 
 // Pages
 import LoginPage         from '../pages/Login/LoginPage'
 import ResetPasswordPage from '../pages/ResetPassword/ResetPasswordPage'
 import StudentDashboard  from '../pages/Student/Dashboard/StudentDashboard'
 import AdminDashboard    from '../pages/Admin/Dashboard/AdminDashboard'
-import SecurityPage      from '../pages/Account/Security/SecurityPage'
+import SettingsPage      from '../pages/Account/Settings/SettingsPage'
+import AccountsPage      from '../pages/Admin/Accounts/AccountsPage'
+import ModulesPage       from '../pages/Admin/Modules/ModulesPage'
+import ModuleContentEditor from '../pages/Admin/ModuleEditor/ModuleContentEditor'
+import ModulePreviewPage from '../pages/Admin/ModulePreview/ModulePreviewPage'
+import ModuleConfigurationPage from '../pages/Admin/ModuleConfiguration/ModuleConfigurationPage'
+import StudentLessonViewerPage from '../pages/Student/Modules/LessonViewer/StudentLessonViewerPage'
 import ComingSoon        from '../pages/ComingSoon'
 import NotFound          from '../pages/NotFound'
 
@@ -17,10 +24,14 @@ import NotFound          from '../pages/NotFound'
  * ProtectedRoute
  * Waits for the initial Firebase session check, then redirects to login
  * if no session exists. Unverified emails are gated behind
- * EmailVerificationGate before requiredRole is even checked — nobody
- * reaches a dashboard without confirming their email first. Otherwise
- * redirects to the user's own dashboard if their role doesn't match the
- * route's requiredRole.
+ * EmailVerificationGate first — nobody reaches a dashboard without
+ * confirming their email. Accounts still on a temporary (admin-set)
+ * password are gated behind ForcedPasswordChangeGate next. Both gates
+ * read live from AuthContext's `user`, so completing one step (e.g.
+ * clicking "I've verified — check again") re-renders straight into the
+ * next gate in the same session — no re-login required between steps.
+ * Otherwise redirects to the user's own dashboard if their role doesn't
+ * match the route's requiredRole.
  */
 function ProtectedRoute({ children, requiredRole }) {
   const { user, loading } = useAuth()
@@ -33,6 +44,9 @@ function ProtectedRoute({ children, requiredRole }) {
   }
   if (!user.emailVerified) {
     return <EmailVerificationGate />
+  }
+  if (user.mustChangePassword) {
+    return <ForcedPasswordChangeGate />
   }
   if (requiredRole && user.role !== requiredRole) {
     // Wrong role — send to their own dashboard
@@ -72,16 +86,6 @@ export default function AppRouter() {
       />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      {/* ── Account (any authenticated role) ── */}
-      <Route
-        path="/account/security"
-        element={
-          <ProtectedRoute>
-            <SecurityPage />
-          </ProtectedRoute>
-        }
-      />
-
       {/* ── Student ── */}
       <Route
         path="/student/dashboard"
@@ -96,6 +100,14 @@ export default function AppRouter() {
         element={
           <ProtectedRoute requiredRole="student">
             <ComingSoon />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/modules/password-security"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentLessonViewerPage moduleId="password-security" />
           </ProtectedRoute>
         }
       />
@@ -131,6 +143,14 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/student/settings"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <SettingsPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── Admin ── */}
       <Route
@@ -142,10 +162,10 @@ export default function AppRouter() {
         }
       />
       <Route
-        path="/admin/students"
+        path="/admin/accounts"
         element={
           <ProtectedRoute requiredRole="admin">
-            <ComingSoon />
+            <AccountsPage />
           </ProtectedRoute>
         }
       />
@@ -153,7 +173,31 @@ export default function AppRouter() {
         path="/admin/modules"
         element={
           <ProtectedRoute requiredRole="admin">
-            <ComingSoon />
+            <ModulesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/modules/editor"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ModuleContentEditor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/modules/preview"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ModulePreviewPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/modules/:moduleId/configure"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ModuleConfigurationPage />
           </ProtectedRoute>
         }
       />
@@ -185,7 +229,7 @@ export default function AppRouter() {
         path="/admin/settings"
         element={
           <ProtectedRoute requiredRole="admin">
-            <ComingSoon />
+            <SettingsPage />
           </ProtectedRoute>
         }
       />

@@ -40,7 +40,8 @@ import {
   TotpMultiFactorGenerator,
 } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from './firebase'
+import { httpsCallable } from 'firebase/functions'
+import { auth, db, functions } from './firebase'
 import { validatePassword } from '../utils/passwordPolicy'
 
 const USERS_COLLECTION = 'users'
@@ -89,6 +90,7 @@ async function _resolveUserProfile(firebaseUser) {
     role: data.role,
     displayName: data.displayName || firebaseUser.displayName || firebaseUser.email,
     emailVerified: firebaseUser.emailVerified,
+    mustChangePassword: !!data.mustChangePassword,
   }
 }
 
@@ -323,6 +325,34 @@ export async function confirmReset(oobCode, newPassword) {
       throw new Error('Please choose a stronger password.')
     }
     throw new Error('Unable to reset your password right now. Please try again.')
+  }
+}
+
+/**
+ * Change the signed-in user's own password (self-service). Used by the
+ * forced first-login flow when an account still has mustChangePassword
+ * set — goes through the changeOwnPassword Cloud Function rather than
+ * the client SDK's updatePassword() because clearing mustChangePassword
+ * on the Firestore profile requires the Admin SDK (see firestore.rules).
+ * @param {string} newPassword
+ * @returns {Promise<void>}
+ */
+export async function changeOwnPassword(newPassword) {
+  const { valid, errors } = validatePassword(newPassword)
+  if (!valid) {
+    throw new Error(`Password requirements not met: ${errors.join(', ')}.`)
+  }
+  try {
+    const call = httpsCallable(functions, 'changeOwnPassword')
+    await call({ newPassword })
+  } catch (err) {
+    if (err?.code === 'functions/unauthenticated') {
+      throw new Error('Your session has expired. Please sign in again.')
+    }
+    if (err?.code === 'functions/invalid-argument') {
+      throw new Error(err.message || 'Please check your new password.')
+    }
+    throw new Error('Unable to update your password right now. Please try again.')
   }
 }
 

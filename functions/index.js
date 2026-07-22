@@ -123,13 +123,27 @@ exports.createUserAccount = onCall(async (request) => {
     throw new HttpsError('internal', 'Unable to create the account.')
   }
 
-  await db.collection(USERS_COLLECTION).doc(userRecord.uid).set({
-    role,
-    displayName,
-    email: normalizedEmail,
-    status: 'active',
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  })
+  try {
+    await db.collection(USERS_COLLECTION).doc(userRecord.uid).set({
+      role,
+      displayName,
+      email: normalizedEmail,
+      status: 'active',
+      mustChangePassword: true,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    })
+  } catch (err) {
+    // The Auth user was already created above — without this cleanup it
+    // would be orphaned (no Firestore profile, invisible in listUsers,
+    // yet still permanently blocking this email via auth/email-already-exists).
+    console.error('[createUserAccount] Firestore profile write failed, rolling back Auth user:', userRecord.uid, err)
+    try {
+      await admin.auth().deleteUser(userRecord.uid)
+    } catch (cleanupErr) {
+      console.error('[createUserAccount] rollback delete also failed — orphaned Auth user:', userRecord.uid, cleanupErr)
+    }
+    throw new HttpsError('internal', 'Unable to create the account. Please try again.')
+  }
 
   await writeAuditLog({
     action: 'create_user',
@@ -202,9 +216,45 @@ exports.resetUserPassword = onCall(async (request) => {
     throw new HttpsError('internal', 'Unable to reset the password.')
   }
 
+  // An admin-set password is a new temporary password, same as at account
+  // creation — the user should be prompted to choose their own on next login.
+  await db.collection(USERS_COLLECTION).doc(uid).set({ mustChangePassword: true }, { merge: true })
+
   const targetSnap = await db.collection(USERS_COLLECTION).doc(uid).get()
   const targetEmail = targetSnap.exists ? targetSnap.data().email : null
   await writeAuditLog({ action: 'reset_password', actor, targetUid: uid, targetEmail })
+
+  return { success: true }
+})
+
+/**
+ * changeOwnPassword — any authenticated user, for their own account only.
+ * data: { newPassword }
+ * Updates the caller's own Firebase Auth password and clears
+ * mustChangePassword on their Firestore profile. Requires the Admin SDK
+ * even though it's self-service: clients cannot write users/{uid}
+ * directly (see firestore.rules), so the flag can only be cleared here.
+ * Used by the forced first-login password change flow.
+ */
+exports.changeOwnPassword = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'You must be signed in.')
+  }
+
+  const { newPassword } = request.data || {}
+  assertValidPassword(newPassword)
+
+  const uid = request.auth.uid
+  try {
+    await admin.auth().updateUser(uid, { password: newPassword })
+  } catch (err) {
+    if (err.code === 'auth/user-not-found') {
+      throw new HttpsError('not-found', 'Your account could not be found.')
+    }
+    throw new HttpsError('internal', 'Unable to update your password.')
+  }
+
+  await db.collection(USERS_COLLECTION).doc(uid).set({ mustChangePassword: false }, { merge: true })
 
   return { success: true }
 })

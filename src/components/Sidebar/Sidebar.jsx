@@ -11,18 +11,17 @@ const STUDENT_NAV = [
   { label: 'Quiz',             path: '/student/quiz',      icon: '✎' },
   { label: 'Progress',         path: '/student/progress',  icon: '📈' },
   { label: 'Profile',          path: '/student/profile',   icon: '👤' },
-  { label: 'Security',         path: '/account/security',  icon: '🔒' },
+  { label: 'Settings',         path: '/student/settings',  icon: '⚙' },
 ]
 
 const ADMIN_NAV = [
   { label: 'Dashboard',    path: '/admin/dashboard',  icon: '⊞' },
-  { label: 'Students',     path: '/admin/students',   icon: '👥' },
+  { label: 'Accounts',     path: '/admin/accounts',   icon: '👥' },
   { label: 'Modules',      path: '/admin/modules',    icon: '📚' },
   { label: 'Scenarios',    path: '/admin/scenarios',  icon: '🛡' },
   { label: 'Quiz Manager', path: '/admin/quizzes',    icon: '✎' },
   { label: 'Analytics',    path: '/admin/analytics',  icon: '📊' },
   { label: 'Settings',     path: '/admin/settings',   icon: '⚙' },
-  { label: 'Security',     path: '/account/security', icon: '🔒' },
 ]
 
 export default function Sidebar({ role = 'student', isOpen, onClose }) {

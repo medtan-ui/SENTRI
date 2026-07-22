@@ -1,0 +1,405 @@
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+/* ── Top actions ── */
+.topActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.topActionsRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ── Header ── */
+.header {
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* ── Banner ── */
+.successBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(30,126,52,0.2);
+  border-left: 3px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--color-success);
+  margin-bottom: var(--space-5);
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  margin-bottom: var(--space-6);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.tabBtn {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  background: var(--color-surface);
+  color: var(--color-gold-dark);
+  box-shadow: var(--shadow-input);
+}
+
+/* ── Tab content card ── */
+.tabCard {
+  padding: var(--space-8);
+}
+
+.tabHeading {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-5);
+}
+
+/* ── Form ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.readonlyValue {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-input);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  line-height: 1.6;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(184,134,11,0.12);
+}
+
+.select {
+  height: 42px;
+  padding: 0 var(--space-3);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-input);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(184,134,11,0.12);
+}
+
+/* ── Enable/Disable toggle ── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.toggleSwitch {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-border);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.toggleSwitch[data-on="true"] {
+  background: var(--color-success);
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-white);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  transition: transform var(--transition-fast);
+}
+
+.toggleSwitch[data-on="true"] .toggleKnob {
+  transform: translateX(20px);
+}
+
+.toggleLabel {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Info rows (Scenario / Quiz tabs) ── */
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.infoLabel {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.infoValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.statusBadge[data-status="draft"]     { background: var(--color-gold-muted); color: var(--color-gold-dark); }
+.statusBadge[data-status="published"] { background: var(--color-success-bg); color: var(--color-success); }
+
+/* ── Assignments ── */
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.radioOption:hover {
+  background: var(--color-bg);
+}
+
+.radioOptionActive {
+  border-color: var(--color-gold);
+  background: var(--color-gold-muted);
+}
+
+.radioInput {
+  accent-color: var(--color-gold);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.radioText {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-2);
+}
+
+.checkboxOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text);
+  transition: background var(--transition-fast);
+}
+
+.checkboxOption:hover {
+  background: var(--color-bg);
+}
+
+.checkboxInput {
+  accent-color: var(--color-gold);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.studentMeta {
+  color: var(--color-text-muted);
+  font-size: 11.5px;
+}
+
+.allStudentsNote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+  border-left: 3px solid var(--color-gold);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* ── Prerequisites ── */
+.prereqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.prereqOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.prereqOption:hover {
+  background: var(--color-bg);
+}
+
+.prereqOptionDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.prereqName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.prereqCurrentTag {
+  font-size: 11px;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+/* ── Responsive ── */
+@media (max-width: 620px) {
+  .formRow { grid-template-columns: 1fr; }
+  .infoRow { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+  .infoValue { text-align: left; }
+}

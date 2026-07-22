@@ -5,7 +5,7 @@
 
 /* ── Header ── */
 .header {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-5);
 }
 
 .title {
@@ -20,6 +20,40 @@
   margin-top: var(--space-1);
   font-size: 14px;
   color: var(--color-text-muted);
+}
+
+/* ── Tabs (mirrors AccountsPage) ── */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: var(--space-6);
+}
+
+.tabBtn {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  background: var(--color-surface);
+  color: var(--color-gold-dark);
+  box-shadow: var(--shadow-input);
 }
 
 /* ── Banners ── */
@@ -51,6 +85,7 @@
 /* ── Card ── */
 .card {
   width: 100%;
+  margin-bottom: var(--space-5);
 }
 
 .cardTitle {
@@ -66,6 +101,42 @@
   color: var(--color-text-muted);
   line-height: 1.6;
   margin-bottom: var(--space-4);
+}
+
+/* ── Email verification (display only) ── */
+.verifyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.verifyRow .cardTitle {
+  margin-bottom: var(--space-1);
+}
+
+.verifyRow .body {
+  margin-bottom: 0;
+}
+
+.verifiedBadge,
+.unverifiedBadge {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.verifiedBadge {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.unverifiedBadge {
+  background: var(--color-error-bg);
+  color: var(--color-error);
 }
 
 /* ── Enrolled factor list ── */

@@ -4,7 +4,7 @@ import { useAuth } from '../../../context/AuthContext'
 import styles from './AdminDashboard.module.css'
 
 const STATS = [
-  { label: 'Total Students',      value: '148',  icon: '👥', accent: '#2E86AB' },
+  { label: 'Total Accounts',      value: '148',  icon: '👥', accent: '#2E86AB' },
   { label: 'Active This Week',    value: '92',   icon: '✅', accent: '#1E7E34' },
   { label: 'Modules Published',   value: '8',    icon: '📚', accent: '#B8860B' },
   { label: 'Avg. Quiz Score',     value: '78%',  icon: '📊', accent: '#7B2D8B' },
@@ -20,7 +20,7 @@ const RECENT_ACTIVITY = [
 
 const PENDING = [
   { label: 'Pending Quiz Reviews',    count: 14, color: '#B8860B' },
-  { label: 'Inactive Students (7d)',  count: 56, color: '#C0392B' },
+  { label: 'Inactive Accounts (7d)',  count: 56, color: '#C0392B' },
   { label: 'Modules Awaiting Review', count: 2,  color: '#2E86AB' },
 ]
 

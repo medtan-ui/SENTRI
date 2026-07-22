@@ -9,6 +9,7 @@ import {
   resendVerificationEmail,
   verifyResetCode,
   confirmReset,
+  changeOwnPassword as changeOwnPasswordService,
   startTotpEnrollment,
   confirmTotpEnrollment,
   getEnrolledFactors,
@@ -79,6 +80,15 @@ export function AuthProvider({ children }) {
     return nextUser
   }, [])
 
+  const changeOwnPassword = useCallback(async (newPassword) => {
+    await changeOwnPasswordService(newPassword)
+    // Re-reads the Firestore profile so user.mustChangePassword flips to
+    // false and ProtectedRoute stops rendering the forced-change gate.
+    const nextUser = await refreshCurrentUser()
+    setUser(nextUser)
+    return nextUser
+  }, [])
+
   const value = {
     user,
     loading,
@@ -88,6 +98,7 @@ export function AuthProvider({ children }) {
     resetPassword,
     resendVerification,
     refreshUser,
+    changeOwnPassword,
     // Password-reset link completion (public /reset-password page).
     verifyResetCode,
     confirmReset,
@@ -112,6 +123,7 @@ export function AuthProvider({ children }) {
  *   resetPassword: (email: string) => Promise<void>,
  *   resendVerification: () => Promise<void>,
  *   refreshUser: () => Promise<object|null>,
+ *   changeOwnPassword: (newPassword: string) => Promise<object|null>,
  *   verifyResetCode: (oobCode: string) => Promise<string>,
  *   confirmReset: (oobCode: string, newPassword: string) => Promise<void>,
  *   startTotpEnrollment: () => Promise<object>,
