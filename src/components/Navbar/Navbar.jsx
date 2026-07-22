@@ -1,9 +1,9 @@
 import React from 'react'
-import { getCurrentUser } from '../../services/authService'
+import { useAuth } from '../../context/AuthContext'
 import styles from './Navbar.module.css'
 
 export default function Navbar({ onToggleSidebar }) {
-  const user = getCurrentUser()
+  const { user } = useAuth()
 
   return (
     <header className={styles.navbar}>

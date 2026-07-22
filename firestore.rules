@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      // A signed-in user may read only their own profile — this is how
+      // authService.js resolves role on login/session restore.
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // No client (student, admin, or otherwise) writes here directly.
+      // Account creation/deletion/role changes happen exclusively through
+      // the admin-only Cloud Functions in functions/index.js, which use
+      // the Admin SDK and are not subject to these rules.
+      allow write: if false;
+    }
+
+    match /auditLogs/{logId} {
+      // Written only by Cloud Functions (Admin SDK, bypasses these rules).
+      // Not even admins read this directly from the client — see the
+      // admin-only getAuditLog callable in functions/index.js.
+      allow read, write: if false;
+    }
+
+    // Default deny for anything not explicitly matched above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

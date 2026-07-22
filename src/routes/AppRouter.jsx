@@ -1,25 +1,58 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { getCurrentUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
+import LoadingScreen from '../components/LoadingScreen/LoadingScreen'
+import EmailVerificationGate from '../components/EmailVerificationGate/EmailVerificationGate'
 
 // Pages
 import LoginPage         from '../pages/Login/LoginPage'
+import ResetPasswordPage from '../pages/ResetPassword/ResetPasswordPage'
 import StudentDashboard  from '../pages/Student/Dashboard/StudentDashboard'
 import AdminDashboard    from '../pages/Admin/Dashboard/AdminDashboard'
+import SecurityPage      from '../pages/Account/Security/SecurityPage'
 import ComingSoon        from '../pages/ComingSoon'
 import NotFound          from '../pages/NotFound'
 
 /**
  * ProtectedRoute
- * Redirects to login if no session exists, or if the user's role doesn't match.
+ * Waits for the initial Firebase session check, then redirects to login
+ * if no session exists. Unverified emails are gated behind
+ * EmailVerificationGate before requiredRole is even checked — nobody
+ * reaches a dashboard without confirming their email first. Otherwise
+ * redirects to the user's own dashboard if their role doesn't match the
+ * route's requiredRole.
  */
 function ProtectedRoute({ children, requiredRole }) {
-  const user = getCurrentUser()
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <LoadingScreen />
+  }
   if (!user) {
     return <Navigate to="/" replace />
   }
+  if (!user.emailVerified) {
+    return <EmailVerificationGate />
+  }
   if (requiredRole && user.role !== requiredRole) {
     // Wrong role — send to their own dashboard
+    return <Navigate to={`/${user.role}/dashboard`} replace />
+  }
+  return children
+}
+
+/**
+ * PublicRoute
+ * Keeps a signed-in user off the login page — refreshing "/" while
+ * authenticated lands them back on their dashboard instead.
+ */
+function PublicRoute({ children }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <LoadingScreen />
+  }
+  if (user) {
     return <Navigate to={`/${user.role}/dashboard`} replace />
   }
   return children
@@ -29,7 +62,25 @@ export default function AppRouter() {
   return (
     <Routes>
       {/* ── Public ── */}
-      <Route path="/" element={<LoginPage />} />
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* ── Account (any authenticated role) ── */}
+      <Route
+        path="/account/security"
+        element={
+          <ProtectedRoute>
+            <SecurityPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── Student ── */}
       <Route

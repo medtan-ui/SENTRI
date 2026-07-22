@@ -1,11 +1,11 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
 import DashboardLayout from '../components/Layout/DashboardLayout'
-import { getCurrentUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 import styles from './ComingSoon.module.css'
 
 export default function ComingSoon() {
-  const user = getCurrentUser()
+  const { user } = useAuth()
   const location = useLocation()
 
   // Derive a friendly page name from the URL path

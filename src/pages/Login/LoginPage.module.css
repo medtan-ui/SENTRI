@@ -1,11 +1,6 @@
 .page {
   min-height: 100vh;
   background: var(--color-bg);
-  /* Subtle grid pattern for depth */
-  background-image:
-    linear-gradient(rgba(184,134,11,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(184,134,11,0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,28 +26,10 @@
   margin-bottom: var(--space-6);
 }
 
-.logoPlaceholder {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-md);
-  border: 2px dashed var(--color-gold);
-  background: var(--color-gold-muted);
-  color: var(--color-gold);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.appName {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--color-text);
-  letter-spacing: 0.12em;
-  line-height: 1;
+.logo {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
 }
 
 .tagline {
@@ -87,6 +64,34 @@
 .errorIcon {
   flex-shrink: 0;
   margin-top: 1px;
+}
+
+/* ── Success banner ── */
+.successBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(30,126,52,0.2);
+  border-left: 3px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--color-success);
+  margin-bottom: var(--space-5);
+}
+
+.successIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Reset password intro copy ── */
+.resetIntro {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-5);
 }
 
 /* ── Form ── */

@@ -26,15 +26,8 @@
 .brandLogo {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
-  background: var(--color-gold);
-  color: var(--color-white);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 50%;
+  object-fit: cover;
   flex-shrink: 0;
 }
 

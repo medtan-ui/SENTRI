@@ -1,6 +1,6 @@
 import React from 'react'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
-import { getCurrentUser } from '../../../services/authService'
+import { useAuth } from '../../../context/AuthContext'
 import styles from './StudentDashboard.module.css'
 
 // ── Quick stats ──
@@ -19,7 +19,7 @@ const UPCOMING = [
 ]
 
 export default function StudentDashboard() {
-  const user = getCurrentUser()
+  const { user } = useAuth()
 
   return (
     <DashboardLayout role="student">

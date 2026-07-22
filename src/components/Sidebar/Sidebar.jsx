@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { logout } from '../../services/authService'
+import { useAuth } from '../../context/AuthContext'
+import logo from '../../assets/images/logo.png'
 import styles from './Sidebar.module.css'
 
 const STUDENT_NAV = [
@@ -10,6 +11,7 @@ const STUDENT_NAV = [
   { label: 'Quiz',             path: '/student/quiz',      icon: '✎' },
   { label: 'Progress',         path: '/student/progress',  icon: '📈' },
   { label: 'Profile',          path: '/student/profile',   icon: '👤' },
+  { label: 'Security',         path: '/account/security',  icon: '🔒' },
 ]
 
 const ADMIN_NAV = [
@@ -20,10 +22,12 @@ const ADMIN_NAV = [
   { label: 'Quiz Manager', path: '/admin/quizzes',    icon: '✎' },
   { label: 'Analytics',    path: '/admin/analytics',  icon: '📊' },
   { label: 'Settings',     path: '/admin/settings',   icon: '⚙' },
+  { label: 'Security',     path: '/account/security', icon: '🔒' },
 ]
 
 export default function Sidebar({ role = 'student', isOpen, onClose }) {
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const navItems = role === 'admin' ? ADMIN_NAV : STUDENT_NAV
 
   async function handleLogout() {
@@ -48,7 +52,7 @@ export default function Sidebar({ role = 'student', isOpen, onClose }) {
       >
         {/* Brand */}
         <div className={styles.brand}>
-          <span className={styles.brandLogo}>S</span>
+          <img src={logo} alt="SENTRI logo" className={styles.brandLogo} />
           <div className={styles.brandText}>
             <span className={styles.brandName}>SENTRI</span>
             <span className={styles.brandSub}>Training System</span>

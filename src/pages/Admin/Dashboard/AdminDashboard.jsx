@@ -1,6 +1,6 @@
 import React from 'react'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
-import { getCurrentUser } from '../../../services/authService'
+import { useAuth } from '../../../context/AuthContext'
 import styles from './AdminDashboard.module.css'
 
 const STATS = [
@@ -25,7 +25,7 @@ const PENDING = [
 ]
 
 export default function AdminDashboard() {
-  const user = getCurrentUser()
+  const { user } = useAuth()
 
   return (
     <DashboardLayout role="admin">
