@@ -1,7 +1,14 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import { useAuth } from '../../../context/AuthContext'
+import { useModuleProgress, describeModuleStatus } from '../../../context/ModuleProgressContext'
 import styles from './StudentDashboard.module.css'
+
+// Assigned module entry point — the one module wired up so far. A future
+// version reads this list from Firestore instead of a single hardcoded id.
+const ASSIGNED_MODULE_ID = 'password-security'
+const ASSIGNED_MODULE_TITLE = 'Password Security'
 
 // ── Quick stats ──
 const STATS = [
@@ -20,6 +27,9 @@ const UPCOMING = [
 
 export default function StudentDashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { getModuleStatus } = useModuleProgress()
+  const assignedStatus = describeModuleStatus(getModuleStatus(ASSIGNED_MODULE_ID))
 
   return (
     <DashboardLayout role="student">
@@ -37,6 +47,22 @@ export default function StudentDashboard() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
         </div>
+
+        {/* ── Assigned module ── */}
+        <section className={styles.assignedModule}>
+          <div>
+            <span className={styles.assignedEyebrow}>Assigned Module</span>
+            <h2 className={styles.assignedTitle}>{ASSIGNED_MODULE_TITLE}</h2>
+            <span className={styles.assignedStatus}>{assignedStatus}</span>
+          </div>
+          <button
+            type="button"
+            className={styles.assignedBtn}
+            onClick={() => navigate(`/student/modules/${ASSIGNED_MODULE_ID}`)}
+          >
+            {assignedStatus === 'Not Started' ? 'Start Module →' : 'Continue Module →'}
+          </button>
+        </section>
 
         {/* ── Stats row ── */}
         <div className={styles.statsGrid}>

@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
-import { STUDENT_LESSONS } from './mockStudentLessons'
+import { loadModuleConfig } from '../../../../services/moduleLoader'
+import { useModuleProgress } from '../../../../context/ModuleProgressContext'
 import styles from './StudentLessonViewerPage.module.css'
 
 const WORDS_PER_MINUTE = 200
@@ -13,30 +14,58 @@ function countWords(text) {
 }
 
 /**
- * StudentLessonViewerPage
- * Where a student studies a module's lesson before attempting its
- * interactive simulation. Generic (takes moduleId as a prop) so the
- * same component can serve the other five modules later — routed today
- * only for Password Security, per the static /student/modules/
- * password-security path. Mock data only, no Firestore.
+ * StudentLessonViewerPage — /student/modules/:moduleId
+ * Where a student studies a module's lesson before its interactive
+ * simulation. Every piece of content comes from loadModuleConfig(moduleId)
+ * — nothing here is hardcoded to Password Security, so the same page
+ * serves any future module the loader knows about.
  */
-export default function StudentLessonViewerPage({ moduleId }) {
+export default function StudentLessonViewerPage() {
+  const { moduleId } = useParams()
   const navigate = useNavigate()
-  const lesson = STUDENT_LESSONS[moduleId]
+  const { markLessonComplete } = useModuleProgress()
 
+  // undefined = loading, null = not found, object = loaded
+  const [config, setConfig] = useState(undefined)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [furthestIndex, setFurthestIndex] = useState(0)
 
-  if (!lesson) {
+  useEffect(() => {
+    let cancelled = false
+    setConfig(undefined)
+    setCurrentIndex(0)
+    setFurthestIndex(0)
+    loadModuleConfig(moduleId).then((result) => {
+      if (!cancelled) setConfig(result)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [moduleId])
+
+  if (config === undefined) {
     return (
       <DashboardLayout role="student">
         <div className={styles.page}>
           <Card className={styles.notFoundCard}>
-            <h1 className={styles.title}>Lesson not available</h1>
-            <p className={styles.subtitle}>This module's lesson content hasn't been added yet.</p>
+            <div className={styles.spinner} aria-hidden="true" />
+            <p className={styles.loadingLabel}>Loading lesson…</p>
+          </Card>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (config === null) {
+    return (
+      <DashboardLayout role="student">
+        <div className={styles.page}>
+          <Card className={styles.notFoundCard}>
+            <h1 className={styles.title}>Module unavailable</h1>
+            <p className={styles.subtitle}>Configuration not found.</p>
             <div style={{ marginTop: 'var(--space-5)' }}>
               <Button variant="primary" onClick={() => navigate('/student/dashboard')}>
-                ← Back to Dashboard
+                ← Return to Dashboard
               </Button>
             </div>
           </Card>
@@ -45,6 +74,7 @@ export default function StudentLessonViewerPage({ moduleId }) {
     )
   }
 
+  const { lesson } = config
   const totalSections = lesson.sections.length
   const activeSection = lesson.sections[currentIndex]
   const progressPct = Math.round(((furthestIndex + 1) / totalSections) * 100)
@@ -59,13 +89,14 @@ export default function StudentLessonViewerPage({ moduleId }) {
   }
 
   function handlePreviousLesson() {
-    if (lesson.previousModuleId) {
-      navigate(`/student/modules/${lesson.previousModuleId}`)
+    if (config.previousModuleId) {
+      navigate(`/student/modules/${config.previousModuleId}`)
     }
   }
 
   function handleStartSimulation() {
-    navigate(`/student/modules/${moduleId}/simulation`)
+    markLessonComplete(moduleId)
+    navigate(`/student/modules/${moduleId}/scenario`)
   }
 
   return (
@@ -73,10 +104,11 @@ export default function StudentLessonViewerPage({ moduleId }) {
       <div className={styles.page}>
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>{lesson.title}</h1>
+            <h1 className={styles.title}>{config.title}</h1>
+            <p className={styles.description}>{config.description}</p>
             <div className={styles.badgeRow}>
-              <span className={styles.difficultyBadge} data-difficulty={lesson.difficulty.toLowerCase()}>
-                {lesson.difficulty}
+              <span className={styles.difficultyBadge} data-difficulty={config.difficulty.toLowerCase()}>
+                {config.difficulty}
               </span>
               <span className={styles.timeBadge}>⏱ {readingMinutes} min read</span>
             </div>
@@ -120,6 +152,15 @@ export default function StudentLessonViewerPage({ moduleId }) {
             </Card>
 
             <Card className={styles.block}>
+              <h2 className={styles.blockHeading}>Best Practices</h2>
+              <ul className={styles.bestPracticesList}>
+                {lesson.bestPractices.map((bp, i) => (
+                  <li key={i}>{bp}</li>
+                ))}
+              </ul>
+            </Card>
+
+            <Card className={styles.block}>
               <h2 className={styles.blockHeading}>Key Takeaways</h2>
               <ul className={styles.takeawaysList}>
                 {lesson.keyTakeaways.map((k, i) => (
@@ -144,8 +185,8 @@ export default function StudentLessonViewerPage({ moduleId }) {
               <Button
                 variant="ghost"
                 onClick={handlePreviousLesson}
-                disabled={!lesson.previousModuleId}
-                title={!lesson.previousModuleId ? 'This is the first module in the curriculum' : undefined}
+                disabled={!config.previousModuleId}
+                title={!config.previousModuleId ? 'This is the first module in the curriculum' : undefined}
               >
                 ← Previous Lesson
               </Button>

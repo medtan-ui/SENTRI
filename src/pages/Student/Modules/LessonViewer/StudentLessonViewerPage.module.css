@@ -27,6 +27,14 @@
   color: var(--color-text-muted);
 }
 
+.description {
+  margin-top: var(--space-2);
+  max-width: 640px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
 .badgeRow {
   display: flex;
   align-items: center;
@@ -112,7 +120,8 @@
 }
 
 .objectivesList,
-.takeawaysList {
+.takeawaysList,
+.bestPracticesList {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -306,11 +315,30 @@
   margin-right: 4px;
 }
 
-/* ── Not found ── */
+/* ── Not found / loading ── */
 .notFoundCard {
   max-width: 480px;
   margin: var(--space-10) auto 0;
   text-align: center;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto var(--space-3);
+  border-radius: 50%;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-gold);
+  animation: lessonViewerSpin 700ms linear infinite;
+}
+
+.loadingLabel {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+@keyframes lessonViewerSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── Responsive ── */

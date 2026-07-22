@@ -17,6 +17,8 @@ import ModuleContentEditor from '../pages/Admin/ModuleEditor/ModuleContentEditor
 import ModulePreviewPage from '../pages/Admin/ModulePreview/ModulePreviewPage'
 import ModuleConfigurationPage from '../pages/Admin/ModuleConfiguration/ModuleConfigurationPage'
 import StudentLessonViewerPage from '../pages/Student/Modules/LessonViewer/StudentLessonViewerPage'
+import ScenarioRunnerPage from '../pages/Student/Modules/ScenarioRunner/ScenarioRunnerPage'
+import SimulationCompletePage from '../pages/Student/Modules/SimulationComplete/SimulationCompletePage'
 import ComingSoon        from '../pages/ComingSoon'
 import NotFound          from '../pages/NotFound'
 
@@ -104,10 +106,26 @@ export default function AppRouter() {
         }
       />
       <Route
-        path="/student/modules/password-security"
+        path="/student/modules/:moduleId"
         element={
           <ProtectedRoute requiredRole="student">
-            <StudentLessonViewerPage moduleId="password-security" />
+            <StudentLessonViewerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/modules/:moduleId/scenario"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <ScenarioRunnerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/modules/:moduleId/simulation-complete"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <SimulationCompletePage />
           </ProtectedRoute>
         }
       />

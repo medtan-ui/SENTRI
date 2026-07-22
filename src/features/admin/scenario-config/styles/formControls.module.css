@@ -1,0 +1,50 @@
+/**
+ * Shared form-field primitives for the Scenario Configuration feature,
+ * matching the textarea/label styling already established in the
+ * Lesson Content Editor (src/pages/Admin/ModuleConfiguration/LessonEditor).
+ * Composed into component-local CSS Modules via `composes: x from`.
+ */
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-input);
+  line-height: 1.55;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12);
+}
+
+.textareaError {
+  border-color: var(--color-error);
+}
+
+.errorText {
+  font-size: 11.5px;
+  color: var(--color-error);
+}

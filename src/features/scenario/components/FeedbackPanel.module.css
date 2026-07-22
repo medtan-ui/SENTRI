@@ -1,0 +1,68 @@
+.overlay {
+  composes: fadeIn from '../styles/overlayAnimations.module.css';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  padding: var(--space-5);
+}
+
+.panel {
+  composes: slideUp from '../styles/overlayAnimations.module.css';
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border-top: 4px solid var(--color-border);
+}
+
+.safe {
+  border-top-color: var(--color-success);
+}
+
+.risky {
+  border-top-color: var(--color-error);
+}
+
+.icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.text {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin-bottom: var(--space-5);
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-gold);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: var(--shadow-button);
+  transition: background var(--transition-fast);
+}
+
+.primaryBtn:hover {
+  background: var(--color-gold-dark);
+}

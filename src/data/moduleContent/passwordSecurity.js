@@ -1,16 +1,21 @@
-/**
- * mockStudentLessons.js
- * Student-facing lesson content, keyed by module id. Fully self-contained
- * mock data — no dependency on the admin-side curriculum/config mock
- * files, no Firestore. Only Password Security is populated for now.
- */
+import { passwordModuleConfig } from '../../features/scenario/configs/passwordModuleConfig'
 
-export const STUDENT_LESSONS = {
-  'password-security': {
-    title: 'Password Security',
-    difficulty: 'Beginner',
-    isFirstModule: true,
-    previousModuleId: null,
+/**
+ * passwordSecurity.js
+ * Mock module data for Password Security — the single seam a future
+ * Firestore-backed `loadModuleConfig` will read the same shape from.
+ * Bundles this module's lesson content with its (already-existing)
+ * Scenario Engine config, so the loader can hand both back together.
+ */
+export const passwordSecurityModuleData = {
+  moduleId: 'password-security',
+  title: 'Password Security',
+  description:
+    'Learn what makes a password strong, how attackers actually crack or steal passwords, and the everyday habits that keep your accounts safe.',
+  difficulty: 'Beginner',
+  previousModuleId: null,
+
+  lesson: {
     objectives: [
       'Understand what makes a password strong',
       'Recognize common password attacks',
@@ -42,17 +47,18 @@ export const STUDENT_LESSONS = {
           'Brute-force attacks try every possible combination of characters until the correct password is found — modern computing power makes short passwords crackable in seconds.\n\nDictionary attacks try common words and known leaked passwords instead of every possible combination, which is much faster against predictable passwords.\n\nCredential stuffing takes username/password pairs leaked from one breach and automatically tries them against many other websites, exploiting password reuse.\n\nPhishing tricks users into typing their password directly into a fake login page controlled by the attacker — no cracking required at all.',
       },
       {
-        id: 'best-practices',
-        title: 'Best Practices',
-        content:
-          '• Use a unique password for every account.\n• Aim for at least 12-16 characters, favoring length over complexity.\n• Use a password manager to generate and store strong passwords for you.\n• Enable multi-factor authentication (MFA) wherever it\'s offered.\n• Never share your password with anyone, including IT support — legitimate staff will never ask for it.\n• Change a password immediately if a service you use reports a data breach.',
-      },
-      {
         id: 'summary',
         title: 'Summary',
         content:
           "Password security is one of the simplest and most effective ways to protect your digital life. By choosing long, unique passwords, using a password manager, and enabling multi-factor authentication, you make it dramatically harder for attackers to compromise your accounts.\n\nYou've completed the Password Security lesson. Next, you'll apply what you've learned in an interactive simulation where you'll practice spotting weak passwords and responding to real account security scenarios.",
       },
+    ],
+    bestPractices: [
+      'Enable multi-factor authentication (MFA) wherever it is offered',
+      'Use a password manager to generate and store unique passwords',
+      'Never reuse the same password across accounts',
+      'Favor long passphrases (4-5 random words) over short, complex passwords',
+      'Change a password immediately if a service reports a data breach',
     ],
     keyTakeaways: [
       'Strong passwords are long, unique, and unpredictable.',
@@ -64,4 +70,14 @@ export const STUDENT_LESSONS = {
       { id: 'ref-02', title: 'Have I Been Pwned — check for breached credentials', link: 'https://haveibeenpwned.com' },
     ],
   },
+
+  // Reuses the Scenario Engine's own config verbatim — the engine is not
+  // duplicated or reimplemented here, only referenced.
+  scenario: passwordModuleConfig,
+
+  // Quiz doesn't exist yet. The shape is reserved so the loader's return
+  // value doesn't need to change when a real quiz config is added later.
+  quiz: null,
 }
+
+export default passwordSecurityModuleData

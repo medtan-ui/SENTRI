@@ -1,0 +1,24 @@
+/**
+ * Shared keyframes/animation classes for the scenario engine's overlays
+ * (DecisionOverlay, FeedbackPanel, ConsequencePlayer). Consumed via CSS
+ * Modules `composes: ... from` so every overlay animates in consistently
+ * without duplicating the same @keyframes in five files.
+ */
+
+@keyframes scenarioFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scenarioSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fadeIn {
+  animation: scenarioFadeIn var(--transition-med) ease;
+}
+
+.slideUp {
+  animation: scenarioSlideUp 260ms ease;
+}

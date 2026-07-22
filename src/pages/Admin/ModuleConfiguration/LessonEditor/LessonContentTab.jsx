@@ -1,26 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
+import LoadingSkeleton from '../../../../components/LoadingSkeleton/LoadingSkeleton'
+import ErrorState from '../../../../components/ErrorState/ErrorState'
+import { useLesson } from '../../../../hooks/useLesson'
 import LessonSectionCard from './LessonSectionCard'
 import EditableListField from './EditableListField'
 import ReferencesEditor from './ReferencesEditor'
 import LessonPreviewModal from './LessonPreviewModal'
-import { LESSON_CONTENT } from './mockLessonContent'
 import styles from './LessonContentTab.module.css'
 
 const WORDS_PER_MINUTE = 200
-
-function cloneLessonState(seed) {
-  return {
-    introduction: seed.introduction,
-    objectives: [...seed.objectives],
-    lessonContent: seed.lessonContent,
-    realWorldExample: seed.realWorldExample,
-    bestPractices: [...seed.bestPractices],
-    keyTakeaways: [...seed.keyTakeaways],
-    references: seed.references.map((r) => ({ ...r })),
-  }
-}
 
 function countWords(text) {
   return text?.trim().split(/\s+/).filter(Boolean).length || 0
@@ -29,49 +19,21 @@ function countWords(text) {
 /**
  * LessonContentTab
  * The Lesson Content Editor, reusable for any of the six fixed modules
- * (looked up by moduleId). Fully self-contained — its own local mock
- * state, its own Save Draft / Preview Lesson / Discard Changes actions.
- * Independent of ModuleConfigurationPage's own Save/Discard, which only
- * covers the Overview/Assignments/Prerequisites tabs.
+ * (looked up by moduleId). Fully self-contained — its own Save Draft /
+ * Preview Lesson / Discard Changes actions. Independent of
+ * ModuleConfigurationPage's own Save/Discard, which only covers the
+ * Overview/Assignments/Prerequisites tabs.
+ *
+ * Data comes from useLesson() (Hooks layer, backed by lessonService →
+ * Firestore). This component only renders — it never talks to
+ * Firestore directly.
  */
 export default function LessonContentTab({ moduleId }) {
-  const seed = LESSON_CONTENT[moduleId]
-  const [lesson, setLesson] = useState(() => cloneLessonState(seed))
-  const [dirty, setDirty] = useState(false)
-  const [notice, setNotice] = useState('')
+  const { status, errorMessage, retry, lesson, dirty, saveState, notice, actions } = useLesson(moduleId)
   const [previewOpen, setPreviewOpen] = useState(false)
 
-  useEffect(() => {
-    // A different module was opened — load that module's own lesson
-    // content instead of carrying over whatever was being edited.
-    setLesson(cloneLessonState(seed))
-    setDirty(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleId])
-
-  useEffect(() => {
-    if (!notice) return undefined
-    const t = setTimeout(() => setNotice(''), 3500)
-    return () => clearTimeout(t)
-  }, [notice])
-
-  function updateField(key, value) {
-    setLesson((prev) => ({ ...prev, [key]: value }))
-    setDirty(true)
-  }
-
-  function handleSaveDraft() {
-    setDirty(false)
-    setNotice('Lesson content saved as draft.')
-  }
-
-  function handleDiscard() {
-    setLesson(cloneLessonState(seed))
-    setDirty(false)
-    setNotice('Changes discarded.')
-  }
-
   const wordCount = useMemo(() => {
+    if (!lesson) return 0
     return (
       countWords(lesson.introduction) +
       countWords(lesson.lessonContent) +
@@ -82,6 +44,18 @@ export default function LessonContentTab({ moduleId }) {
     )
   }, [lesson])
 
+  if (status === 'loading') {
+    return <LoadingSkeleton blocks={4} rows={3} />
+  }
+
+  if (status === 'error') {
+    return <ErrorState message={errorMessage} onRetry={retry} />
+  }
+
+  if (status === 'not-found' || !lesson) {
+    return <p className={styles.loading}>No lesson content exists for this module yet.</p>
+  }
+
   const readingMinutes = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE))
   const objectiveCount = lesson.objectives.filter((o) => o.trim()).length
   const bestPracticeCount = lesson.bestPractices.filter((b) => b.trim()).length
@@ -90,9 +64,13 @@ export default function LessonContentTab({ moduleId }) {
   return (
     <div className={styles.editor}>
       <div className={styles.topActions}>
-        <Button variant="ghost" onClick={handleDiscard} disabled={!dirty}>Discard Changes</Button>
+        <Button variant="ghost" onClick={actions.cancel} disabled={!dirty || saveState === 'saving'}>
+          Discard Changes
+        </Button>
         <Button variant="ghost" onClick={() => setPreviewOpen(true)}>Preview Lesson</Button>
-        <Button variant="primary" onClick={handleSaveDraft} disabled={!dirty}>Save Draft</Button>
+        <Button variant="primary" onClick={actions.save} disabled={!dirty || saveState === 'saving'}>
+          {saveState === 'saving' ? 'Saving…' : 'Save Draft'}
+        </Button>
       </div>
 
       {notice && (
@@ -108,7 +86,7 @@ export default function LessonContentTab({ moduleId }) {
               className={styles.textarea}
               rows={3}
               value={lesson.introduction}
-              onChange={(e) => updateField('introduction', e.target.value)}
+              onChange={(e) => actions.updateField('introduction', e.target.value)}
               placeholder="Give students a quick overview of what this lesson covers…"
             />
           </LessonSectionCard>
@@ -116,7 +94,7 @@ export default function LessonContentTab({ moduleId }) {
           <LessonSectionCard title="Learning Objectives" description="What students should be able to do after this lesson.">
             <EditableListField
               items={lesson.objectives}
-              onChange={(next) => updateField('objectives', next)}
+              onChange={(next) => actions.updateField('objectives', next)}
               placeholder="e.g., Understand strong passwords"
               addLabel="Add Objective"
             />
@@ -127,7 +105,7 @@ export default function LessonContentTab({ moduleId }) {
               className={styles.textarea}
               rows={12}
               value={lesson.lessonContent}
-              onChange={(e) => updateField('lessonContent', e.target.value)}
+              onChange={(e) => actions.updateField('lessonContent', e.target.value)}
               placeholder="Write the full lesson content here…"
             />
           </LessonSectionCard>
@@ -137,7 +115,7 @@ export default function LessonContentTab({ moduleId }) {
               className={styles.textarea}
               rows={5}
               value={lesson.realWorldExample}
-              onChange={(e) => updateField('realWorldExample', e.target.value)}
+              onChange={(e) => actions.updateField('realWorldExample', e.target.value)}
               placeholder="Describe a real or realistic example…"
             />
           </LessonSectionCard>
@@ -145,7 +123,7 @@ export default function LessonContentTab({ moduleId }) {
           <LessonSectionCard title="Best Practices" description="Actionable recommendations for students to follow.">
             <EditableListField
               items={lesson.bestPractices}
-              onChange={(next) => updateField('bestPractices', next)}
+              onChange={(next) => actions.updateField('bestPractices', next)}
               placeholder="e.g., Enable MFA"
               addLabel="Add Best Practice"
             />
@@ -154,7 +132,7 @@ export default function LessonContentTab({ moduleId }) {
           <LessonSectionCard title="Key Takeaways" description="The most important points for students to remember.">
             <EditableListField
               items={lesson.keyTakeaways}
-              onChange={(next) => updateField('keyTakeaways', next)}
+              onChange={(next) => actions.updateField('keyTakeaways', next)}
               placeholder="e.g., Strong passwords protect accounts."
               addLabel="Add Takeaway"
             />
@@ -163,7 +141,7 @@ export default function LessonContentTab({ moduleId }) {
           <LessonSectionCard title="References" description="Supporting sources students can read further.">
             <ReferencesEditor
               references={lesson.references}
-              onChange={(next) => updateField('references', next)}
+              onChange={(next) => actions.updateField('references', next)}
             />
           </LessonSectionCard>
         </div>

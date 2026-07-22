@@ -1,0 +1,26 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-6);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-gold);
+  animation: scenarioSpin 700ms linear infinite;
+}
+
+.label {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+@keyframes scenarioSpin {
+  to { transform: rotate(360deg); }
+}

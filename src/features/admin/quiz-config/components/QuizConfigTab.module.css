@@ -1,0 +1,65 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.topActionsRight {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(30, 126, 52, 0.2);
+  border-left: 3px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--color-success);
+}
+
+.blockingBanner {
+  background: var(--color-error-bg);
+  border-left: 3px solid var(--color-error);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--color-error);
+}
+
+.overviewCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.moduleName {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.quizTitle {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+.loading {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  padding: var(--space-6) 0;
+  text-align: center;
+}
