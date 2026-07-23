@@ -6,9 +6,9 @@ import styles from './QuizSettingsCard.module.css'
 /**
  * QuizSettingsCard
  * The one dedicated card for this quiz's settings — passing score, time
- * limit, maximum attempts, instructions, and availability. There is
- * exactly one quiz per module, so there is nothing here to select or
- * switch between.
+ * limit, instructions, and availability. There is exactly one quiz per
+ * module and exactly one attempt per student, so there is nothing here to
+ * select or switch between.
  */
 export default function QuizSettingsCard({ settings, onChange }) {
   return (
@@ -38,18 +38,6 @@ export default function QuizSettingsCard({ settings, onChange }) {
             className={forms.numberInput}
             value={settings.timeLimitMinutes}
             onChange={(e) => onChange({ timeLimitMinutes: Number(e.target.value) })}
-          />
-        </div>
-
-        <div className={forms.fieldGroup}>
-          <label className={forms.fieldLabel} htmlFor="maxAttempts">Maximum Attempts</label>
-          <input
-            id="maxAttempts"
-            type="number"
-            min={1}
-            className={forms.numberInput}
-            value={settings.maxAttempts}
-            onChange={(e) => onChange({ maxAttempts: Number(e.target.value) })}
           />
         </div>
       </div>

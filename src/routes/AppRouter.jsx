@@ -16,10 +16,17 @@ import ModulesPage       from '../pages/Admin/Modules/ModulesPage'
 import ModuleContentEditor from '../pages/Admin/ModuleEditor/ModuleContentEditor'
 import ModulePreviewPage from '../pages/Admin/ModulePreview/ModulePreviewPage'
 import ModuleConfigurationPage from '../pages/Admin/ModuleConfiguration/ModuleConfigurationPage'
+import ScenarioManagerPage from '../pages/Admin/ScenarioManager/ScenarioManagerPage'
+import QuizManagerPage   from '../pages/Admin/QuizManager/QuizManagerPage'
+import AdminAnalyticsPage from '../pages/Admin/Analytics/AdminAnalyticsPage'
+import StudentModulesPage from '../pages/Student/Modules/StudentModulesPage'
 import StudentLessonViewerPage from '../pages/Student/Modules/LessonViewer/StudentLessonViewerPage'
 import ScenarioRunnerPage from '../pages/Student/Modules/ScenarioRunner/ScenarioRunnerPage'
 import SimulationCompletePage from '../pages/Student/Modules/SimulationComplete/SimulationCompletePage'
-import ComingSoon        from '../pages/ComingSoon'
+import StudentQuizPage from '../pages/Student/Modules/Quiz/StudentQuizPage'
+import StudentQuizOverviewPage from '../pages/Student/Quiz/StudentQuizOverviewPage'
+import StudentProgressPage from '../pages/Student/Progress/StudentProgressPage'
+import StudentProfilePage from '../pages/Student/Profile/StudentProfilePage'
 import NotFound          from '../pages/NotFound'
 
 /**
@@ -101,7 +108,7 @@ export default function AppRouter() {
         path="/student/modules"
         element={
           <ProtectedRoute requiredRole="student">
-            <ComingSoon />
+            <StudentModulesPage />
           </ProtectedRoute>
         }
       />
@@ -130,10 +137,10 @@ export default function AppRouter() {
         }
       />
       <Route
-        path="/student/scenarios"
+        path="/student/modules/:moduleId/quiz"
         element={
           <ProtectedRoute requiredRole="student">
-            <ComingSoon />
+            <StudentQuizPage />
           </ProtectedRoute>
         }
       />
@@ -141,7 +148,7 @@ export default function AppRouter() {
         path="/student/quiz"
         element={
           <ProtectedRoute requiredRole="student">
-            <ComingSoon />
+            <StudentQuizOverviewPage />
           </ProtectedRoute>
         }
       />
@@ -149,7 +156,7 @@ export default function AppRouter() {
         path="/student/progress"
         element={
           <ProtectedRoute requiredRole="student">
-            <ComingSoon />
+            <StudentProgressPage />
           </ProtectedRoute>
         }
       />
@@ -157,7 +164,7 @@ export default function AppRouter() {
         path="/student/profile"
         element={
           <ProtectedRoute requiredRole="student">
-            <ComingSoon />
+            <StudentProfilePage />
           </ProtectedRoute>
         }
       />
@@ -223,7 +230,7 @@ export default function AppRouter() {
         path="/admin/scenarios"
         element={
           <ProtectedRoute requiredRole="admin">
-            <ComingSoon />
+            <ScenarioManagerPage />
           </ProtectedRoute>
         }
       />
@@ -231,7 +238,7 @@ export default function AppRouter() {
         path="/admin/quizzes"
         element={
           <ProtectedRoute requiredRole="admin">
-            <ComingSoon />
+            <QuizManagerPage />
           </ProtectedRoute>
         }
       />
@@ -239,7 +246,7 @@ export default function AppRouter() {
         path="/admin/analytics"
         element={
           <ProtectedRoute requiredRole="admin">
-            <ComingSoon />
+            <AdminAnalyticsPage />
           </ProtectedRoute>
         }
       />

@@ -5,10 +5,12 @@ import styles from './ModuleConfigurationPage.module.css'
 
 /**
  * OverviewTab
- * Module name is read-only; description, estimated time, difficulty,
- * and the enable/disable toggle are editable (local state only).
+ * Module name is read-only; description, estimated time, and difficulty
+ * are editable. There is no enable/disable toggle — every configured
+ * module is reachable once unlocked by curriculum order (see the Modules
+ * list page for reordering).
  */
-export default function OverviewTab({ moduleName, description, estimatedTime, difficulty, enabled, onChange }) {
+export default function OverviewTab({ moduleName, description, estimatedTime, difficulty, onChange }) {
   return (
     <div className={styles.form}>
       <div className={styles.formGroup}>
@@ -49,23 +51,6 @@ export default function OverviewTab({ moduleName, description, estimatedTime, di
               <option key={d} value={d}>{d}</option>
             ))}
           </select>
-        </div>
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Module Status</label>
-        <div className={styles.toggleRow}>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={enabled}
-            className={styles.toggleSwitch}
-            data-on={enabled}
-            onClick={() => onChange({ enabled: !enabled })}
-          >
-            <span className={styles.toggleKnob} />
-          </button>
-          <span className={styles.toggleLabel}>{enabled ? 'Enabled' : 'Disabled'}</span>
         </div>
       </div>
     </div>

@@ -85,6 +85,9 @@ export default function ScenarioCard({
                 pauseTimestamp={scenario.pauseTimestamp}
                 pauseError={pauseError}
                 onChangePauseTimestamp={(value) => onUpdateScenario({ pauseTimestamp: value })}
+                onChangeVideoUrl={(value) =>
+                  onUpdateScenario({ video: { ...scenario.video, videoUrl: value, videoAvailable: Boolean(value) } })
+                }
               />
               <ChoiceList
                 choices={scenario.choices}

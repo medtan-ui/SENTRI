@@ -1,0 +1,101 @@
+/**
+ * Deliberately ordinary phone chrome — plain, not SENTRI's theme.
+ * Fixed aspect ratio, centered on desktop; near-fullscreen on mobile
+ * (see the max-width: 480px query at the bottom).
+ */
+.bezel {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  border-radius: 32px;
+  overflow: hidden;
+  background: #1c1c1e;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.notch {
+  width: 80px;
+  height: 16px;
+  background: #1c1c1e;
+  border-radius: 0 0 10px 10px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.statusBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 16px;
+  background: #ffffff;
+  color: #1c1c1e;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+}
+
+.carrierLabel {
+  font-weight: 500;
+  color: #6b6f76;
+}
+
+.statusIcons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+/* ── Scrollable content area — fixed height, not aspect-ratio, so it
+   stays predictable regardless of how tall a scene's content is ── */
+.viewport {
+  position: relative;
+  background: #f9f9fa;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 520px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bottomNav {
+  flex-shrink: 0;
+  background: #ffffff;
+  border-top: 1px solid #e2e4e8;
+  border-radius: 0 0 22px 22px;
+}
+
+.defaultNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.defaultNavIcon {
+  font-size: 17px;
+  opacity: 0.55;
+}
+
+@media (max-width: 480px) {
+  .bezel {
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .viewport {
+    height: 65vh;
+  }
+  .bottomNav {
+    border-radius: 0;
+  }
+}

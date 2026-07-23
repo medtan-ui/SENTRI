@@ -38,7 +38,6 @@ export const DIFFICULTY_OPTIONS = ['Easy', 'Medium', 'Hard']
  * @typedef {Object} QuizSettings
  * @property {number} passingScore        Percentage, 0-100.
  * @property {number} timeLimitMinutes
- * @property {number} maxAttempts
  * @property {string} instructions        Shown to the student before starting.
  * @property {boolean} available          Whether students can currently take this quiz.
  */

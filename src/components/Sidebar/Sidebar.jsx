@@ -7,7 +7,6 @@ import styles from './Sidebar.module.css'
 const STUDENT_NAV = [
   { label: 'Dashboard',        path: '/student/dashboard', icon: '⊞' },
   { label: 'Modules',          path: '/student/modules',   icon: '📚' },
-  { label: 'Scenario Training',path: '/student/scenarios', icon: '🛡' },
   { label: 'Quiz',             path: '/student/quiz',      icon: '✎' },
   { label: 'Progress',         path: '/student/progress',  icon: '📈' },
   { label: 'Profile',          path: '/student/profile',   icon: '👤' },

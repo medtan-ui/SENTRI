@@ -5,10 +5,9 @@ import Button from '../../../components/Button/Button'
 import Input from '../../../components/Input/Input'
 import { useAuth } from '../../../context/AuthContext'
 import { createUserAccount, deleteUserAccount, resetUserPassword, listUsers, getAuditLog } from '../../../services/adminService'
-import { validatePassword, passwordStrength } from '../../../utils/passwordPolicy'
+import { validatePassword } from '../../../utils/passwordPolicy'
+import PasswordStrengthMeter from '../../../components/PasswordStrengthMeter/PasswordStrengthMeter'
 import styles from './AccountsPage.module.css'
-
-const POLICY_RULES = ['At least 8 characters', 'One lowercase letter', 'One uppercase letter', 'One number']
 
 const AUDIT_ACTION_LABELS = {
   create_user: 'Created account',
@@ -96,7 +95,6 @@ export default function AccountsPage() {
   }
 
   const { errors: createPolicyErrors } = validatePassword(form.password)
-  const createStrength = passwordStrength(form.password)
 
   async function handleCreate(e) {
     e.preventDefault()
@@ -321,25 +319,7 @@ export default function AccountsPage() {
                     />
                   </div>
 
-                  {form.password && (
-                    <div className={styles.strengthRow}>
-                      <div className={styles.strengthTrack}>
-                        <div
-                          className={styles.strengthFill}
-                          data-score={createStrength.score}
-                          style={{ width: `${(createStrength.score / 4) * 100}%` }}
-                        />
-                      </div>
-                      <span className={styles.strengthLabel}>{createStrength.label}</span>
-                    </div>
-                  )}
-                  <ul className={styles.policyList}>
-                    {POLICY_RULES.map((rule) => (
-                      <li key={rule} className={createPolicyErrors.includes(rule) ? styles.policyPending : styles.policyMet}>
-                        {createPolicyErrors.includes(rule) ? '○' : '✓'} {rule}
-                      </li>
-                    ))}
-                  </ul>
+                  <PasswordStrengthMeter password={form.password} />
 
                   <Button type="submit" variant="primary" loading={creating} disabled={creating}>
                     Create Account

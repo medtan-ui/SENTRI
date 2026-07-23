@@ -1,0 +1,247 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Inbox ── */
+.inboxHeader,
+.settingsHeader {
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #26282c;
+  border-bottom: 1px solid #eceef1;
+  background: #ffffff;
+}
+
+.threadRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #eceef1;
+  background: #ffffff;
+}
+
+.threadRowMainWrap {
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
+.threadRowMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #7a7f88;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.threadRowText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.threadRowSender {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.blockedTag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9a1c0f;
+  background: #fdecea;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.threadRowPreview {
+  display: block;
+  font-size: 11.5px;
+  color: #7a7f88;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreBtnWrap {
+  flex-shrink: 0;
+}
+
+.moreBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 15px;
+  color: #7a7f88;
+}
+
+.moreMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 14px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  z-index: 20;
+  min-width: 170px;
+}
+
+.moreMenuItem {
+  display: block;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #26282c;
+  white-space: nowrap;
+}
+
+/* ── Thread ── */
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #eceef1;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  color: #26282c;
+}
+
+.threadTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.bubbleRow {
+  display: flex;
+  justify-content: flex-start;
+  padding: 14px;
+}
+
+.bubble {
+  max-width: 78%;
+  background: #eceef1;
+  color: #26282c;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+}
+
+.quickReplies {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.quickReplyChip {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #2e5fa3;
+  background: #ffffff;
+  border: 1px solid #2e5fa3;
+  border-radius: 999px;
+  padding: 8px 16px;
+}
+
+/* ── Settings ── */
+.settingsList {
+  list-style: none;
+}
+
+.settingsItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eceef1;
+  background: #ffffff;
+}
+
+.settingsItemTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #26282c;
+}
+
+.settingsItemHint {
+  font-size: 11px;
+  color: #8a8f98;
+}
+
+.settingsNote {
+  padding: 12px 14px;
+  font-size: 11.5px;
+  color: #4a4e56;
+}
+
+/* ── Bottom nav (rendered into PhoneFrame's bottomNavSlot) ── */
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 0;
+}
+
+.navItemWrap {
+  display: block;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 16px;
+  color: #9a9ea6;
+  padding: 4px 10px;
+}
+
+.navItemActive {
+  color: #2e5fa3;
+}
+
+.navLabel {
+  font-size: 10px;
+  font-weight: 600;
+}

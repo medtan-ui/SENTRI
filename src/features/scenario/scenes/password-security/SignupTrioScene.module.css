@@ -1,0 +1,137 @@
+/**
+ * Deliberately ordinary — plain corporate signup cards, not SENTRI's
+ * gold theme. This is the cloned interface itself.
+ */
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+.instructions {
+  text-align: center;
+  font-size: 13.5px;
+  color: #5a5f68;
+  margin-bottom: var(--space-2);
+}
+
+.funNote {
+  text-align: center;
+  font-size: 12.5px;
+  color: #8a6d1f;
+  background: #fdf6e3;
+  border: 1px solid #f0e2b6;
+  border-radius: 8px;
+  padding: 6px 14px;
+  max-width: 480px;
+  margin: 0 auto var(--space-5);
+}
+
+.cardRow {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.card {
+  flex: 1;
+  min-width: 0;
+  max-width: 240px;
+  background: #ffffff;
+  border: 1px solid #d9dbe0;
+  border-radius: 10px;
+  padding: var(--space-4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid #eceef1;
+}
+
+.cardIcon {
+  font-size: 18px;
+}
+
+.cardName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a7f88;
+  margin-bottom: 4px;
+  margin-top: var(--space-3);
+}
+
+.usernameDisplay {
+  font-size: 13px;
+  color: #3c3f44;
+  background: #f3f4f6;
+  border: 1px solid #e2e4e8;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.passwordInput {
+  width: 100%;
+  font-size: 13.5px;
+  color: #26282c;
+  background: #ffffff;
+  border: 1px solid #c9ccd1;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: inherit;
+}
+
+.passwordInput:focus {
+  outline: none;
+}
+
+.emptyWarning {
+  display: block;
+  font-size: 11px;
+  color: #c0392b;
+  margin-top: 4px;
+}
+
+.saveBtnWrap {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-4);
+}
+
+.saveBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #2e5fa3;
+  padding: 9px 0;
+  border-radius: 6px;
+}
+
+@media (max-width: 760px) {
+  .cardRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .card {
+    max-width: none;
+  }
+}

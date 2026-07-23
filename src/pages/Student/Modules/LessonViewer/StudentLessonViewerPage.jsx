@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
+import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
+import PretestGate from '../../../../components/PretestGate/PretestGate'
+import YouTubePlayer from '../../../../components/VideoPlayer/YouTubePlayer'
+import Tooltip from '../../../../components/Tooltip/Tooltip'
 import { loadModuleConfig } from '../../../../services/moduleLoader'
-import { useModuleProgress } from '../../../../context/ModuleProgressContext'
+import { useModuleProgress } from '../../../../hooks/useModuleProgress'
+import { useModulePretest } from '../../../../hooks/useModulePretest'
 import styles from './StudentLessonViewerPage.module.css'
 
 const WORDS_PER_MINUTE = 200
@@ -23,12 +28,40 @@ function countWords(text) {
 export default function StudentLessonViewerPage() {
   const { moduleId } = useParams()
   const navigate = useNavigate()
-  const { markLessonComplete } = useModuleProgress()
+  const { actions, status: progressStatus } = useModuleProgress(moduleId)
+  const {
+    status: pretestStatus,
+    errorMessage: pretestErrorMessage,
+    retry: retryPretest,
+    pretest,
+    pretestCompleted,
+    submitting: pretestSubmitting,
+    submit: submitPretest,
+  } = useModulePretest(moduleId)
 
   // undefined = loading, null = not found, object = loaded
   const [config, setConfig] = useState(undefined)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [furthestIndex, setFurthestIndex] = useState(0)
+
+  // Whether to show the lesson yet. Captured once, the first time the
+  // pretest status resolves: if it was ALREADY completed on an earlier
+  // visit, skip the gate entirely; otherwise the gate stays up until the
+  // student explicitly clicks through its own "Continue to Lesson" button
+  // (not the instant pretestCompleted flips true on submit — that would
+  // yank the result screen away before they can read it).
+  const [skipGate, setSkipGate] = useState(false)
+  const [gateCleared, setGateCleared] = useState(false)
+  const pretestCaptured = useRef(false)
+
+  useEffect(() => {
+    if (pretestStatus === 'success' && !pretestCaptured.current) {
+      pretestCaptured.current = true
+      if (pretestCompleted) setSkipGate(true)
+    }
+  }, [pretestStatus, pretestCompleted])
+
+  const showLesson = skipGate || gateCleared
 
   useEffect(() => {
     let cancelled = false
@@ -42,6 +75,26 @@ export default function StudentLessonViewerPage() {
       cancelled = true
     }
   }, [moduleId])
+
+  // Opening the lesson only ever marks lessonStarted — never completion.
+  // Gated on progressStatus === 'success' (not just config having
+  // loaded): useModuleProgress's own lazy-seed read is a separate async
+  // effect from the one loading lesson content, and firing this before
+  // that seed has landed would try to update a progress doc that
+  // doesn't exist yet.
+  useEffect(() => {
+    if (config && progressStatus === 'success' && showLesson) actions.startLesson()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config, progressStatus, showLesson])
+
+  // Reaching the final section is what marks lessonCompleted — not
+  // clicking "Start Interactive Simulation" (see handleStartSimulation).
+  useEffect(() => {
+    if (!config || progressStatus !== 'success' || !showLesson) return
+    const totalSections = config.lesson.sections.length
+    if (furthestIndex === totalSections - 1) actions.completeLesson()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config, progressStatus, furthestIndex, showLesson])
 
   if (config === undefined) {
     return (
@@ -95,13 +148,27 @@ export default function StudentLessonViewerPage() {
   }
 
   function handleStartSimulation() {
-    markLessonComplete(moduleId)
     navigate(`/student/modules/${moduleId}/scenario`)
   }
+
+  const lessonComplete = furthestIndex === totalSections - 1
 
   return (
     <DashboardLayout role="student">
       <div className={styles.page}>
+      <ModuleAccessGuard moduleId={moduleId} require="lesson">
+        {!showLesson ? (
+          <PretestGate
+            status={pretestStatus}
+            errorMessage={pretestErrorMessage}
+            retry={retryPretest}
+            pretest={pretest}
+            submitting={pretestSubmitting}
+            onSubmit={submitPretest}
+            onContinue={() => setGateCleared(true)}
+          />
+        ) : (
+        <>
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>{config.title}</h1>
@@ -123,6 +190,10 @@ export default function StudentLessonViewerPage() {
 
         <div className={styles.layout}>
           <div className={styles.mainColumn}>
+            <Card className={styles.block}>
+              <YouTubePlayer videoId={config.videoId} title={config.title} />
+            </Card>
+
             <Card className={styles.block}>
               <h2 className={styles.blockHeading}>Learning Objectives</h2>
               <ul className={styles.objectivesList}>
@@ -190,9 +261,16 @@ export default function StudentLessonViewerPage() {
               >
                 ← Previous Lesson
               </Button>
-              <Button variant="primary" size="lg" onClick={handleStartSimulation}>
-                Start Interactive Simulation →
-              </Button>
+              <Tooltip label={!lessonComplete ? 'Read through to the last section to unlock the simulation' : null}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={handleStartSimulation}
+                  disabled={!lessonComplete}
+                >
+                  Start Interactive Simulation →
+                </Button>
+              </Tooltip>
             </div>
           </div>
 
@@ -231,6 +309,9 @@ export default function StudentLessonViewerPage() {
             </Card>
           </aside>
         </div>
+        </>
+        )}
+      </ModuleAccessGuard>
       </div>
     </DashboardLayout>
   )

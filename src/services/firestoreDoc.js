@@ -48,8 +48,23 @@ export async function getOrSeedDoc(collectionName, docId, seed) {
     const snap = await getDoc(ref)
     if (snap.exists()) return snap.data()
     if (!seed) return null
-    await setDoc(ref, seed)
-    return seed
+    try {
+      await setDoc(ref, seed)
+      return seed
+    } catch (writeErr) {
+      // Two concurrent first-reads of the same never-seeded doc can both
+      // observe "doesn't exist" and both attempt to create it — whoever
+      // commits second is, from Firestore's point of view, now updating
+      // an existing doc, which non-admin callers (students reading
+      // modules/moduleQuizzes) aren't allowed to do. Re-read once before
+      // treating that as a real failure; the winner's data is just as
+      // valid as what this caller would have written.
+      if (writeErr?.code === 'permission-denied') {
+        const retrySnap = await getDoc(ref)
+        if (retrySnap.exists()) return retrySnap.data()
+      }
+      throw writeErr
+    }
   } catch (err) {
     console.error(`[firestoreDoc] getOrSeedDoc(${collectionName}/${docId}) failed:`, err)
     throw new Error(friendlyError(err))

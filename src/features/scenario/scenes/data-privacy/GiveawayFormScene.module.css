@@ -1,0 +1,95 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #eceef1;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  color: #26282c;
+}
+
+.headerTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.form {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.intro {
+  font-size: 12.5px;
+  color: #4a4e56;
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a7f88;
+  margin-bottom: 4px;
+  margin-top: var(--space-3);
+}
+
+.input {
+  width: 100%;
+  font-size: 13.5px;
+  color: #26282c;
+  background: #ffffff;
+  border: 1px solid #c9ccd1;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.warning {
+  display: block;
+  font-size: 11px;
+  color: #c0392b;
+  margin-top: var(--space-2);
+}
+
+.submitBtnWrap {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-5);
+}
+
+.submitBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  background: #2e5fa3;
+  padding: 11px 0;
+  border-radius: 6px;
+}

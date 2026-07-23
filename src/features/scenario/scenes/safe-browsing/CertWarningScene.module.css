@@ -1,0 +1,161 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Address bar (replaces BrowserChrome's default) ── */
+.addressBarWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.addressBarTarget {
+  display: block;
+  width: 100%;
+}
+
+.addressBarInner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fdecea;
+  border: 1px solid #f0b4ac;
+  border-radius: 14px;
+  padding: 5px 12px;
+}
+
+.notSecure {
+  font-size: 11px;
+}
+
+.addressText {
+  font-size: 12.5px;
+  color: #9a1c0f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.addressInspector {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Interstitial page ── */
+.interstitial {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+}
+
+.warningIcon {
+  font-size: 40px;
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #26282c;
+  margin-bottom: var(--space-3);
+}
+
+.body {
+  font-size: 13px;
+  color: #4a4e56;
+  line-height: 1.6;
+  max-width: 380px;
+  margin-bottom: var(--space-5);
+}
+
+.errorCode {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 11.5px;
+  color: #8a8f98;
+}
+
+.backBtnWrap {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  margin-bottom: var(--space-4);
+}
+
+.backBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  background: #2e5fa3;
+  padding: 10px 0;
+  border-radius: 6px;
+}
+
+.plainToggle {
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  color: #5a5f68;
+  padding: 4px;
+}
+
+.advancedPanel {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 340px;
+}
+
+.advancedLink {
+  display: inline-block;
+  font-size: 12.5px;
+  color: #2e5fa3;
+  text-decoration: underline;
+}
+
+.certDetails {
+  background: #f7f8f9;
+  border: 1px solid #e2e4e8;
+  border-radius: 6px;
+  padding: var(--space-3);
+  text-align: left;
+}
+
+.certTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #c0392b;
+  margin-bottom: 4px;
+}
+
+.certText {
+  font-size: 11.5px;
+  color: #4a4e56;
+  font-family: 'Courier New', monospace;
+  line-height: 1.5;
+}
+
+.feedbackInspector {
+  margin-top: var(--space-5);
+  width: 100%;
+  max-width: 380px;
+}

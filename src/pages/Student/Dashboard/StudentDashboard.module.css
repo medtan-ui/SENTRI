@@ -136,6 +136,19 @@
   margin-top: 4px;
 }
 
+/* ── Module grid ── (card/grid styles live in components/ModuleGrid) */
+.moduleSection {
+  margin-bottom: var(--space-8);
+}
+
+.sectionHeading {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
 /* ── Columns ── */
 .columns {
   display: grid;
@@ -170,10 +183,33 @@
 }
 
 .taskItem {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.taskButton {
+  width: 100%;
+  text-align: left;
   padding: var(--space-4);
   background: var(--color-bg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.taskButton:hover:not(:disabled) {
+  border-color: var(--color-gold);
+}
+
+.taskButton:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.emptyText {
+  font-size: 13px;
+  color: var(--color-text-muted);
 }
 
 .taskMeta {
@@ -203,45 +239,7 @@
   margin-top: 3px;
 }
 
-/* ── Progress bars ── */
-.progressRow {
-  margin-bottom: var(--space-4);
-}
-.progressRow:last-child {
-  margin-bottom: 0;
-}
-
-.progressHeader {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-.progressName {
-  font-size: 13px;
-  color: var(--color-text);
-}
-
-.progressPct {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.progressTrack {
-  height: 6px;
-  background: var(--color-border);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width 0.4s ease;
-}
-
-/* ── Responsive ── */
+/* ── Responsive ── (progress-bar styles live in components/ModuleProgressList) */
 @media (max-width: 900px) {
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);

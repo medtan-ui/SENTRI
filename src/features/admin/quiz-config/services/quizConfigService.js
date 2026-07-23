@@ -43,9 +43,8 @@ function buildDefaultSettings(passingScore, title) {
     settings: {
       passingScore,
       timeLimitMinutes: 15,
-      maxAttempts: 3,
       instructions:
-        'Answer every question to the best of your ability. You need a passing score to complete this module.',
+        "Answer every question to the best of your ability. You'll only get one attempt, so take your time.",
       available: true,
     },
   }

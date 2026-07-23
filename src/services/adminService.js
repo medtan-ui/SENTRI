@@ -15,23 +15,10 @@
 import { httpsCallable } from 'firebase/functions'
 import { functions } from './firebase'
 import { validatePassword } from '../utils/passwordPolicy'
+import { friendlyCallableError } from './callableErrors'
 
 function _friendlyCallableError(err) {
-  switch (err?.code) {
-    case 'functions/permission-denied':
-      return 'You do not have permission to perform this action.'
-    case 'functions/unauthenticated':
-      return 'Your session has expired. Please sign in again.'
-    case 'functions/already-exists':
-      return 'An account with this email already exists.'
-    case 'functions/not-found':
-      return 'No account found for this user.'
-    case 'functions/invalid-argument':
-    case 'functions/failed-precondition':
-      return err.message || 'Please check the information you entered.'
-    default:
-      return 'Something went wrong. Please try again.'
-  }
+  return friendlyCallableError(err, { 'not-found': 'No account found for this user.' })
 }
 
 /**

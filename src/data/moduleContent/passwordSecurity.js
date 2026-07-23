@@ -1,11 +1,14 @@
-import { passwordModuleConfig } from '../../features/scenario/configs/passwordModuleConfig'
+import { passwordSecurityConfig } from '../../features/scenario/configs/passwordSecurity.config'
 
 /**
  * passwordSecurity.js
  * Mock module data for Password Security — the single seam a future
  * Firestore-backed `loadModuleConfig` will read the same shape from.
- * Bundles this module's lesson content with its (already-existing)
- * Scenario Engine config, so the loader can hand both back together.
+ * Bundles this module's lesson content with its Scenario Engine config
+ * (src/features/scenario/engine/, the diegetic-interaction rebuild — not
+ * the older DecisionOverlay-based engine still used by the admin Scenario
+ * Configuration feature's mock seed data), so the loader can hand both
+ * back together.
  */
 export const passwordSecurityModuleData = {
   moduleId: 'password-security',
@@ -14,6 +17,9 @@ export const passwordSecurityModuleData = {
     'Learn what makes a password strong, how attackers actually crack or steal passwords, and the everyday habits that keep your accounts safe.',
   difficulty: 'Beginner',
   previousModuleId: null,
+  // Paste a YouTube video id (or leave empty) once the lesson video for
+  // this module is ready — YouTubePlayer shows a placeholder until then.
+  videoId: '',
 
   lesson: {
     objectives: [
@@ -73,7 +79,7 @@ export const passwordSecurityModuleData = {
 
   // Reuses the Scenario Engine's own config verbatim — the engine is not
   // duplicated or reimplemented here, only referenced.
-  scenario: passwordModuleConfig,
+  scenario: passwordSecurityConfig,
 
   // Quiz doesn't exist yet. The shape is reserved so the loader's return
   // value doesn't need to change when a real quiz config is added later.

@@ -22,18 +22,6 @@ export const DIFFICULTY_FROM_CURRICULUM = {
   Advanced: 'Hard',
 }
 
-export const MOCK_SECTIONS = ['BSIT 1-A', 'BSIT 1-B', 'BSIT 2-A', 'BSCS 1-A', 'BSCS 1-B', 'BSCS 2-A']
-
-export const MOCK_STUDENTS = [
-  { id: 'stu-01', name: 'Maria Santos', section: 'BSIT 1-A' },
-  { id: 'stu-02', name: 'Juan dela Cruz', section: 'BSIT 1-A' },
-  { id: 'stu-03', name: 'Ana Reyes', section: 'BSIT 1-B' },
-  { id: 'stu-04', name: 'Carlo Mendoza', section: 'BSCS 1-A' },
-  { id: 'stu-05', name: 'Sofia Torres', section: 'BSCS 1-B' },
-  { id: 'stu-06', name: 'Miguel Bautista', section: 'BSIT 2-A' },
-  { id: 'stu-07', name: 'Isabel Ramos', section: 'BSCS 2-A' },
-  { id: 'stu-08', name: 'Diego Fernandez', section: 'BSIT 1-B' },
-]
 
 export const MODULE_CONFIG = {
   'password-security': {

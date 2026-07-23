@@ -13,6 +13,17 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // SENTRI's curriculum is fixed at exactly these six modules (see
+    // src/pages/Admin/Modules/mockModules.js) — used below to scope the
+    // student lazy-seed exception to real modules only, never an
+    // arbitrary document id.
+    function isRealModuleId(moduleId) {
+      return moduleId in [
+        'password-security', 'phishing-awareness', 'malware-awareness',
+        'safe-browsing', 'data-privacy', 'online-safety'
+      ];
+    }
+
     match /users/{userId} {
       // A signed-in user may read only their own profile — this is how
       // authService.js resolves role on login/session restore.
@@ -33,16 +44,37 @@ service cloud.firestore {
     }
 
     // ── Training Curriculum configuration data ──────────────────────
-    // Admin-only for now, both read and write: today only the admin
-    // Module Configuration pages touch these collections (the student
-    // side still reads local mock data — see src/services/moduleLoader.js
-    // — pending a future Cloud Function that can safely strip answer
-    // keys/correct choices before any student-facing read). Revisit this
-    // when student-facing Firestore reads are introduced; quiz documents
-    // in particular must not be readable client-side by students as-is,
-    // since correctChoiceId sits in the same document as the questions.
+    // Still admin-only for write everywhere — content authoring stays on
+    // the admin Module Configuration pages. `modules` and `moduleQuizzes`
+    // are now also readable by any signed-in student: the student
+    // dashboard/progress system reads `modules` for moduleOrder/status,
+    // and the student Quiz page reads `moduleQuizzes` to render
+    // questions. The lesson/scenario content pages still read local mock
+    // data (see src/services/moduleLoader.js), so those two collections
+    // stay admin-only until that changes.
+    //
+    // Known accepted tradeoff: moduleQuizzes documents store
+    // correctChoiceId alongside the questions, so a student who inspects
+    // network traffic can see the answer key, and quiz grading happens
+    // client-side (the student's own moduleProgress write is what
+    // records the result — see below). Closing both gaps properly means
+    // a Cloud Function that strips answers server-side and grades
+    // attempts itself; deliberately out of scope for now, tracked as a
+    // follow-up hardening step rather than silently ignored.
+    //
+    // Both `modules` and `moduleQuizzes` lazily seed their own document
+    // from static mock content the first time anyone reads a module that
+    // no admin has opened in the Configuration pages yet (see
+    // getOrSeedDoc in firestoreDoc.js) — including a student, if they
+    // happen to be first. That seed write has to be allowed for
+    // students too, or their very first dashboard/quiz load throws
+    // permission-denied forever until an admin visits that module first.
+    // Scoped narrowly: only a *create* of a *real* module id, content
+    // unchanged after that except by an admin.
     match /modules/{moduleId} {
-      allow read, write: if isAdmin();
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && isRealModuleId(moduleId);
+      allow update, delete: if isAdmin();
     }
 
     match /moduleLessons/{moduleId} {
@@ -54,11 +86,102 @@ service cloud.firestore {
     }
 
     match /moduleQuizzes/{moduleId} {
-      allow read, write: if isAdmin();
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && isRealModuleId(moduleId);
+      allow update, delete: if isAdmin();
+    }
+
+    // Per-module pre-test — ungraded baseline check a student takes once,
+    // the first time they open a module. Same lazy-seed shape as
+    // moduleQuizzes: any signed-in user reads, only a real module id may be
+    // (lazily) created, and only an admin could ever edit the questions.
+    match /modulePretests/{moduleId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && isRealModuleId(moduleId);
+      allow update, delete: if isAdmin();
     }
 
     match /moduleAssignments/{moduleId} {
       allow read, write: if isAdmin();
+    }
+
+    // ── Student module progress ──────────────────────────────────────
+    // Doc id is `${userId}_${moduleId}`; the userId field is the actual
+    // ownership check (the id format is a convention, not something
+    // these rules parse). A student may only read/write their own
+    // progress row, for any module — never another student's, and never
+    // more than one row per write. Nothing is ever deleted; a module a
+    // student has progressed through keeps its record even if an admin
+    // later disables that module.
+    match /moduleProgress/{progressId} {
+      // `resource == null` covers the lazy-seed read of a module this
+      // student has never touched yet — the doc doesn't exist, so there's
+      // nothing to leak, but `resource.data.userId` would otherwise throw
+      // a null-evaluation error instead of a clean "not found."
+      allow read: if request.auth != null
+        && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // resource != null first: an update racing ahead of this doc's own
+      // lazy-seed (two effects in the same page, timed independently)
+      // must fail as a clean permission-denied, not a null-evaluation
+      // error. The client-side fix is to not attempt the update until
+      // its own read of this doc has resolved (see useModuleProgress
+      // callers); this guard is defense-in-depth for that.
+      allow update: if request.auth != null && resource != null
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // ── Scenario Engine decision telemetry ──────────────────────────
+    // One document per decision (including retries), written by a
+    // signed-in student for themselves only. No client ever computes
+    // analytics from this collection — a Cloud Function is expected to
+    // trigger off these writes (see the TODO in scenarioDecisionService.js).
+    // Update is allowed only to flip feedback_viewed once the student
+    // actually dismisses the feedback panel; nothing else about a
+    // decision record may change after it's written, and nothing is
+    // ever deleted.
+    match /scenario_decision_records/{recordId} {
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+      allow read: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['feedback_viewed']);
+      allow delete: if false;
+    }
+
+    // ── Cloud Functions backend collections ──────────────────────────
+    // Everything below is written exclusively by the Cloud Functions in
+    // functions/src (Admin SDK, bypasses these rules) — submitQuiz,
+    // recordAnalyticsEvent, aggregateModuleAnalytics,
+    // aggregateStudentAnalytics, and the updateLearningAnalytics trigger.
+    // No client (student or admin) ever writes these directly; reads are
+    // opened only where an admin dashboard would plausibly want them.
+    match /quizAttempts/{attemptId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /analyticsEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /moduleAnalytics/{moduleId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /studentAnalytics/{userId} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+      allow write: if false;
+    }
+
+    match /learningAnalytics/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
     }
 
     // Default deny for anything not explicitly matched above.

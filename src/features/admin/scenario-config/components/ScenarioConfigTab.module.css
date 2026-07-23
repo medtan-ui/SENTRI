@@ -12,6 +12,12 @@
   flex-wrap: wrap;
 }
 
+.topActionsLeft {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
 .topActionsRight {
   display: flex;
   gap: var(--space-3);

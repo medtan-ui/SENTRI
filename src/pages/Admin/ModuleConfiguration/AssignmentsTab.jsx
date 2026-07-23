@@ -1,30 +1,28 @@
 import React from 'react'
-import { MOCK_SECTIONS, MOCK_STUDENTS } from './mockConfigData'
+import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
+import ErrorState from '../../../components/ErrorState/ErrorState'
+import { useStudentRoster } from '../../../hooks/useStudentRoster'
 import styles from './ModuleConfigurationPage.module.css'
 
 const TYPES = [
-  { value: 'individual', label: 'Individual Students' },
-  { value: 'sections', label: 'Entire Sections' },
   { value: 'all', label: 'All Students' },
+  { value: 'students', label: 'Individual Students' },
 ]
 
 /**
  * AssignmentsTab
- * Mock-only assignment picker — local state, nothing persisted. Initial
- * selection mirrors what's already shown on the module's curriculum card.
+ * Kept simple by design: a module is assigned either to every student, or
+ * to a hand-picked list of specific students — no sections/groups. The
+ * student list is the real registered roster (useStudentRoster), not mock
+ * data.
  */
-export default function AssignmentsTab({ assignmentType, selectedSections, selectedStudentIds, onChange }) {
-  function toggleSection(section) {
-    const next = selectedSections.includes(section)
-      ? selectedSections.filter((s) => s !== section)
-      : [...selectedSections, section]
-    onChange({ selectedSections: next })
-  }
+export default function AssignmentsTab({ assignmentType, selectedStudentIds, onChange }) {
+  const { status, errorMessage, retry, students } = useStudentRoster()
 
-  function toggleStudent(id) {
-    const next = selectedStudentIds.includes(id)
-      ? selectedStudentIds.filter((s) => s !== id)
-      : [...selectedStudentIds, id]
+  function toggleStudent(uid) {
+    const next = selectedStudentIds.includes(uid)
+      ? selectedStudentIds.filter((s) => s !== uid)
+      : [...selectedStudentIds, uid]
     onChange({ selectedStudentIds: next })
   }
 
@@ -48,41 +46,37 @@ export default function AssignmentsTab({ assignmentType, selectedSections, selec
         ))}
       </div>
 
-      {assignmentType === 'sections' && (
-        <div className={styles.checkboxGrid}>
-          {MOCK_SECTIONS.map((section) => (
-            <label key={section} className={styles.checkboxOption}>
-              <input
-                type="checkbox"
-                className={styles.checkboxInput}
-                checked={selectedSections.includes(section)}
-                onChange={() => toggleSection(section)}
-              />
-              {section}
-            </label>
-          ))}
-        </div>
-      )}
-
-      {assignmentType === 'individual' && (
-        <div className={styles.checkboxGrid}>
-          {MOCK_STUDENTS.map((student) => (
-            <label key={student.id} className={styles.checkboxOption}>
-              <input
-                type="checkbox"
-                className={styles.checkboxInput}
-                checked={selectedStudentIds.includes(student.id)}
-                onChange={() => toggleStudent(student.id)}
-              />
-              {student.name} <span className={styles.studentMeta}>({student.section})</span>
-            </label>
-          ))}
-        </div>
+      {assignmentType === 'students' && (
+        <>
+          {status === 'loading' && <LoadingSkeleton blocks={1} rows={4} />}
+          {status === 'error' && <ErrorState message={errorMessage} onRetry={retry} />}
+          {status === 'success' && students.length === 0 && (
+            <p className={styles.allStudentsNote}>
+              <span aria-hidden="true">ℹ</span> No student accounts exist yet — create some on the Accounts page
+              first.
+            </p>
+          )}
+          {status === 'success' && students.length > 0 && (
+            <div className={styles.checkboxGrid}>
+              {students.map((student) => (
+                <label key={student.uid} className={styles.checkboxOption}>
+                  <input
+                    type="checkbox"
+                    className={styles.checkboxInput}
+                    checked={selectedStudentIds.includes(student.uid)}
+                    onChange={() => toggleStudent(student.uid)}
+                  />
+                  {student.displayName} <span className={styles.studentMeta}>({student.email})</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {assignmentType === 'all' && (
         <p className={styles.allStudentsNote}>
-          <span aria-hidden="true">ℹ</span> This module will be assigned to every enrolled student, regardless of section.
+          <span aria-hidden="true">ℹ</span> This module will be assigned to every enrolled student.
         </p>
       )}
     </div>

@@ -9,7 +9,16 @@
  * getDefaultQuizConfig in src/features/admin/quiz-config/services/
  * quizConfigService.js — so the already-authored quiz questions become
  * each document's initial Firestore value instead of being thrown away.
+ *
+ * Submitting an attempt (submitQuiz below) does NOT write to Firestore
+ * from here — it calls the submitQuiz Cloud Function, which grades
+ * authoritatively server-side (against its own read of this same
+ * document) and records progress/attempts itself. This file never
+ * computes a score or writes a result.
  */
+import { httpsCallable } from 'firebase/functions'
+import { functions } from './firebase'
+import { friendlyCallableError } from './callableErrors'
 import { getDefaultQuizConfig } from '../features/admin/quiz-config/services/quizConfigService'
 import { getOrSeedDoc, overwriteDoc, mergeDoc } from './firestoreDoc'
 
@@ -46,4 +55,26 @@ export async function saveQuiz(moduleId, data) {
  */
 export function getDefaultQuiz(moduleId) {
   return getDefaultQuizConfig(moduleId)
+}
+
+/**
+ * Submits one quiz attempt for grading. The server re-reads this same
+ * quiz document itself to grade — `answers` is the only input trusted
+ * from the client, never a score. Also records the attempt and (on a
+ * pass) completes the module and unlocks the next one, all atomically.
+ * @param {string} moduleId
+ * @param {Record<string,string>} answers  questionId -> choiceId
+ * @returns {Promise<{score:number, correctCount:number, total:number, passed:boolean,
+ *   passingScore:number, attemptsUsed:number, attemptsRemaining:number|null,
+ *   moduleCompleted:boolean, perQuestionResults:Array<{questionId:string, correct:boolean,
+ *   selectedChoiceId:string|null, correctChoiceId:string, explanation:string}>}>}
+ */
+export async function submitQuiz(moduleId, answers) {
+  try {
+    const call = httpsCallable(functions, 'submitQuiz')
+    const { data } = await call({ moduleId, answers })
+    return data
+  } catch (err) {
+    throw new Error(friendlyCallableError(err))
+  }
 }

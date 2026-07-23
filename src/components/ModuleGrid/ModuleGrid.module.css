@@ -1,0 +1,135 @@
+.moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+.moduleCard {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.moduleCard[data-locked='true'] {
+  opacity: 0.6;
+}
+
+.moduleCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.moduleIconTile {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.moduleStatusBadge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+.moduleStatusBadge[data-status='available'] {
+  background: #e3e8f0;
+  color: #1f3a5f;
+}
+
+.moduleStatusBadge[data-status='in_progress'] {
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.moduleStatusBadge[data-status='quiz_available'] {
+  background: #fdecea;
+  color: #9a1c0f;
+}
+
+.moduleStatusBadge[data-status='completed'] {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.moduleCardTitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.moduleCardDescription {
+  margin-top: var(--space-1);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  flex: 1;
+  margin-bottom: var(--space-4);
+}
+
+.progressTrack {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+.moduleCardPct {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.moduleCta {
+  margin-top: var(--space-4);
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-gold);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: var(--space-3);
+  box-shadow: var(--shadow-button);
+  transition: background var(--transition-fast);
+}
+
+.moduleCta:hover:not(:disabled) {
+  background: var(--color-gold-dark);
+}
+
+.moduleCta:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .moduleGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .moduleGrid { grid-template-columns: 1fr; }
+}

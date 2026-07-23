@@ -1,0 +1,154 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+.notifHeader {
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #26282c;
+  border-bottom: 1px solid #eceef1;
+  background: #ffffff;
+}
+
+.requestCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #7a7f88;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.requestBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.requestName {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.requestMeta {
+  font-size: 11.5px;
+  color: #8a8f98;
+  margin-bottom: 4px;
+}
+
+.confirmBtnWrap {
+  display: block;
+  margin-top: 6px;
+}
+
+.confirmBtn {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  background: #2e5fa3;
+  padding: 8px 18px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* ── Profile view ── */
+.profileView {
+  padding: 12px 14px;
+}
+
+.backBtn {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #2e5fa3;
+  padding: 6px 0;
+  margin-bottom: var(--space-3);
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-5);
+}
+
+.profileAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #7a7f88;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profileName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.profileStats {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: 12.5px;
+  color: #4a4e56;
+  margin-bottom: var(--space-5);
+}
+
+.profileStats li {
+  background: #f7f8f9;
+  border: 1px solid #e2e4e8;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.deleteBtnWrap {
+  display: block;
+  width: 100%;
+}
+
+.deleteBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9a1c0f;
+  background: #fdecea;
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  padding: 10px 0;
+  border-radius: 6px;
+}

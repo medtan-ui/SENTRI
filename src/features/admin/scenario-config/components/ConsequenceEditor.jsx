@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import badges from '../styles/badges.module.css'
+import React from 'react'
+import YouTubePlayer from '../../../../components/VideoPlayer/YouTubePlayer'
+import forms from '../styles/formControls.module.css'
 import styles from './ConsequenceEditor.module.css'
 
 /**
@@ -7,20 +8,14 @@ import styles from './ConsequenceEditor.module.css'
  * Only rendered for a risky choice. Lets an admin toggle whether this
  * choice's consequence is a video (choice.consequenceVideo present) or a
  * still-image placeholder (no consequenceVideo at all) — the exact two
- * modes ConsequencePlayer already supports. There is no separate "title"
- * or "explanation" field here: those ARE choice.feedbackTitle/feedbackText,
- * edited once in ChoiceEditor and reused by both the FeedbackPanel and
- * the ConsequencePlayer's explanation card — duplicating them here would
- * create a second field the engine never reads.
+ * modes ConsequencePlayer already supports — and, when a video, paste its
+ * real YouTube URL. There is no separate "title" or "explanation" field
+ * here: those ARE choice.feedbackTitle/feedbackText, edited once in
+ * ChoiceEditor and reused by both the FeedbackPanel and the
+ * ConsequencePlayer's explanation card.
  */
-export default function ConsequenceEditor({ choice, onSetEnabled }) {
-  const [notice, setNotice] = useState('')
+export default function ConsequenceEditor({ choice, onSetEnabled, onChangeVideoUrl }) {
   const hasVideo = Boolean(choice.consequenceVideo)
-
-  function handleReplaceMedia() {
-    setNotice('Mock action — connect Firestore Storage to enable real uploads.')
-    setTimeout(() => setNotice(''), 2500)
-  }
 
   return (
     <div className={styles.wrap}>
@@ -46,19 +41,24 @@ export default function ConsequenceEditor({ choice, onSetEnabled }) {
 
       {hasVideo ? (
         <div className={styles.videoInfo}>
-          <span className={`${badges.pill} ${badges.placeholderStatus}`}>Placeholder</span>
-          <span className={styles.duration}>{choice.consequenceVideo.duration}s</span>
-          <button type="button" className={styles.replaceBtn} onClick={handleReplaceMedia}>
-            Replace placeholder media
-          </button>
+          <YouTubePlayer url={choice.consequenceVideo.videoUrl} title="Consequence video" />
+          <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-3)' }}>
+            <label className={forms.fieldLabel} htmlFor={`${choice.id}-consequence-url`}>YouTube Video URL</label>
+            <input
+              id={`${choice.id}-consequence-url`}
+              type="text"
+              className={styles.urlInput}
+              value={choice.consequenceVideo.videoUrl || ''}
+              onChange={(e) => onChangeVideoUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=…"
+            />
+          </div>
         </div>
       ) : (
         <p className={styles.note}>
           This choice shows the engine's generic warning placeholder — no consequence video configured.
         </p>
       )}
-
-      {notice && <p className={styles.notice}>{notice}</p>}
     </div>
   )
 }

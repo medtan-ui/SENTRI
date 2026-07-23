@@ -1,0 +1,259 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+.mailApp {
+  display: flex;
+  min-height: 380px;
+}
+
+.sidebar {
+  width: 130px;
+  flex-shrink: 0;
+  background: #f4f5f6;
+  border-right: 1px solid #e2e4e8;
+  padding: var(--space-3);
+}
+
+.composeBtn {
+  background: #2e5fa3;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.folderList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.folder,
+.folderActive {
+  font-size: 12.5px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  color: #4a4e56;
+}
+
+.folderActive {
+  background: #e3e8f0;
+  color: #1f3a5f;
+  font-weight: 700;
+}
+
+.mailMain {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid #eceef1;
+}
+
+.toolbarIcon {
+  font-size: 15px;
+  color: #7a7f88;
+}
+
+.toolbarBtn {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #3c3f44;
+  padding: 5px 10px;
+  border: 1px solid #d4d7dc;
+  border-radius: 6px;
+}
+
+.reportBtn {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #9a1c0f;
+  background: #fdecea;
+  padding: 5px 10px;
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  border-radius: 6px;
+}
+
+.senderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: var(--space-3);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #c9ccd1;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.senderMeta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.senderName {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #2e5fa3;
+  text-decoration: underline dotted;
+}
+
+.senderFullAddress {
+  font-size: 11.5px;
+  color: #8a8f98;
+}
+
+.subject {
+  font-size: 15px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.emailBody {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #3c3f44;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--space-4);
+}
+
+.emailBody p {
+  position: relative;
+}
+
+.submitRow {
+  position: relative;
+  display: inline-block;
+  margin-bottom: var(--space-4);
+}
+
+.submitHoverWrap {
+  display: inline-block;
+}
+
+.submitBtn {
+  display: inline-block;
+  background: #2e5fa3;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 6px;
+}
+
+.otherEmails {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #eceef1;
+  margin-top: var(--space-3);
+}
+
+.otherEmailRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 0;
+  border-bottom: 1px solid #f2f3f4;
+  font-size: 12px;
+  color: #7a7f88;
+}
+
+.otherEmailFrom {
+  font-weight: 700;
+  color: #4a4e56;
+  width: 110px;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.otherEmailSubject {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.otherEmailTime {
+  flex-shrink: 0;
+}
+
+/* ── Hover status bar — real browsers show link previews bottom-left ── */
+.statusBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 15;
+  background: #fdfdfd;
+  border: 1px solid #d4d7dc;
+  border-bottom: none;
+  border-left: none;
+  border-top-right-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: #3c3f44;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Feedback callouts (pedagogical layer, SENTRI accent) ── */
+.callout {
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #9a1c0f;
+  background: #fdecea;
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.callout[data-pos='sender'],
+.callout[data-pos='greeting'] {
+  display: block;
+  margin-left: 0;
+}
+
+.callout[data-pos='link'] {
+  display: block;
+  margin-left: 0;
+  margin-top: var(--space-2);
+}

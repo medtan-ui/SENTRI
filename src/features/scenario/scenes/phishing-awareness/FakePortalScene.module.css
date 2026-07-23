@@ -1,0 +1,200 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Address bar (replaces BrowserChrome's default) ── */
+.addressBarWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.addressBarTarget {
+  display: block;
+  width: 100%;
+}
+
+.addressBarInner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #d4d7dc;
+  border-radius: 14px;
+  padding: 5px 12px;
+}
+
+.lock {
+  font-size: 11px;
+}
+
+.addressText {
+  font-size: 12.5px;
+  color: #3c3f44;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.domainSegment {
+  border-radius: 3px;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.domainHighlighted {
+  background: #fdecea;
+  color: #9a1c0f;
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+.addressCallout {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background: #fff;
+  border: 1px solid #d4d7dc;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #3c3f44;
+}
+
+.backToSafetyBtn {
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #1e7e34;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* ── Fake portal page ── */
+.portalPage {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) var(--space-4);
+  background: linear-gradient(180deg, #eef2f8 0%, #f9f9fa 220px);
+}
+
+.portalHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-6);
+}
+
+.portalLogo {
+  font-size: 22px;
+}
+
+.portalName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f3a5f;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 300px;
+  background: #ffffff;
+  border: 1px solid #d9dbe0;
+  border-radius: 10px;
+  padding: var(--space-5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.loginTitle {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #26282c;
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a7f88;
+  margin-bottom: 4px;
+  margin-top: var(--space-3);
+}
+
+.emailInput,
+.passwordInput {
+  width: 100%;
+  font-size: 13.5px;
+  color: #26282c;
+  background: #ffffff;
+  border: 1px solid #c9ccd1;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: inherit;
+}
+
+.emailInput {
+  background: #f3f4f6;
+  color: #5a5f68;
+}
+
+.passwordInput:focus {
+  outline: none;
+}
+
+.emptyWarning {
+  display: block;
+  font-size: 11px;
+  color: #c0392b;
+  margin-top: 4px;
+}
+
+.signInBtnWrap {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-4);
+}
+
+.signInBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #2e5fa3;
+  padding: 9px 0;
+  border-radius: 6px;
+}
+
+.forgotWrap {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  text-align: center;
+}
+
+.forgotLink {
+  display: inline-block;
+  font-size: 12px;
+  color: #2e5fa3;
+  text-decoration: underline;
+}

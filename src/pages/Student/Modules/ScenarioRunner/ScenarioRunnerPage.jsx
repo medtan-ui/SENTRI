@@ -3,9 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
-import { ScenarioEngine, LoadingScreen } from '../../../../features/scenario'
+import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
+import LoadingScreen from '../../../../features/scenario/components/LoadingScreen'
+import ScenarioEngine from '../../../../features/scenario/engine/ScenarioEngine'
 import { loadModuleConfig } from '../../../../services/moduleLoader'
-import { useModuleProgress } from '../../../../context/ModuleProgressContext'
+import { useModuleProgress } from '../../../../hooks/useModuleProgress'
 import styles from './ScenarioRunnerPage.module.css'
 
 const ENTER_MESSAGES = ['Loading Scenario…', 'Loading module assets…', 'Preparing simulation…']
@@ -14,16 +16,20 @@ const STAGE_MS = 550
 
 /**
  * ScenarioRunnerPage — /student/modules/:moduleId/scenario
- * The bridge between the Lesson Viewer and the reusable Scenario Engine.
- * Loads a module's scenario config via loadModuleConfig, hands it to
- * <ScenarioEngine> untouched, and reacts to onSimulationComplete by
- * recording mock progress and moving on to the completion page. The
- * engine itself is not modified — this page only wires it up.
+ * The bridge between the Lesson Viewer and the reusable Scenario Engine
+ * (src/features/scenario/engine/) — diegetic, target-based interaction,
+ * not a "what should you do?" menu. Loads a module's scenario config via
+ * loadModuleConfig, hands it to <ScenarioEngine> untouched, and reacts
+ * to its onContinueToQuiz callback (only enabled once every scenario has
+ * resolved safely) by recording mock progress and moving on to the
+ * completion page. onBackToLesson returns to this module's Lesson
+ * Viewer at any time. This page only wires the engine up — it contains
+ * no scenario logic itself.
  */
 export default function ScenarioRunnerPage() {
   const { moduleId } = useParams()
   const navigate = useNavigate()
-  const { markSimulationComplete } = useModuleProgress()
+  const { actions } = useModuleProgress(moduleId)
 
   // undefined = still loading, null = not found, object = loaded
   const [config, setConfig] = useState(undefined)
@@ -75,10 +81,14 @@ export default function ScenarioRunnerPage() {
     return () => clearTimeout(timer)
   }, [phase, messageIndex, moduleId, navigate])
 
-  function handleSimulationComplete() {
-    markSimulationComplete(moduleId)
+  function handleContinueToQuiz() {
+    actions.completeSimulation()
     setMessageIndex(0)
     setPhase('exiting')
+  }
+
+  function handleBackToLesson() {
+    navigate(`/student/modules/${moduleId}`)
   }
 
   if (phase === 'not-found') {
@@ -113,7 +123,13 @@ export default function ScenarioRunnerPage() {
   return (
     <DashboardLayout role="student">
       <div className={styles.page}>
-        <ScenarioEngine config={config.scenario} onSimulationComplete={handleSimulationComplete} />
+        <ModuleAccessGuard moduleId={moduleId} require="simulation">
+          <ScenarioEngine
+            config={config.scenario}
+            onBackToLesson={handleBackToLesson}
+            onContinueToQuiz={handleContinueToQuiz}
+          />
+        </ModuleAccessGuard>
       </div>
     </DashboardLayout>
   )

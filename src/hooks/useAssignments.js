@@ -4,10 +4,7 @@ import { useDraftResource } from './useDraftResource'
 
 function validateAssignments(draft) {
   const issues = []
-  if (draft.assignmentType === 'sections' && draft.assignedSections.length === 0) {
-    issues.push({ field: 'assignedSections', message: 'Select at least one section.' })
-  }
-  if (draft.assignmentType === 'individual' && draft.assignedStudentIds.length === 0) {
+  if (draft.assignmentType === 'students' && draft.assignedStudentIds.length === 0) {
     issues.push({ field: 'assignedStudentIds', message: 'Select at least one student.' })
   }
   return issues

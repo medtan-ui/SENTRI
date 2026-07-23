@@ -1,0 +1,246 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Address bar (replaces BrowserChrome's default) ── */
+.addressBarWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.addressBarTarget {
+  display: block;
+  width: 100%;
+}
+
+.addressBarInner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #d4d7dc;
+  border-radius: 14px;
+  padding: 5px 12px;
+}
+
+.lock {
+  font-size: 11px;
+}
+
+.addressText {
+  font-size: 12.5px;
+  color: #3c3f44;
+}
+
+.suggestionDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #d4d7dc;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.suggestionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: #26282c;
+}
+
+.suggestionUrl {
+  flex: 1;
+  color: #2e5fa3;
+}
+
+.suggestionTag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #1e7e34;
+  background: #e6f4ea;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+/* ── Mail app layout ── */
+.mailApp {
+  display: flex;
+  min-height: 340px;
+}
+
+.sidebar {
+  width: 130px;
+  flex-shrink: 0;
+  background: #f4f5f6;
+  border-right: 1px solid #e2e4e8;
+  padding: var(--space-3);
+}
+
+.composeBtn {
+  background: #2e5fa3;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.folderList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.folder,
+.folderActive {
+  font-size: 12.5px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  color: #4a4e56;
+}
+
+.folderActive {
+  background: #e3e8f0;
+  color: #1f3a5f;
+  font-weight: 700;
+}
+
+.mailMain {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4);
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid #eceef1;
+}
+
+.toolbarIcon {
+  font-size: 15px;
+  color: #7a7f88;
+}
+
+.toolbarBtn {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #3c3f44;
+  padding: 5px 10px;
+  border: 1px solid #d4d7dc;
+  border-radius: 6px;
+}
+
+.senderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: var(--space-3);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #c9ccd1;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.senderMeta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.senderName {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.senderEmail {
+  font-size: 11.5px;
+  color: #8a8f98;
+}
+
+.subject {
+  font-size: 15px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.emailBody {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #3c3f44;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--space-4);
+}
+
+.urgencyLine {
+  position: relative;
+}
+
+.verifyRow {
+  position: relative;
+  display: inline-block;
+}
+
+.verifyBtn {
+  display: inline-block;
+  background: #2e5fa3;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 6px;
+}
+
+/* ── Feedback callouts (pedagogical layer, SENTRI accent) ── */
+.callout {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #9a1c0f;
+  background: #fdecea;
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.callout[data-pos='link'] {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  white-space: nowrap;
+}

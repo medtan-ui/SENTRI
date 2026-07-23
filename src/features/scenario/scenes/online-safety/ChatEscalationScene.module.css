@@ -1,0 +1,119 @@
+.scene {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.decorative {
+  pointer-events: none;
+  user-select: none;
+}
+
+.thread {
+  display: flex;
+  flex-direction: column;
+}
+
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #eceef1;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  color: #26282c;
+}
+
+.threadTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #26282c;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+
+.bubbleRowReceived {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.bubbleRowSent {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bubbleReceived,
+.bubbleSent {
+  max-width: 78%;
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 9px 12px;
+  border-radius: 14px;
+}
+
+.bubbleReceived {
+  background: #eceef1;
+  color: #26282c;
+  border-bottom-left-radius: 4px;
+}
+
+.bubbleSent {
+  background: #2e5fa3;
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.quickReplies {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 14px 10px;
+}
+
+.quickReplyChip {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2e5fa3;
+  background: #ffffff;
+  border: 1px solid #2e5fa3;
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+
+.inputBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 14px;
+}
+
+.inputPlaceholder {
+  flex: 1;
+  font-size: 12px;
+  color: #9a9ea6;
+  background: #f4f5f6;
+  border: 1px solid #e2e4e8;
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+
+.sendIcon {
+  font-size: 15px;
+  color: #9a9ea6;
+}

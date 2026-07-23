@@ -1,35 +1,49 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
+import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
+import ErrorState from '../../../components/ErrorState/ErrorState'
+import ModuleGrid, { MODULE_STATUS_META, moduleDestination } from '../../../components/ModuleGrid/ModuleGrid'
+import ModuleProgressList from '../../../components/ModuleProgressList/ModuleProgressList'
 import { useAuth } from '../../../context/AuthContext'
-import { useModuleProgress, describeModuleStatus } from '../../../context/ModuleProgressContext'
+import { useStudentModules } from '../../../hooks/useStudentModules'
+import { MODULE_STATUS } from '../../../services/moduleProgressService'
 import styles from './StudentDashboard.module.css'
 
-// Assigned module entry point — the one module wired up so far. A future
-// version reads this list from Firestore instead of a single hardcoded id.
-const ASSIGNED_MODULE_ID = 'password-security'
-const ASSIGNED_MODULE_TITLE = 'Password Security'
-
-// ── Quick stats ──
-const STATS = [
-  { label: 'Modules Completed', value: '3 / 8',  icon: '📚', accent: '#B8860B' },
-  { label: 'Quiz Average',       value: '84%',    icon: '✎',  accent: '#2E86AB' },
-  { label: 'Training Hours',     value: '6.5 hr', icon: '⏱',  accent: '#1E7E34' },
-  { label: 'Current Streak',     value: '4 days', icon: '🔥',  accent: '#C0392B' },
-]
-
-// ── Upcoming items ──
-const UPCOMING = [
-  { title: 'Phishing Recognition — Module 4',    due: 'Due Jul 20',  status: 'In Progress' },
-  { title: 'Social Engineering Scenarios',        due: 'Due Jul 25',  status: 'Not Started' },
-  { title: 'Password Security Quiz',              due: 'Due Jul 28',  status: 'Not Started' },
-]
+const STATUS_DOT_COLOR = {
+  [MODULE_STATUS.LOCKED]: '#AAAAAA',
+  [MODULE_STATUS.AVAILABLE]: '#2E86AB',
+  [MODULE_STATUS.IN_PROGRESS]: '#B8860B',
+  [MODULE_STATUS.QUIZ_AVAILABLE]: '#B8860B',
+  [MODULE_STATUS.COMPLETED]: '#1E7E34',
+}
 
 export default function StudentDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { getModuleStatus } = useModuleProgress()
-  const assignedStatus = describeModuleStatus(getModuleStatus(ASSIGNED_MODULE_ID))
+  const { status, errorMessage, retry, modules } = useStudentModules()
+
+  const inProgressOrNext = modules.find((m) =>
+    [MODULE_STATUS.AVAILABLE, MODULE_STATUS.IN_PROGRESS, MODULE_STATUS.QUIZ_AVAILABLE].includes(m.status),
+  )
+
+  const completedModules = modules.filter((m) => m.status === MODULE_STATUS.COMPLETED)
+  const scoredModules = modules.filter((m) => typeof m.progress?.score === 'number')
+  const quizAverage =
+    scoredModules.length > 0
+      ? Math.round(scoredModules.reduce((sum, m) => sum + m.progress.score, 0) / scoredModules.length)
+      : null
+  const scenariosCompleted = modules.filter((m) => m.progress?.simulationCompleted).length
+  const curriculumPct = modules.length > 0 ? Math.round((completedModules.length / modules.length) * 100) : 0
+
+  const stats = [
+    { label: 'Modules Completed', value: `${completedModules.length} / ${modules.length || 6}`, icon: '📚', accent: '#B8860B' },
+    { label: 'Quiz Average', value: quizAverage === null ? '—' : `${quizAverage}%`, icon: '✎', accent: '#2E86AB' },
+    { label: 'Scenarios Completed', value: `${scenariosCompleted} / ${modules.length || 6}`, icon: '🎬', accent: '#1E7E34' },
+    { label: 'Curriculum Progress', value: `${curriculumPct}%`, icon: '📈', accent: '#C0392B' },
+  ]
+
+  const upNext = modules.filter((m) => m.status !== MODULE_STATUS.COMPLETED).slice(0, 3)
 
   return (
     <DashboardLayout role="student">
@@ -48,25 +62,29 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* ── Assigned module ── */}
-        <section className={styles.assignedModule}>
-          <div>
-            <span className={styles.assignedEyebrow}>Assigned Module</span>
-            <h2 className={styles.assignedTitle}>{ASSIGNED_MODULE_TITLE}</h2>
-            <span className={styles.assignedStatus}>{assignedStatus}</span>
-          </div>
-          <button
-            type="button"
-            className={styles.assignedBtn}
-            onClick={() => navigate(`/student/modules/${ASSIGNED_MODULE_ID}`)}
-          >
-            {assignedStatus === 'Not Started' ? 'Start Module →' : 'Continue Module →'}
-          </button>
-        </section>
+        {/* ── Continue where you left off ── */}
+        {inProgressOrNext && (
+          <section className={styles.assignedModule}>
+            <div>
+              <span className={styles.assignedEyebrow}>
+                {inProgressOrNext.status === MODULE_STATUS.AVAILABLE ? 'Up Next' : 'Continue'}
+              </span>
+              <h2 className={styles.assignedTitle}>{inProgressOrNext.title}</h2>
+              <span className={styles.assignedStatus}>{MODULE_STATUS_META[inProgressOrNext.status].label}</span>
+            </div>
+            <button
+              type="button"
+              className={styles.assignedBtn}
+              onClick={() => navigate(moduleDestination(inProgressOrNext))}
+            >
+              {MODULE_STATUS_META[inProgressOrNext.status].cta}
+            </button>
+          </section>
+        )}
 
         {/* ── Stats row ── */}
         <div className={styles.statsGrid}>
-          {STATS.map((s) => (
+          {stats.map((s) => (
             <div key={s.label} className={styles.statCard}>
               <span className={styles.statIcon} style={{ background: s.accent + '18' }}>
                 {s.icon}
@@ -79,58 +97,54 @@ export default function StudentDashboard() {
           ))}
         </div>
 
+        {/* ── Module grid ── */}
+        <section className={styles.moduleSection}>
+          <h2 className={styles.sectionHeading}>Your Modules</h2>
+
+          {status === 'loading' && <LoadingSkeleton blocks={3} rows={2} />}
+          {status === 'error' && <ErrorState message={errorMessage} onRetry={retry} />}
+          {status === 'success' && <ModuleGrid modules={modules} />}
+        </section>
+
         {/* ── Content columns ── */}
         <div className={styles.columns}>
 
-          {/* Upcoming tasks */}
+          {/* What's next in the curriculum */}
           <section className={styles.panel}>
-            <h2 className={styles.panelTitle}>Upcoming Tasks</h2>
-            <ul className={styles.taskList}>
-              {UPCOMING.map((item) => (
-                <li key={item.title} className={styles.taskItem}>
-                  <div className={styles.taskMeta}>
-                    <span
-                      className={styles.statusDot}
-                      style={{
-                        background: item.status === 'In Progress' ? '#B8860B' : '#AAAAAA',
-                      }}
-                    />
-                    <div>
-                      <p className={styles.taskTitle}>{item.title}</p>
-                      <p className={styles.taskDue}>{item.due} · {item.status}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <h2 className={styles.panelTitle}>What's Next</h2>
+            {upNext.length === 0 ? (
+              <p className={styles.emptyText}>You've completed every module. Nice work!</p>
+            ) : (
+              <ul className={styles.taskList}>
+                {upNext.map((m) => {
+                  const destination = moduleDestination(m)
+                  return (
+                    <li key={m.moduleId} className={styles.taskItem}>
+                      <button
+                        type="button"
+                        className={styles.taskButton}
+                        disabled={!destination}
+                        onClick={() => destination && navigate(destination)}
+                      >
+                        <div className={styles.taskMeta}>
+                          <span className={styles.statusDot} style={{ background: STATUS_DOT_COLOR[m.status] }} />
+                          <div>
+                            <p className={styles.taskTitle}>{m.title}</p>
+                            <p className={styles.taskDue}>{MODULE_STATUS_META[m.status].label}</p>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
           </section>
 
-          {/* Progress overview */}
+          {/* Progress overview — same six modules, real data */}
           <section className={styles.panel}>
             <h2 className={styles.panelTitle}>Module Progress</h2>
-            {[
-              { name: 'Cybersecurity Basics',    pct: 100 },
-              { name: 'Network Safety',           pct: 100 },
-              { name: 'Email & Phishing',         pct: 100 },
-              { name: 'Phishing Recognition',     pct: 45  },
-              { name: 'Social Engineering',       pct: 0   },
-            ].map((m) => (
-              <div key={m.name} className={styles.progressRow}>
-                <div className={styles.progressHeader}>
-                  <span className={styles.progressName}>{m.name}</span>
-                  <span className={styles.progressPct}>{m.pct}%</span>
-                </div>
-                <div className={styles.progressTrack}>
-                  <div
-                    className={styles.progressFill}
-                    style={{
-                      width: `${m.pct}%`,
-                      background: m.pct === 100 ? '#1E7E34' : 'var(--color-gold)',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
+            <ModuleProgressList modules={modules} />
           </section>
         </div>
       </div>

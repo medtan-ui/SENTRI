@@ -119,7 +119,13 @@ export default function ChoiceEditor({
       </div>
 
       {!choice.isSafe && (
-        <ConsequenceEditor choice={choice} onSetEnabled={onSetConsequenceEnabled} />
+        <ConsequenceEditor
+          choice={choice}
+          onSetEnabled={onSetConsequenceEnabled}
+          onChangeVideoUrl={(value) =>
+            onUpdate({ consequenceVideo: { ...choice.consequenceVideo, videoUrl: value } })
+          }
+        />
       )}
     </div>
   )

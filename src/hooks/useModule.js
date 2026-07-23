@@ -67,10 +67,10 @@ export function useModule(moduleId) {
 /**
  * useModuleList
  * Read-only list of all six modules, sorted by moduleOrder — used by
- * PrerequisitesTab (and any future curriculum-wide view) to show the
- * other modules' current names without touching draft/edit state. Field
- * names are adapted here (title -> name) to match the shape components
- * already expect, so those components stay unchanged.
+ * ModulesPage (curriculum grid + reordering), ScenarioManagerPage, and
+ * QuizManagerPage without touching draft/edit state. Field names are
+ * adapted here (title -> name) to match the shape those components
+ * already expect.
  */
 export function useModuleList() {
   const [status, setStatus] = useState('loading') // 'loading' | 'error' | 'success'
