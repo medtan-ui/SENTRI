@@ -67,15 +67,19 @@ export async function getStudentAnalytics(userId) {
 }
 
 /**
- * Recomputes and persists the *caller's own* analytics summary
- * server-side — no userId is passed; the Cloud Function resolves it from
- * the caller's auth token.
+ * Recomputes and persists a student's analytics summary server-side. With
+ * no userId, the Cloud Function resolves the caller's own uid from their
+ * auth token (self-service, e.g. the student Progress page). An admin may
+ * pass another student's userId to refresh it on their behalf (e.g. the
+ * admin Individual Analytics view) — enforced server-side by
+ * resolveTargetUid, which rejects a non-admin passing anyone but themself.
+ * @param {string} [userId]
  * @returns {Promise<object>} the freshly computed summary
  */
-export async function aggregateStudentAnalytics() {
+export async function aggregateStudentAnalytics(userId) {
   try {
     const call = httpsCallable(functions, 'aggregateStudentAnalytics')
-    const { data } = await call({})
+    const { data } = await call(userId ? { userId } : {})
     return data
   } catch (err) {
     throw new Error(friendlyCallableError(err))

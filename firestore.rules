@@ -118,8 +118,13 @@ service cloud.firestore {
       // student has never touched yet — the doc doesn't exist, so there's
       // nothing to leak, but `resource.data.userId` would otherwise throw
       // a null-evaluation error instead of a clean "not found."
+      // isAdmin() is read-only here (matches studentAnalytics/quizAttempts/
+      // moduleAnalytics below) — the Individual Analytics view reads any
+      // student's progress this way, but create/update stay owner-only, so
+      // an admin still can't write another student's progress from the
+      // client.
       allow read: if request.auth != null
-        && (resource == null || resource.data.userId == request.auth.uid);
+        && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       // resource != null first: an update racing ahead of this doc's own
       // lazy-seed (two effects in the same page, timed independently)

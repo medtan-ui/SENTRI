@@ -10,7 +10,6 @@ const STUDENT_NAV = [
   { label: 'Quiz',             path: '/student/quiz',      icon: '✎' },
   { label: 'Progress',         path: '/student/progress',  icon: '📈' },
   { label: 'Profile',          path: '/student/profile',   icon: '👤' },
-  { label: 'Settings',         path: '/student/settings',  icon: '⚙' },
 ]
 
 const ADMIN_NAV = [
@@ -20,7 +19,7 @@ const ADMIN_NAV = [
   { label: 'Scenarios',    path: '/admin/scenarios',  icon: '🛡' },
   { label: 'Quiz Manager', path: '/admin/quizzes',    icon: '✎' },
   { label: 'Analytics',    path: '/admin/analytics',  icon: '📊' },
-  { label: 'Settings',     path: '/admin/settings',   icon: '⚙' },
+  { label: 'Profile',      path: '/admin/profile',    icon: '👤' },
 ]
 
 export default function Sidebar({ role = 'student', isOpen, onClose }) {

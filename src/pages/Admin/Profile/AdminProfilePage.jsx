@@ -1,31 +1,49 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
 import EditNicknameSection from '../../../components/EditNicknameSection/EditNicknameSection'
 import ChangePasswordSection from '../../../components/ChangePasswordSection/ChangePasswordSection'
 import { useAuth } from '../../../context/AuthContext'
-import { useStudentModules } from '../../../hooks/useStudentModules'
-import { MODULE_STATUS } from '../../../services/moduleProgressService'
-import styles from './StudentProfilePage.module.css'
+import { listUsers } from '../../../services/adminService'
+import styles from './AdminProfilePage.module.css'
 
 const QUICK_LINKS = [
-  { label: 'View My Progress', path: '/student/progress', icon: '📈' },
-  { label: 'My Modules', path: '/student/modules', icon: '📚' },
+  { label: 'Manage Accounts', path: '/admin/accounts', icon: '👥' },
+  { label: 'View Analytics', path: '/admin/analytics', icon: '📊' },
 ]
 
 /**
- * StudentProfilePage — /student/profile
+ * AdminProfilePage — /admin/profile
  * Identity, a compact stats row, self-service profile/security controls
  * (nickname, password), and quick navigation — Settings no longer exists
  * as a separate page, so its useful bits live here instead.
  */
-export default function StudentProfilePage() {
+export default function AdminProfilePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { modules } = useStudentModules()
+  const [counts, setCounts] = useState(null)
 
-  const name = user?.nickname || user?.displayName || user?.email
+  useEffect(() => {
+    let cancelled = false
+    listUsers()
+      .then((users) => {
+        if (cancelled) return
+        setCounts({
+          total: users.length,
+          students: users.filter((u) => u.role === 'student').length,
+          admins: users.filter((u) => u.role === 'admin').length,
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setCounts(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const name = user?.nickname || user?.displayName
   const initials = (name || '?')
     .split(' ')
     .map((part) => part[0])
@@ -33,12 +51,8 @@ export default function StudentProfilePage() {
     .slice(0, 2)
     .toUpperCase()
 
-  const completedCount = modules.filter((m) => m.status === MODULE_STATUS.COMPLETED).length
-  const scores = modules.map((m) => m.progress?.score).filter((s) => typeof s === 'number')
-  const avgScore = scores.length > 0 ? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length) : null
-
   return (
-    <DashboardLayout role="student">
+    <DashboardLayout role="admin">
       <div className={styles.page}>
         <div className={styles.header}>
           <h1 className={styles.title}>Profile</h1>
@@ -48,13 +62,13 @@ export default function StudentProfilePage() {
         <Card className={styles.identityCard}>
           <span className={styles.avatar} aria-hidden="true">{initials}</span>
           <div className={styles.identityInfo}>
-            <h2 className={styles.name}>{name ?? 'Student'}</h2>
+            <h2 className={styles.name}>{name ?? 'Admin'}</h2>
             {user?.displayName && user.displayName !== name && (
               <p className={styles.fullName}>{user.displayName}</p>
             )}
             <p className={styles.email}>{user?.email}</p>
             <div className={styles.badgeRow}>
-              <span className={styles.roleBadge}>Student</span>
+              <span className={styles.roleBadge}>Administrator</span>
               <span className={user?.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge}>
                 {user?.emailVerified ? '✓ Verified' : '⚠ Not verified'}
               </span>
@@ -64,12 +78,16 @@ export default function StudentProfilePage() {
 
         <div className={styles.statsGrid}>
           <Card className={styles.statCard}>
-            <p className={styles.statValue}>{completedCount} / {modules.length}</p>
-            <p className={styles.statLabel}>Modules Completed</p>
+            <p className={styles.statValue}>{counts ? counts.total : '—'}</p>
+            <p className={styles.statLabel}>Total Accounts</p>
           </Card>
           <Card className={styles.statCard}>
-            <p className={styles.statValue}>{avgScore === null ? '—' : `${avgScore}%`}</p>
-            <p className={styles.statLabel}>Average Quiz Score</p>
+            <p className={styles.statValue}>{counts ? counts.students : '—'}</p>
+            <p className={styles.statLabel}>Students</p>
+          </Card>
+          <Card className={styles.statCard}>
+            <p className={styles.statValue}>{counts ? counts.admins : '—'}</p>
+            <p className={styles.statLabel}>Admins</p>
           </Card>
         </div>
 

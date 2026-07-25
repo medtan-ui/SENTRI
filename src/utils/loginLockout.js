@@ -17,9 +17,9 @@
  */
 
 const STORAGE_PREFIX = 'sentri_login_attempts_'
-const LOCK_THRESHOLD = 5
+const LOCK_THRESHOLD = 10
 const BASE_LOCKOUT_MS = 30_000
-const MAX_LOCKOUT_MS = 5 * 60_000
+const MAX_LOCKOUT_MS = 10 * 60_000
 
 function _key(email) {
   return STORAGE_PREFIX + (email || '').trim().toLowerCase()

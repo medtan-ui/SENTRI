@@ -21,6 +21,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules, users, recentAttempts, moduleSummaries } = useAdminOverview()
 
+  const name = user?.nickname || user?.displayName || 'Administrator'
   const studentCount = users.filter((u) => u.role === 'student').length
   const avgScore =
     recentAttempts.length > 0
@@ -32,22 +33,22 @@ export default function AdminDashboard() {
   }
 
   function studentName(userId) {
-    return users.find((u) => u.uid === userId)?.displayName || 'A student'
+    const match = users.find((u) => u.uid === userId)
+    return match?.nickname || match?.displayName || 'A student'
   }
 
   return (
     <DashboardLayout role="admin">
       <div className={styles.page}>
 
-        {/* ── Header ── */}
-        <div className={styles.header}>
+        {/* ── Hero ── */}
+        <div className={styles.hero}>
           <div>
-            <h1 className={styles.title}>Admin Dashboard</h1>
-            <p className={styles.subtitle}>
-              Welcome, <strong>{user?.displayName ?? 'Administrator'}</strong>. Here's your system overview.
-            </p>
+            <span className={styles.heroEyebrow}>Welcome back</span>
+            <h1 className={styles.heroTitle}>Hey, {name}! 👋</h1>
+            <p className={styles.heroSubtitle}>Here's how SENTRI is looking today.</p>
           </div>
-          <div className={styles.dateBadge}>
+          <div className={styles.heroDateBadge}>
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
         </div>

@@ -11,10 +11,17 @@ import styles from './FeedbackPanel.module.css'
  * explanation instead of repeating the same short line — there are no
  * dead ends, the student always reaches the safe choice eventually,
  * on their own click.
+ *
+ * A safely-resolved scenario may also carry a `postCompletionReflection`
+ * in its config — a closing note shown only here, only once the scenario
+ * is actually done, never mid-scenario. Config-driven and optional so
+ * this stays generic across every module instead of hardcoding any one
+ * scenario's copy into this shared component.
  */
-export default function FeedbackPanel({ choice, attemptCount, onRetry, onContinue }) {
+export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry, onContinue }) {
   const isSafe = choice.is_safe_choice
   const guided = !isSafe && attemptCount >= 3
+  const reflection = isSafe ? scenario?.postCompletionReflection : null
 
   return (
     <div className={styles.overlay}>
@@ -22,6 +29,8 @@ export default function FeedbackPanel({ choice, attemptCount, onRetry, onContinu
         <span className={styles.icon} aria-hidden="true">{isSafe ? '✅' : '⚠️'}</span>
         <h3 className={styles.title}>{choice.outcome_title}</h3>
         <p className={styles.text}>{choice.feedback_text}</p>
+
+        {reflection && <p className={styles.reflection}>{reflection}</p>}
 
         {guided && (
           <div className={styles.guidedHint}>

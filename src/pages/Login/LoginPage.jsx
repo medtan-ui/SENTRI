@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Card from '../../components/Card/Card'
 import Button from '../../components/Button/Button'
@@ -10,9 +10,11 @@ import styles from './LoginPage.module.css'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { login, completeMfaLogin, resetPassword } = useAuth()
+  const location = useLocation()
+  const { login, resetPassword } = useAuth()
+  const redirectFrom = location.state?.from
 
-  // 'login' | 'mfa' | 'reset'
+  // 'login' | 'reset'
   const [mode, setMode] = useState('login')
 
   // ── Login form state ──
@@ -25,13 +27,6 @@ export default function LoginPage() {
 
   // ── Lockout state ──
   const [lockout, setLockout] = useState({ locked: false, remainingMs: 0 })
-
-  // ── MFA challenge state ──
-  const [mfaResolver, setMfaResolver] = useState(null)
-  const [mfaHintUid, setMfaHintUid]   = useState(null)
-  const [mfaCode, setMfaCode]         = useState('')
-  const [mfaLoading, setMfaLoading]   = useState(false)
-  const [mfaError, setMfaError]       = useState('')
 
   // ── Reset-password form state ──
   const [resetEmail, setResetEmail]     = useState('')
@@ -62,7 +57,16 @@ export default function LoginPage() {
     return true
   }
 
+  // If the visitor got here via a redirect from a protected page (e.g.
+  // clicking "Register Account" while logged out), send them back there
+  // after a successful login instead of their default dashboard.
+  // ProtectedRoute's own role check is the safety net if that page turns
+  // out to require a different role than this account has.
   function navigateForRole(role) {
+    if (redirectFrom) {
+      navigate(`${redirectFrom.pathname}${redirectFrom.search || ''}`, { replace: true })
+      return
+    }
     navigate(role === 'admin' ? '/admin/dashboard' : '/student/dashboard', { replace: true })
   }
 
@@ -84,50 +88,12 @@ export default function LoginPage() {
       resetAttempts(email)
       navigateForRole(user.role)
     } catch (err) {
-      if (err.mfaRequired) {
-        setMfaResolver(err.resolver)
-        setMfaHintUid(err.hintUid)
-        setMfaError('')
-        setMfaCode('')
-        setMode('mfa')
-        return
-      }
       const nextLockout = recordFailedAttempt(email)
       setLockout(nextLockout)
       setError(err.message)
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // ── Submit: MFA code ──
-  async function handleMfaSubmit(e) {
-    e.preventDefault()
-    setMfaError('')
-
-    if (!mfaCode.trim()) {
-      setMfaError('Enter the 6-digit code from your authenticator app.')
-      return
-    }
-
-    setMfaLoading(true)
-    try {
-      const user = await completeMfaLogin(mfaResolver, mfaHintUid, mfaCode.trim())
-      resetAttempts(email)
-      navigateForRole(user.role)
-    } catch (err) {
-      setMfaError(err.message)
-    } finally {
-      setMfaLoading(false)
-    }
-  }
-
-  function cancelMfa() {
-    setMfaResolver(null)
-    setMfaHintUid(null)
-    setMfaCode('')
-    setMfaError('')
-    setMode('login')
   }
 
   // ── Submit: forgot password ──
@@ -193,6 +159,11 @@ export default function LoginPage() {
 
           {mode === 'login' && (
             <>
+              {/* ── Redirected-from-a-protected-page note ── */}
+              {redirectFrom && !error && (
+                <p className={styles.resetIntro}>Sign in to continue.</p>
+              )}
+
               {/* ── Error message ── */}
               {error && (
                 <div className={styles.errorBanner} role="alert">
@@ -268,51 +239,16 @@ export default function LoginPage() {
                     ? 'Signing in…'
                     : 'Sign In'}
                 </Button>
-              </form>
-            </>
-          )}
-
-          {mode === 'mfa' && (
-            <>
-              <p className={styles.resetIntro}>
-                Enter the 6-digit code from your authenticator app to finish signing in.
-              </p>
-
-              {mfaError && (
-                <div className={styles.errorBanner} role="alert">
-                  <span className={styles.errorIcon} aria-hidden="true">⚠</span>
-                  {mfaError}
-                </div>
-              )}
-
-              <form onSubmit={handleMfaSubmit} noValidate className={styles.form}>
-                <Input
-                  id="mfaCode"
-                  label="Verification code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  value={mfaCode}
-                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
-                  placeholder="123456"
-                  required
-                />
 
                 <Button
-                  type="submit"
-                  variant="primary"
+                  type="button"
+                  variant="ghost"
                   size="lg"
                   fullWidth
-                  loading={mfaLoading}
-                  disabled={mfaLoading}
+                  onClick={() => navigate('/register')}
                 >
-                  {mfaLoading ? 'Verifying…' : 'Verify'}
+                  Register Account
                 </Button>
-
-                <button type="button" className={styles.forgotLink} onClick={cancelMfa}>
-                  ← Back to Sign In
-                </button>
               </form>
             </>
           )}

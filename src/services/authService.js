@@ -3,9 +3,9 @@
  * ─────────────────────────────────────────────────────────────
  * Firebase Authentication + Firestore role resolution.
  *
- * Login flow: Firebase Authentication → (if enrolled) TOTP MFA challenge
- * → email verification check → read the learner's Firestore "users/{uid}"
- * profile doc → determine role ('student' | 'admin').
+ * Login flow: Firebase Authentication → email verification check → read
+ * the learner's Firestore "users/{uid}" profile doc → determine role
+ * ('student' | 'admin').
  *
  * Firestore schema expected at users/{uid}:
  *   { role: 'student' | 'admin', displayName: string, email: string }
@@ -18,9 +18,9 @@
  *    to reach a dashboard, the role must be verified server-side data.
  *  • Login failures return a generic message so we never reveal
  *    whether a given email is registered.
- *  • Unverified emails and outstanding MFA challenges are surfaced as
- *    typed signals (not generic errors) so the UI can route to the
- *    right screen instead of just showing a failure banner.
+ *  • Unverified emails are surfaced as a typed signal (not a generic
+ *    error) so the UI can route to the right screen instead of just
+ *    showing a failure banner.
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -35,14 +35,15 @@ import {
   sendEmailVerification,
   verifyPasswordResetCode,
   confirmPasswordReset,
-  getMultiFactorResolver,
-  multiFactor,
-  TotpMultiFactorGenerator,
+  reauthenticateWithCredential,
+  updatePassword,
+  EmailAuthProvider,
 } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { auth, db, functions } from './firebase'
 import { validatePassword } from '../utils/passwordPolicy'
+import { friendlyCallableError } from './callableErrors'
 
 const USERS_COLLECTION = 'users'
 const VALID_ROLES = ['student', 'admin']
@@ -83,12 +84,19 @@ async function _resolveUserProfile(firebaseUser) {
 
   const data = profileSnap.data()
   if (!VALID_ROLES.includes(data.role)) return null
+  // A fresh sign-in for a disabled account never reaches here — Firebase
+  // Auth itself rejects it with auth/user-disabled first (see
+  // ERROR_MESSAGES below). This covers the other case: an already-open
+  // session whose account gets deactivated mid-session. Treating it the
+  // same as "no profile" signs it out on the next auth-state refresh.
+  if (data.status === 'disabled') return null
 
   return {
     uid: firebaseUser.uid,
     email: firebaseUser.email,
     role: data.role,
     displayName: data.displayName || firebaseUser.displayName || firebaseUser.email,
+    nickname: data.nickname || data.displayName || firebaseUser.displayName || firebaseUser.email,
     emailVerified: firebaseUser.emailVerified,
     mustChangePassword: !!data.mustChangePassword,
   }
@@ -107,18 +115,12 @@ async function _finishLogin(firebaseUser) {
 /**
  * Sign in with email/password, then resolve the account's role from Firestore.
  *
- * If the account has TOTP multi-factor auth enrolled, this throws a
- * special error shaped `{ mfaRequired: true, resolver, hintUid }` instead
- * of a plain Error — callers must check `err.mfaRequired` before treating
- * a rejection as a hard failure, and pass the resolver/hintUid on to
- * completeMfaSignIn() once the user enters their 6-digit code.
- *
  * @param {string} email
  * @param {string} password
  * @param {boolean} [rememberMe=false]  true persists the session across
  *   browser restarts; false keeps it scoped to the current tab session.
  * @returns {Promise<{ uid, email, role, displayName, emailVerified }>}
- * @throws {Error} user-friendly message on failure, or an MFA-required signal
+ * @throws {Error} user-friendly message on failure
  */
 export async function loginWithEmail(email, password, rememberMe = false) {
   const trimmedEmail = (email || '').trim().toLowerCase()
@@ -132,23 +134,6 @@ export async function loginWithEmail(email, password, rememberMe = false) {
     const credential = await signInWithEmailAndPassword(auth, trimmedEmail, password)
     return await _finishLogin(credential.user)
   } catch (err) {
-    if (err?.code === 'auth/multi-factor-auth-required') {
-      const resolver = getMultiFactorResolver(auth, err)
-      const hint = resolver.hints.find(
-        (h) => h.factorId === TotpMultiFactorGenerator.FACTOR_ID
-      )
-      if (!hint) {
-        throw new Error(
-          'This account requires a multi-factor method this app does not support yet. Please contact your administrator.'
-        )
-      }
-      const mfaError = new Error('Verification code required.')
-      mfaError.mfaRequired = true
-      mfaError.resolver = resolver
-      mfaError.hintUid = hint.uid
-      throw mfaError
-    }
-
     // Logged for local debugging only — the thrown message stays generic.
     // Check the browser console for the real Firebase/Firestore error code
     // (e.g. "permission-denied" usually means Firestore rules aren't
@@ -163,26 +148,32 @@ export async function loginWithEmail(email, password, rememberMe = false) {
 }
 
 /**
- * Complete a sign-in that was paused for a TOTP MFA challenge.
- * @param {object} resolver  from the mfaRequired error thrown by loginWithEmail
- * @param {string} hintUid   from the same error
- * @param {string} code      6-digit code from the user's authenticator app
- * @returns {Promise<{ uid, email, role, displayName, emailVerified }>}
+ * Register a new student account — public self-service, no admin required.
+ * Creates the Firebase Auth user and Firestore profile server-side via the
+ * registerStudentAccount Cloud Function (which only ever creates a
+ * student, regardless of what's sent — role is hardcoded server-side).
+ * Does not sign the caller in; see AuthContext's register(), which signs
+ * in immediately after this succeeds so the new student doesn't have to
+ * retype what they just entered.
+ * @param {{ displayName: string, nickname: string, email: string, password: string }} input
+ * @returns {Promise<void>}
+ * @throws {Error} user-friendly message on failure
  */
-export async function completeMfaSignIn(resolver, hintUid, code) {
+export async function registerStudentAccount(input) {
+  const { valid, errors } = validatePassword(input?.password)
+  if (!valid) {
+    throw new Error(`Password requirements not met: ${errors.join(', ')}.`)
+  }
   try {
-    const assertion = TotpMultiFactorGenerator.assertionForSignIn(hintUid, code)
-    const credential = await resolver.resolveSignIn(assertion)
-    return await _finishLogin(credential.user)
+    const call = httpsCallable(functions, 'registerStudentAccount')
+    await call({
+      displayName: input.displayName,
+      nickname: input.nickname,
+      email: input.email,
+      password: input.password,
+    })
   } catch (err) {
-    console.error('[authService] MFA verification failed:', err)
-    if (err?.code === 'auth/invalid-verification-code') {
-      throw new Error('Incorrect code. Please try again.')
-    }
-    if (err?.code === 'auth/code-expired') {
-      throw new Error('That code expired. Please try again with a new one.')
-    }
-    throw new Error('Unable to verify your code. Please try again.')
+    throw new Error(friendlyCallableError(err))
   }
 }
 
@@ -356,73 +347,79 @@ export async function changeOwnPassword(newPassword) {
   }
 }
 
-// ── TOTP multi-factor authentication (enroll/manage) ──────────────────
+/**
+ * Update the signed-in user's own nickname (self-service, from Profile) —
+ * goes through the updateOwnNickname Cloud Function rather than a direct
+ * Firestore write, since users/{uid} is Admin-SDK-only (see firestore.rules).
+ * Lets an account created before the nickname feature existed set one for
+ * the first time.
+ * @param {string} nickname
+ * @returns {Promise<void>}
+ */
+export async function updateOwnNickname(nickname) {
+  const trimmed = (nickname || '').trim()
+  if (!trimmed) {
+    throw new Error('Please enter a nickname.')
+  }
+  try {
+    const call = httpsCallable(functions, 'updateOwnNickname')
+    await call({ nickname: trimmed })
+  } catch (err) {
+    if (err?.code === 'functions/unauthenticated') {
+      throw new Error('Your session has expired. Please sign in again.')
+    }
+    if (err?.code === 'functions/invalid-argument') {
+      throw new Error(err.message || 'Please check your nickname.')
+    }
+    throw new Error('Unable to update your nickname right now. Please try again.')
+  }
+}
 
 /**
- * Begin TOTP enrollment for the current user. Returns the raw secret (for
- * manual entry into an authenticator app) plus an otpauth:// URI.
- * @returns {Promise<{ totpSecret: object, secretKey: string, otpauthUri: string }>}
+ * Change the signed-in user's own password (self-service, from Profile),
+ * verifying their actual current password first via Firebase Auth's
+ * re-authentication flow before calling the client SDK's own updatePassword
+ * — this is "Firebase Authentication's password update flow" proper,
+ * distinct from changeOwnPassword() above (that one is Admin-SDK-based,
+ * with no current-password check, and exists only for the forced
+ * temporary-password flow where the user doesn't know a "current"
+ * password yet).
+ * @param {string} currentPassword
+ * @param {string} newPassword
+ * @returns {Promise<void>}
  */
-export async function startTotpEnrollment() {
-  if (!auth.currentUser) {
+export async function updateOwnPassword(currentPassword, newPassword) {
+  const { valid, errors } = validatePassword(newPassword)
+  if (!valid) {
+    throw new Error(`Password requirements not met: ${errors.join(', ')}.`)
+  }
+  if (!auth.currentUser?.email) {
     throw new Error('You must be signed in.')
   }
   try {
-    const session = await multiFactor(auth.currentUser).getSession()
-    const totpSecret = await TotpMultiFactorGenerator.generateSecret(session)
-    const accountName = auth.currentUser.email || 'account'
-    const otpauthUri = totpSecret.generateQrCodeUrl(accountName, 'SENTRI')
-    return { totpSecret, secretKey: totpSecret.secretKey, otpauthUri }
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword)
+    await reauthenticateWithCredential(auth.currentUser, credential)
   } catch (err) {
-    console.error('[authService] TOTP enrollment start failed:', err)
+    if (err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
+      throw new Error('Your current password is incorrect.')
+    }
+    if (err?.code === 'auth/too-many-requests') {
+      throw new Error('Too many attempts. Please wait a moment and try again.')
+    }
+    if (err?.code === 'auth/network-request-failed') {
+      throw new Error('Network error. Please check your connection and try again.')
+    }
+    throw new Error('Unable to verify your current password right now. Please try again.')
+  }
+  try {
+    await updatePassword(auth.currentUser, newPassword)
+  } catch (err) {
+    if (err?.code === 'auth/weak-password') {
+      throw new Error('Please choose a stronger password.')
+    }
     if (err?.code === 'auth/requires-recent-login') {
       throw new Error('Please sign out and sign back in, then try again.')
     }
-    throw new Error(
-      'Unable to start two-factor setup. Multi-factor authentication may not be enabled for this project yet.'
-    )
-  }
-}
-
-/**
- * Finish TOTP enrollment once the user has entered a valid 6-digit code.
- * @param {object} totpSecret  from startTotpEnrollment()
- * @param {string} code
- * @param {string} [label='Authenticator app']  shown in the enrolled-factor list
- * @returns {Promise<void>}
- */
-export async function confirmTotpEnrollment(totpSecret, code, label = 'Authenticator app') {
-  try {
-    const assertion = TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, code)
-    await multiFactor(auth.currentUser).enroll(assertion, label)
-  } catch (err) {
-    if (err?.code === 'auth/invalid-verification-code') {
-      throw new Error('Incorrect code. Please double-check your authenticator app and try again.')
-    }
-    throw new Error('Unable to enable two-factor authentication. Please try again.')
-  }
-}
-
-/**
- * @returns {Array<{ uid: string, displayName: string, factorId: string }>}
- */
-export function getEnrolledFactors() {
-  if (!auth.currentUser) return []
-  return multiFactor(auth.currentUser).enrolledFactors
-}
-
-/**
- * Remove an enrolled MFA factor (turn off two-factor authentication).
- * @param {string} factorUid
- * @returns {Promise<void>}
- */
-export async function unenrollFactor(factorUid) {
-  try {
-    await multiFactor(auth.currentUser).unenroll(factorUid)
-  } catch (err) {
-    if (err?.code === 'auth/requires-recent-login') {
-      throw new Error('Please sign out and sign back in, then try again.')
-    }
-    throw new Error('Unable to turn off two-factor authentication. Please try again.')
+    throw new Error('Unable to update your password right now. Please try again.')
   }
 }

@@ -1,0 +1,282 @@
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-gold-dark);
+  cursor: pointer;
+  margin-bottom: var(--space-6);
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: var(--space-6);
+}
+
+/* ── Banners ── */
+.successBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(30,126,52,0.2);
+  border-left: 3px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--color-success);
+  margin-bottom: var(--space-5);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--color-error-bg);
+  border: 1px solid rgba(192,57,43,0.2);
+  border-left: 3px solid var(--color-error);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--color-error);
+  margin-bottom: var(--space-4);
+}
+
+.emptyState {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+/* ── Identity card ── */
+.identityCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.identityInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.fullName {
+  margin-top: 2px;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+.email {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.badgeRow {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.roleBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.roleAdmin {
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.roleStudent {
+  background: rgba(46,134,171,0.12);
+  color: #2E86AB;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+}
+
+.statusActive {
+  color: var(--color-success);
+}
+
+.statusDisabled {
+  color: var(--color-error);
+}
+
+/* ── Panels ── */
+.panel {
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ── Account information ── */
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4) var(--space-6);
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detailLabel {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.detailValue {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+/* ── Actions ── */
+.actionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.resetForm {
+  max-width: 380px;
+  margin-top: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.toggleBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+.toggleBtn:hover {
+  opacity: 1;
+}
+
+/* ── Individual Analytics ── */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+.analyticsStat {
+  text-align: center;
+}
+
+.analyticsValue {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.analyticsLabel {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .detailGrid { grid-template-columns: 1fr; }
+  .analyticsGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .identityCard { flex-direction: column; align-items: flex-start; }
+}

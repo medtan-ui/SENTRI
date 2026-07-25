@@ -1,9 +1,12 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import styles from './Navbar.module.css'
 
 export default function Navbar({ onToggleSidebar }) {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const name = user?.nickname || user?.displayName
 
   return (
     <header className={styles.navbar}>
@@ -21,13 +24,18 @@ export default function Navbar({ onToggleSidebar }) {
       </div>
 
       <div className={styles.right}>
-        <div className={styles.userBadge}>
+        <button
+          type="button"
+          className={styles.userBadge}
+          onClick={() => user && navigate(`/${user.role}/profile`)}
+          aria-label="View your profile"
+        >
           <span className={styles.avatar} aria-hidden="true">
-            {user?.displayName?.[0] ?? 'U'}
+            {name?.[0] ?? 'U'}
           </span>
-          <span className={styles.userName}>{user?.displayName ?? 'User'}</span>
+          <span className={styles.userName}>{name ?? 'User'}</span>
           <span className={styles.roleTag}>{user?.role ?? ''}</span>
-        </div>
+        </button>
       </div>
     </header>
   )

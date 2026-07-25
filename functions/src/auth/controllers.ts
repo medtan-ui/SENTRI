@@ -14,13 +14,27 @@ import {
   createUserAccountSchema,
   deleteUserAccountSchema,
   getAuditLogSchema,
+  registerStudentAccountSchema,
   resetUserPasswordSchema,
+  setUserAccountStatusSchema,
+  updateOwnNicknameSchema,
 } from './validators'
 
 export const createUserAccount = defineCallable('createUserAccount', async (request) => {
   const actor = await requireAdmin(request)
   const input = parseOrThrow(createUserAccountSchema, request.data)
   return service.createUserAccount(actor, input)
+})
+
+// Deliberately public — no requireAuth/requireAdmin. This is the student
+// self-registration flow reached from the logged-out Login page, so there
+// is no caller identity to check yet. Safe to leave ungated because the
+// input schema and service both hardcode role: 'student' server-side —
+// nothing about who's allowed to call this lets a caller create anything
+// other than an ordinary student account for themselves.
+export const registerStudentAccount = defineCallable('registerStudentAccount', async (request) => {
+  const input = parseOrThrow(registerStudentAccountSchema, request.data)
+  return service.registerStudentAccount(input)
 })
 
 export const deleteUserAccount = defineCallable('deleteUserAccount', async (request) => {
@@ -35,10 +49,22 @@ export const resetUserPassword = defineCallable('resetUserPassword', async (requ
   return service.resetUserPassword(actor, input)
 })
 
+export const setUserAccountStatus = defineCallable('setUserAccountStatus', async (request) => {
+  const actor = await requireAdmin(request)
+  const input = parseOrThrow(setUserAccountStatusSchema, request.data)
+  return service.setUserAccountStatus(actor, actor.uid, input)
+})
+
 export const changeOwnPassword = defineCallable('changeOwnPassword', async (request) => {
   const { uid } = requireAuth(request)
   const input = parseOrThrow(changeOwnPasswordSchema, request.data)
   return service.changeOwnPassword(uid, input)
+})
+
+export const updateOwnNickname = defineCallable('updateOwnNickname', async (request) => {
+  const { uid } = requireAuth(request)
+  const input = parseOrThrow(updateOwnNicknameSchema, request.data)
+  return service.updateOwnNickname(uid, input)
 })
 
 export const listUsers = defineCallable('listUsers', async (request) => {

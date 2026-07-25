@@ -25,6 +25,11 @@
  * @property {string} posterCaption
  * @property {string} scene
  * @property {string} [coachTarget]
+ * @property {string} [postCompletionReflection] optional closing note shown
+ *   in FeedbackPanel only once this scenario is *safely* resolved (not on
+ *   an unsafe attempt, which shows "Try Again" instead of completing) —
+ *   for a broader reflection that doesn't fit any one choice's own
+ *   feedback_text
  * @property {ScenarioChoiceConfig[]} choices
  *
  * @typedef {Object} ModuleScenarioConfig
@@ -51,6 +56,8 @@ export const passwordSecurityConfig = {
       posterCaption: 'Three new accounts, three passwords to choose.',
       scene: 'SignupTrioScene',
       coachTarget: 'signup-password-1',
+      postCompletionReflection:
+        "Real talk: if you just mashed the keyboard for those passwords, there's a good chance you won't remember them next week. 😅",
       choices: [
         {
           scenario_choice_id: 'ps-01-a',

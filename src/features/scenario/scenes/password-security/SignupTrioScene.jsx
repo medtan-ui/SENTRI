@@ -76,9 +76,6 @@ export default function SignupTrioScene({ scenario, interactive, onResolve }) {
       <p className={`${styles.instructions} ${styles.decorative}`}>
         Finish creating your accounts below. Set a password for each one and save it.
       </p>
-      <p className={`${styles.funNote} ${styles.decorative}`}>
-        Real talk: if you're just mashing the keyboard right now, will you actually remember any of this next week? 😅
-      </p>
       <div className={styles.cardRow}>
         {CARDS.map((card) => (
           <div key={card.key} className={styles.card}>

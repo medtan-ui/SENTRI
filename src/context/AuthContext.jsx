@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import {
   loginWithEmail,
-  completeMfaSignIn,
   logoutUser,
   subscribeToAuthChanges,
   sendResetEmail,
@@ -10,10 +9,9 @@ import {
   verifyResetCode,
   confirmReset,
   changeOwnPassword as changeOwnPasswordService,
-  startTotpEnrollment,
-  confirmTotpEnrollment,
-  getEnrolledFactors,
-  unenrollFactor,
+  updateOwnPassword as updateOwnPasswordService,
+  updateOwnNickname as updateOwnNicknameService,
+  registerStudentAccount as registerStudentAccountService,
 } from '../services/authService'
 
 /**
@@ -26,11 +24,6 @@ import {
  * hitting Firebase/Firestore directly. `loading` stays true until the
  * very first auth check resolves, which lets ProtectedRoute avoid
  * bouncing a persisted session back to the login page on refresh.
- *
- * `login()` can reject with an `{ mfaRequired: true, resolver, hintUid }`
- * error instead of a plain failure — callers (LoginPage) must check for
- * that shape and route to a code-entry step, calling completeMfaLogin()
- * once the user has a 6-digit code.
  * ─────────────────────────────────────────────────────────────
  */
 const AuthContext = createContext(undefined)
@@ -48,15 +41,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = useCallback(async (email, password, rememberMe) => {
-    // Does NOT catch mfaRequired here — LoginPage needs the raw error to
-    // read err.resolver/err.hintUid and switch to the code-entry step.
     const nextUser = await loginWithEmail(email, password, rememberMe)
-    setUser(nextUser)
-    return nextUser
-  }, [])
-
-  const completeMfaLogin = useCallback(async (resolver, hintUid, code) => {
-    const nextUser = await completeMfaSignIn(resolver, hintUid, code)
     setUser(nextUser)
     return nextUser
   }, [])
@@ -64,6 +49,18 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     await logoutUser()
     setUser(null)
+  }, [])
+
+  // Public self-registration (RegisterAccountPage). Creates the account,
+  // then signs in immediately as it — same shape as login() — so a new
+  // student doesn't have to retype what they just entered. The freshly
+  // signed-in user has emailVerified: false, so ProtectedRoute's existing
+  // EmailVerificationGate takes over from here automatically.
+  const register = useCallback(async (input) => {
+    await registerStudentAccountService(input)
+    const nextUser = await loginWithEmail(input.email, input.password, true)
+    setUser(nextUser)
+    return nextUser
   }, [])
 
   const resetPassword = useCallback(async (email) => {
@@ -89,24 +86,37 @@ export function AuthProvider({ children }) {
     return nextUser
   }, [])
 
+  // Self-service password change from Profile — distinct from
+  // changeOwnPassword above (that one's for the forced temporary-password
+  // flow). No mustChangePassword involved, so no profile refresh needed.
+  const updateOwnPassword = useCallback(async (currentPassword, newPassword) => {
+    await updateOwnPasswordService(currentPassword, newPassword)
+  }, [])
+
+  const updateNickname = useCallback(async (nickname) => {
+    await updateOwnNicknameService(nickname)
+    // Re-reads the Firestore profile so user.nickname reflects the change
+    // immediately everywhere it's displayed, without a re-login.
+    const nextUser = await refreshCurrentUser()
+    setUser(nextUser)
+    return nextUser
+  }, [])
+
   const value = {
     user,
     loading,
     login,
-    completeMfaLogin,
+    register,
     logout,
     resetPassword,
     resendVerification,
     refreshUser,
     changeOwnPassword,
+    updateOwnPassword,
+    updateNickname,
     // Password-reset link completion (public /reset-password page).
     verifyResetCode,
     confirmReset,
-    // TOTP multi-factor management (Security page).
-    startTotpEnrollment,
-    confirmTotpEnrollment,
-    getEnrolledFactors,
-    unenrollFactor,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
@@ -115,21 +125,19 @@ export function AuthProvider({ children }) {
 /**
  * useAuth
  * @returns {{
- *   user: { uid, email, role, displayName, emailVerified } | null,
+ *   user: { uid, email, role, displayName, nickname, emailVerified } | null,
  *   loading: boolean,
  *   login: (email: string, password: string, rememberMe?: boolean) => Promise<object>,
- *   completeMfaLogin: (resolver: object, hintUid: string, code: string) => Promise<object>,
+ *   register: (input: { displayName: string, nickname: string, email: string, password: string }) => Promise<object>,
  *   logout: () => Promise<void>,
  *   resetPassword: (email: string) => Promise<void>,
  *   resendVerification: () => Promise<void>,
  *   refreshUser: () => Promise<object|null>,
  *   changeOwnPassword: (newPassword: string) => Promise<object|null>,
+ *   updateOwnPassword: (currentPassword: string, newPassword: string) => Promise<void>,
+ *   updateNickname: (nickname: string) => Promise<object|null>,
  *   verifyResetCode: (oobCode: string) => Promise<string>,
  *   confirmReset: (oobCode: string, newPassword: string) => Promise<void>,
- *   startTotpEnrollment: () => Promise<object>,
- *   confirmTotpEnrollment: (totpSecret: object, code: string, label?: string) => Promise<void>,
- *   getEnrolledFactors: () => Array<object>,
- *   unenrollFactor: (factorUid: string) => Promise<void>,
  * }}
  */
 export function useAuth() {

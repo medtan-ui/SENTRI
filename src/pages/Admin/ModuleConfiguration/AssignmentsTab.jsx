@@ -66,7 +66,8 @@ export default function AssignmentsTab({ assignmentType, selectedStudentIds, onC
                     checked={selectedStudentIds.includes(student.uid)}
                     onChange={() => toggleStudent(student.uid)}
                   />
-                  {student.displayName} <span className={styles.studentMeta}>({student.email})</span>
+                  {student.nickname || student.displayName}{' '}
+                  <span className={styles.studentMeta}>({student.email})</span>
                 </label>
               ))}
             </div>

@@ -23,6 +23,8 @@ export default function StudentDashboard() {
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules } = useStudentModules()
 
+  const name = user?.nickname || user?.displayName || 'Student'
+
   const inProgressOrNext = modules.find((m) =>
     [MODULE_STATUS.AVAILABLE, MODULE_STATUS.IN_PROGRESS, MODULE_STATUS.QUIZ_AVAILABLE].includes(m.status),
   )
@@ -49,15 +51,14 @@ export default function StudentDashboard() {
     <DashboardLayout role="student">
       <div className={styles.page}>
 
-        {/* ── Page header ── */}
-        <div className={styles.header}>
+        {/* ── Hero ── */}
+        <div className={styles.hero}>
           <div>
-            <h1 className={styles.title}>Student Dashboard</h1>
-            <p className={styles.subtitle}>
-              Welcome back, <strong>{user?.displayName ?? 'Student'}</strong>! Here's your progress overview.
-            </p>
+            <span className={styles.heroEyebrow}>Welcome back</span>
+            <h1 className={styles.heroTitle}>Hey, {name}! 👋</h1>
+            <p className={styles.heroSubtitle}>Here's how your training is going.</p>
           </div>
-          <div className={styles.dateBadge}>
+          <div className={styles.heroDateBadge}>
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
         </div>

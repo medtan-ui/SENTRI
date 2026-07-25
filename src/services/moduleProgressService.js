@@ -30,7 +30,8 @@
  * submitQuiz Cloud Function (see quizService.js).
  * ─────────────────────────────────────────────────────────────
  */
-import { serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from './firebase'
 import { getOrSeedDoc, mergeDoc } from './firestoreDoc'
 import { listModules } from './moduleService'
 
@@ -120,6 +121,39 @@ export async function listStudentModuleProgress(userId) {
         defaultProgress(userId, m.moduleId, m.moduleOrder, m.moduleOrder === 1),
       ),
     ),
+  )
+  return modules.map((m, i) => ({
+    moduleId: m.moduleId,
+    title: m.title,
+    description: m.description,
+    icon: m.icon,
+    color: m.color,
+    difficulty: m.difficulty,
+    moduleOrder: m.moduleOrder,
+    progress: progressDocs[i],
+    status: deriveModuleStatus(progressDocs[i]),
+  }))
+}
+
+/**
+ * Same shape as listStudentModuleProgress, for an admin viewing another
+ * student's progress (the Individual Analytics section of the View User
+ * page). Deliberately plain getDoc reads with no seed/write fallback — an
+ * admin only has read access to another student's moduleProgress docs
+ * (see firestore.rules), not create/update, so a missing doc is defaulted
+ * in memory for display only. In practice this default is rarely hit:
+ * every real student already has all 6 docs from
+ * initializeAllProgressForUser at account-creation time.
+ * @param {string} userId
+ * @returns {Promise<object[]>}
+ */
+export async function getStudentModuleProgressForAdmin(userId) {
+  const modules = await listModules()
+  const progressDocs = await Promise.all(
+    modules.map(async (m) => {
+      const snap = await getDoc(doc(db, COLLECTION, progressDocId(userId, m.moduleId)))
+      return snap.exists() ? snap.data() : defaultProgress(userId, m.moduleId, m.moduleOrder, m.moduleOrder === 1)
+    }),
   )
   return modules.map((m, i) => ({
     moduleId: m.moduleId,

@@ -1,31 +1,42 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
 import Button from '../../../components/Button/Button'
 import Input from '../../../components/Input/Input'
 import { useAuth } from '../../../context/AuthContext'
-import { createUserAccount, deleteUserAccount, resetUserPassword, listUsers, getAuditLog } from '../../../services/adminService'
+import {
+  deleteUserAccount,
+  resetUserPassword,
+  listUsers,
+  getAuditLog,
+  setUserAccountStatus,
+} from '../../../services/adminService'
 import { validatePassword } from '../../../utils/passwordPolicy'
-import PasswordStrengthMeter from '../../../components/PasswordStrengthMeter/PasswordStrengthMeter'
 import styles from './AccountsPage.module.css'
 
 const AUDIT_ACTION_LABELS = {
   create_user: 'Created account',
   delete_user: 'Deleted account',
   reset_password: 'Reset password',
+  deactivate_user: 'Deactivated account',
+  activate_user: 'Reactivated account',
 }
-
-const EMPTY_FORM = { displayName: '', email: '', role: 'student', password: '' }
 
 /**
  * AccountsPage
- * Admin-only account management: create/delete/reset-password for
+ * Admin-only account management: view/reset-password/deactivate/delete for
  * student and admin accounts, plus a read-only view of the audit trail.
- * All authorization is re-checked server-side in functions/index.js —
- * this page only calls through src/services/adminService.js.
+ * Student accounts are self-registered at the public /register page, not
+ * created here — this page's only creation entry point is for other admin
+ * accounts (Create Admin Account), a deliberately separate flow so the two
+ * never get conflated again. All authorization is re-checked server-side
+ * in functions/src — this page only calls through
+ * src/services/adminService.js.
  */
 export default function AccountsPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [tab, setTab] = useState('accounts') // 'accounts' | 'audit'
 
   // ── Accounts ──
@@ -34,22 +45,18 @@ export default function AccountsPage() {
   const [usersError, setUsersError] = useState('')
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [notice, setNotice] = useState('')
-
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [createError, setCreateError] = useState('')
-  const [creating, setCreating] = useState(false)
 
   const [resetTargetUid, setResetTargetUid] = useState('')
   const [resetPassword, setResetPassword] = useState('')
   const [resetError, setResetError] = useState('')
   const [resetSubmitting, setResetSubmitting] = useState(false)
 
-  const [showNewPwd, setShowNewPwd] = useState(false)
   const [showResetPwd, setShowResetPwd] = useState(false)
 
-  const [busyUid, setBusyUid] = useState('')
+  const [busyUid, setBusyUid] = useState('') // delete in flight
+  const [statusBusyUid, setStatusBusyUid] = useState('') // deactivate/activate in flight
 
   // ── Audit log ──
   const [logs, setLogs] = useState([])
@@ -91,41 +98,6 @@ export default function AccountsPage() {
       setLogsError(err.message)
     } finally {
       setLogsLoading(false)
-    }
-  }
-
-  const { errors: createPolicyErrors } = validatePassword(form.password)
-
-  async function handleCreate(e) {
-    e.preventDefault()
-    setCreateError('')
-
-    if (!form.displayName.trim() || !form.email.trim()) {
-      setCreateError('Name and email are required.')
-      return
-    }
-    if (createPolicyErrors.length > 0) {
-      setCreateError(`Password requirements not met: ${createPolicyErrors.join(', ')}.`)
-      return
-    }
-
-    setCreating(true)
-    try {
-      await createUserAccount({
-        email: form.email.trim(),
-        password: form.password,
-        displayName: form.displayName.trim(),
-        role: form.role,
-      })
-      setNotice(`Account created for ${form.email.trim()}.`)
-      setForm(EMPTY_FORM)
-      setShowCreateForm(false)
-      await loadUsers()
-      setLogsLoaded(false)
-    } catch (err) {
-      setCreateError(err.message)
-    } finally {
-      setCreating(false)
     }
   }
 
@@ -178,18 +150,29 @@ export default function AccountsPage() {
     }
   }
 
-  // ── Show/Hide password toggles (mirrors LoginPage) ──
-  const NewPwdToggleBtn = (
-    <button
-      type="button"
-      onClick={() => setShowNewPwd((v) => !v)}
-      className={styles.toggleBtn}
-      aria-label={showNewPwd ? 'Hide password' : 'Show password'}
-    >
-      {showNewPwd ? '🙈' : '👁'}
-    </button>
-  )
+  async function handleStatusToggle(target) {
+    if (target.uid === user?.uid) return
+    const nextStatus = target.status === 'disabled' ? 'active' : 'disabled'
+    const verb = nextStatus === 'disabled' ? 'Deactivate' : 'Reactivate'
+    const confirmed = window.confirm(`${verb} ${target.displayName} (${target.email})?`)
+    if (!confirmed) return
 
+    setNotice('')
+    setUsersError('')
+    setStatusBusyUid(target.uid)
+    try {
+      await setUserAccountStatus(target.uid, nextStatus)
+      setNotice(`${target.email} was ${nextStatus === 'disabled' ? 'deactivated' : 'reactivated'}.`)
+      setUsers((prev) => prev.map((u) => (u.uid === target.uid ? { ...u, status: nextStatus } : u)))
+      setLogsLoaded(false)
+    } catch (err) {
+      setUsersError(err.message)
+    } finally {
+      setStatusBusyUid('')
+    }
+  }
+
+  // ── Show/Hide password toggle (mirrors LoginPage) ──
   const ResetPwdToggleBtn = (
     <button
       type="button"
@@ -203,9 +186,15 @@ export default function AccountsPage() {
 
   const filteredUsers = users.filter((u) => {
     const matchesRole = roleFilter === 'all' || u.role === roleFilter
+    const matchesStatus =
+      statusFilter === 'all' || (statusFilter === 'disabled' ? u.status === 'disabled' : u.status !== 'disabled')
     const q = search.trim().toLowerCase()
-    const matchesSearch = !q || u.displayName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
-    return matchesRole && matchesSearch
+    const matchesSearch =
+      !q ||
+      u.displayName?.toLowerCase().includes(q) ||
+      u.nickname?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q)
+    return matchesRole && matchesStatus && matchesSearch
   })
 
   return (
@@ -214,7 +203,7 @@ export default function AccountsPage() {
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Accounts</h1>
-            <p className={styles.subtitle}>Create, update, and remove student and admin accounts.</p>
+            <p className={styles.subtitle}>View, update, and remove student and admin accounts.</p>
           </div>
           <div className={styles.tabs} role="tablist">
             <button
@@ -249,7 +238,7 @@ export default function AccountsPage() {
                 id="userSearch"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or email"
+                placeholder="Search by name, nickname, or email"
                 className={styles.searchInput}
               />
               <select
@@ -262,71 +251,20 @@ export default function AccountsPage() {
                 <option value="student">Students</option>
                 <option value="admin">Admins</option>
               </select>
-              <Button variant="primary" onClick={() => { setShowCreateForm((v) => !v); setCreateError('') }}>
-                {showCreateForm ? 'Cancel' : '+ Add Account'}
+              <select
+                className={styles.roleSelect}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                aria-label="Filter by status"
+              >
+                <option value="all">All statuses</option>
+                <option value="active">Active</option>
+                <option value="disabled">Deactivated</option>
+              </select>
+              <Button variant="primary" onClick={() => navigate('/admin/accounts/create-admin')}>
+                + Create Admin Account
               </Button>
             </div>
-
-            {showCreateForm && (
-              <Card className={styles.formCard}>
-                <h2 className={styles.cardTitle}>New Account</h2>
-                {createError && (
-                  <div className={styles.errorBanner} role="alert">
-                    <span aria-hidden="true">⚠</span> {createError}
-                  </div>
-                )}
-                <form onSubmit={handleCreate} className={styles.form}>
-                  <div className={styles.formRow}>
-                    <Input
-                      id="newName"
-                      label="Full Name"
-                      value={form.displayName}
-                      onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
-                      required
-                    />
-                    <Input
-                      id="newEmail"
-                      label="Email"
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                      autoComplete="off"
-                      required
-                    />
-                  </div>
-                  <div className={styles.formRow}>
-                    <div className={styles.selectGroup}>
-                      <label htmlFor="newRole" className={styles.selectLabel}>Role</label>
-                      <select
-                        id="newRole"
-                        className={styles.roleSelect}
-                        value={form.role}
-                        onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                      >
-                        <option value="student">Student</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </div>
-                    <Input
-                      id="newPassword"
-                      label="Temporary Password"
-                      type={showNewPwd ? 'text' : 'password'}
-                      value={form.password}
-                      onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                      autoComplete="new-password"
-                      required
-                      rightElement={NewPwdToggleBtn}
-                    />
-                  </div>
-
-                  <PasswordStrengthMeter password={form.password} />
-
-                  <Button type="submit" variant="primary" loading={creating} disabled={creating}>
-                    Create Account
-                  </Button>
-                </form>
-              </Card>
-            )}
 
             {usersError && (
               <div className={styles.errorBanner} role="alert">
@@ -355,8 +293,13 @@ export default function AccountsPage() {
                     <tbody>
                       {filteredUsers.map((u) => (
                         <React.Fragment key={u.uid}>
-                          <tr>
-                            <td>{u.displayName}</td>
+                          <tr className={u.status === 'disabled' ? styles.rowDisabled : undefined}>
+                            <td>
+                              {u.nickname || u.displayName}
+                              {u.nickname && u.nickname !== u.displayName && (
+                                <div className={styles.nicknameSub}>{u.displayName}</div>
+                              )}
+                            </td>
                             <td>{u.email}</td>
                             <td>
                               <span className={`${styles.roleBadge} ${u.role === 'admin' ? styles.roleAdmin : styles.roleStudent}`}>
@@ -364,14 +307,27 @@ export default function AccountsPage() {
                               </span>
                             </td>
                             <td>
-                              <span className={styles.statusBadge}>{u.status}</span>
+                              <span className={`${styles.statusBadge} ${u.status === 'disabled' ? styles.statusDisabled : styles.statusActive}`}>
+                                {u.status === 'disabled' ? 'Disabled' : 'Active'}
+                              </span>
                             </td>
                             <td className={styles.mutedCell}>
                               {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}
                             </td>
                             <td className={styles.actionsCell}>
+                              <button className={styles.linkBtn} onClick={() => navigate(`/admin/accounts/${u.uid}`)}>
+                                View
+                              </button>
                               <button className={styles.linkBtn} onClick={() => openResetFor(u.uid)}>
                                 {resetTargetUid === u.uid ? 'Cancel' : 'Reset password'}
+                              </button>
+                              <button
+                                className={styles.linkBtn}
+                                onClick={() => handleStatusToggle(u)}
+                                disabled={u.uid === user?.uid || statusBusyUid === u.uid}
+                                title={u.uid === user?.uid ? "You can't deactivate your own account" : undefined}
+                              >
+                                {statusBusyUid === u.uid ? 'Updating…' : u.status === 'disabled' ? 'Activate' : 'Deactivate'}
                               </button>
                               <button
                                 className={`${styles.linkBtn} ${styles.linkDanger}`}

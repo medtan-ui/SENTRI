@@ -94,6 +94,7 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
           {state === 'feedback' && selectedChoice && (
             <FeedbackPanel
               choice={selectedChoice}
+              scenario={currentScenario}
               attemptCount={attemptCount}
               onRetry={actions.retry}
               onContinue={actions.continueToNext}

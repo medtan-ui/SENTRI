@@ -51,6 +51,37 @@ export async function updateAuthUserPassword(uid: string, newPassword: string): 
   }
 }
 
+/**
+ * Disables/re-enables the Firebase Auth user record itself — this is what
+ * actually blocks sign-in (Firebase rejects signInWithEmailAndPassword with
+ * auth/user-disabled for a disabled user), not just a Firestore flag. On
+ * disable, also revokes existing refresh tokens so an already-open session
+ * stops renewing on its next refresh instead of staying valid for up to an
+ * hour.
+ */
+export async function setAuthUserDisabled(uid: string, disabled: boolean): Promise<void> {
+  try {
+    await authAdmin.updateUser(uid, { disabled })
+    if (disabled) {
+      await authAdmin.revokeRefreshTokens(uid)
+    }
+  } catch (err) {
+    const code = (err as { code?: string }).code
+    if (code === 'auth/user-not-found') {
+      throw new AppError('not-found', 'No account found for this user.')
+    }
+    throw new AppError('internal', 'Unable to update the account status.')
+  }
+}
+
+export async function setUserStatus(uid: string, status: 'active' | 'disabled'): Promise<void> {
+  await db.collection(COLLECTIONS.USERS).doc(uid).set({ status }, { merge: true })
+}
+
+export async function setUserNickname(uid: string, nickname: string): Promise<void> {
+  await db.collection(COLLECTIONS.USERS).doc(uid).set({ nickname }, { merge: true })
+}
+
 export async function setUserProfile(uid: string, profile: UserProfile): Promise<void> {
   await db.collection(COLLECTIONS.USERS).doc(uid).set(profile)
 }
@@ -105,6 +136,7 @@ export interface ListedUser {
   uid: string
   role: string
   displayName: string
+  nickname: string
   email: string
   status: string
   createdAt: string | null
@@ -118,6 +150,9 @@ export async function listUserProfiles(): Promise<ListedUser[]> {
       uid: docSnap.id,
       role: data.role,
       displayName: data.displayName,
+      // Falls back to displayName for profiles written before nickname
+      // existed, so every caller always gets a usable value.
+      nickname: data.nickname || data.displayName,
       email: data.email,
       status: data.status || 'active',
       createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,

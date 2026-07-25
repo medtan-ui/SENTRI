@@ -50,6 +50,20 @@
   margin-bottom: var(--space-4);
 }
 
+/* A closing, reflective aside — visually separate from the outcome
+   explanation above it, since it's a different kind of note (a nudge to
+   think back on what you just did, not what happens next). */
+.reflection {
+  font-size: 12.5px;
+  color: var(--color-gold-dark);
+  background: var(--color-gold-muted);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  line-height: 1.5;
+  text-align: left;
+  margin-bottom: var(--space-4);
+}
+
 .guidedHint {
   display: flex;
   align-items: center;

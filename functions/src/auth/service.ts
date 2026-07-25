@@ -11,7 +11,10 @@ import {
   ChangeOwnPasswordInput,
   CreateUserAccountInput,
   DeleteUserAccountInput,
+  RegisterStudentAccountInput,
   ResetUserPasswordInput,
+  SetUserAccountStatusInput,
+  UpdateOwnNicknameInput,
 } from './models'
 
 export async function createUserAccount(
@@ -30,6 +33,7 @@ export async function createUserAccount(
     await repo.setUserProfile(userRecord.uid, {
       role: input.role,
       displayName: input.displayName,
+      nickname: (input.nickname || input.displayName).trim(),
       email: normalizedEmail,
       status: 'active',
       mustChangePassword: true,
@@ -65,6 +69,69 @@ export async function createUserAccount(
     } catch (err) {
       console.error('[createUserAccount] progress seeding failed — continuing:', userRecord.uid, err)
     }
+  }
+
+  return { uid: userRecord.uid }
+}
+
+/**
+ * Public self-registration — no actor, since nobody is authenticated yet.
+ * Always creates a student account (role is hardcoded here, never taken
+ * from client input) with mustChangePassword: false, since the student
+ * chose their own real password just now — unlike admin-created accounts,
+ * there's no temporary password to replace. Verification happens the same
+ * way as any other account: EmailVerificationGate, driven by Firebase's
+ * own emailVerified flag, once the frontend signs the new user in.
+ */
+export async function registerStudentAccount(input: RegisterStudentAccountInput) {
+  const normalizedEmail = input.email.trim().toLowerCase()
+
+  const userRecord = await repo.createAuthUser({
+    email: normalizedEmail,
+    password: input.password,
+    displayName: input.displayName,
+  })
+
+  try {
+    await repo.setUserProfile(userRecord.uid, {
+      role: 'student',
+      displayName: input.displayName,
+      nickname: input.nickname.trim(),
+      email: normalizedEmail,
+      status: 'active',
+      mustChangePassword: false,
+    })
+  } catch (err) {
+    console.error(
+      '[registerStudentAccount] Firestore profile write failed, rolling back Auth user:',
+      userRecord.uid,
+      err,
+    )
+    try {
+      await repo.deleteAuthUser(userRecord.uid)
+    } catch (cleanupErr) {
+      console.error(
+        '[registerStudentAccount] rollback delete also failed — orphaned Auth user:',
+        userRecord.uid,
+        cleanupErr,
+      )
+    }
+    throw new AppError('internal', 'Unable to create the account. Please try again.')
+  }
+
+  await repo.writeAuditLog({
+    action: 'self_register',
+    actorUid: userRecord.uid,
+    actorEmail: normalizedEmail,
+    targetUid: userRecord.uid,
+    targetEmail: normalizedEmail,
+    details: null,
+  })
+
+  try {
+    await initializeAllProgressForUser(userRecord.uid)
+  } catch (err) {
+    console.error('[registerStudentAccount] progress seeding failed — continuing:', userRecord.uid, err)
   }
 
   return { uid: userRecord.uid }
@@ -129,9 +196,43 @@ export async function resetUserPassword(
   return { success: true }
 }
 
+export async function setUserAccountStatus(
+  actor: { uid: string; email: string | null },
+  callerUid: string,
+  input: SetUserAccountStatusInput,
+) {
+  if (input.uid === callerUid) {
+    throw new AppError('failed-precondition', 'You cannot deactivate your own account.')
+  }
+
+  await repo.setAuthUserDisabled(input.uid, input.status === 'disabled')
+  await repo.setUserStatus(input.uid, input.status)
+
+  const target = await repo.getUserProfile(input.uid)
+  await repo.writeAuditLog({
+    action: input.status === 'disabled' ? 'deactivate_user' : 'activate_user',
+    actorUid: actor.uid,
+    actorEmail: actor.email,
+    targetUid: input.uid,
+    targetEmail: target?.email ?? null,
+    details: null,
+  })
+
+  return { success: true }
+}
+
 export async function changeOwnPassword(uid: string, input: ChangeOwnPasswordInput) {
   await repo.updateAuthUserPassword(uid, input.newPassword)
   await repo.setMustChangePassword(uid, false)
+  return { success: true }
+}
+
+// Self-service, any authenticated user, no admin required — lets an
+// account created before the nickname feature existed set one for the
+// first time. No audit log entry: the audit log tracks admin actions on
+// other accounts, not a user editing their own profile.
+export async function updateOwnNickname(uid: string, input: UpdateOwnNicknameInput) {
+  await repo.setUserNickname(uid, input.nickname)
   return { success: true }
 }
 

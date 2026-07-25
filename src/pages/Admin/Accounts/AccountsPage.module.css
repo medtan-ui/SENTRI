@@ -109,42 +109,12 @@
   font-size: 13.5px;
 }
 
-/* ── Create form ── */
-.formCard {
-  margin-bottom: var(--space-6);
-}
-
 .cardTitle {
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--space-4);
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.formRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
-}
-
-.selectGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: var(--space-4);
-}
-
-.selectLabel {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--color-text);
 }
 
 /* ── Password toggle (mirrors LoginPage) ── */
@@ -201,9 +171,19 @@
   border-bottom: none;
 }
 
+.rowDisabled {
+  opacity: 0.55;
+}
+
 .mutedCell {
   color: var(--color-text-muted);
   font-size: 12.5px;
+}
+
+.nicknameSub {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
 }
 
 .roleBadge {
@@ -227,7 +207,15 @@
 
 .statusBadge {
   font-size: 12px;
+  font-weight: 600;
+}
+
+.statusActive {
   color: var(--color-success);
+}
+
+.statusDisabled {
+  color: var(--color-error);
 }
 
 .actionsCell {
@@ -293,10 +281,4 @@
 }
 .auditHeader .cardTitle {
   margin-bottom: 0;
-}
-
-/* ── Responsive ── */
-@media (max-width: 700px) {
-  .formRow { grid-template-columns: 1fr; }
-  .policyList { grid-template-columns: 1fr; }
 }

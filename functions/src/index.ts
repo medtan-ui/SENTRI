@@ -17,7 +17,10 @@ export {
   deleteUserAccount,
   getAuditLog,
   listUsers,
+  registerStudentAccount,
   resetUserPassword,
+  setUserAccountStatus,
+  updateOwnNickname,
 } from './auth/controllers'
 
 export {

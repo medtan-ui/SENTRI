@@ -78,8 +78,26 @@ export async function resetUserPassword(uid, newPassword) {
 }
 
 /**
+ * Deactivate or reactivate an account. Deactivating disables the underlying
+ * Firebase Auth user (blocking sign-in) and mirrors that onto the Firestore
+ * profile's `status` field; the account and all its data stay in Firestore.
+ * @param {string} uid
+ * @param {'active'|'disabled'} status
+ * @returns {Promise<{ success: boolean }>}
+ */
+export async function setUserAccountStatus(uid, status) {
+  try {
+    const call = httpsCallable(functions, 'setUserAccountStatus')
+    const { data } = await call({ uid, status })
+    return data
+  } catch (err) {
+    throw new Error(_friendlyCallableError(err))
+  }
+}
+
+/**
  * List all student/admin account profiles for the account management screen.
- * @returns {Promise<Array<{ uid, role, displayName, email, status, createdAt }>>}
+ * @returns {Promise<Array<{ uid, role, displayName, nickname, email, status, createdAt }>>}
  */
 export async function listUsers() {
   try {
