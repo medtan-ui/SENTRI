@@ -17,7 +17,12 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  getFirestore,
+} from 'firebase/firestore'
 import { getFunctions } from 'firebase/functions'
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 
@@ -42,7 +47,20 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
 export const auth = getAuth(app)
-export const db = getFirestore(app)
+
+// Initialize Firestore with multi-tab persistent local caching for fast loads & offline resilience
+let firestoreDb
+try {
+  firestoreDb = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    }),
+  })
+} catch (e) {
+  firestoreDb = getFirestore(app)
+}
+
+export const db = firestoreDb
 export const functions = getFunctions(app)
 
 // ── App Check ───────────────────────────────────────────────────────
