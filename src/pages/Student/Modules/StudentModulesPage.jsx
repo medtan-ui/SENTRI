@@ -3,6 +3,7 @@ import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../components/ErrorState/ErrorState'
 import ModuleGrid from '../../../components/ModuleGrid/ModuleGrid'
+import TutorialCard from '../../../components/TutorialCard/TutorialCard'
 import { useStudentModules } from '../../../hooks/useStudentModules'
 import styles from './StudentModulesPage.module.css'
 
@@ -22,6 +23,8 @@ export default function StudentModulesPage() {
           <h1 className={styles.title}>Modules</h1>
           <p className={styles.subtitle}>Your full cybersecurity training curriculum, in unlock order.</p>
         </div>
+
+        <TutorialCard />
 
         {status === 'loading' && <LoadingSkeleton blocks={3} rows={2} />}
         {status === 'error' && <ErrorState message={errorMessage} onRetry={retry} />}

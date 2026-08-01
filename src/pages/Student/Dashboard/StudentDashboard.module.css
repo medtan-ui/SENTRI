@@ -52,6 +52,27 @@
   flex-shrink: 0;
 }
 
+/* ── Game-style interaction tip ── */
+.gameTip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--color-gold-muted);
+  border-left: 3px solid var(--color-gold);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-8);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-gold-dark);
+}
+
+.gameTipIcon {
+  font-size: 18px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
 /* ── Assigned module ── */
 .assignedModule {
   display: flex;

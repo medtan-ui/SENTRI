@@ -1,0 +1,127 @@
+.demoPanel {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.demoButtonRow {
+  display: flex;
+  justify-content: center;
+}
+
+.demoButton {
+  position: relative;
+  display: inline-block;
+  padding: 10px 28px;
+  border-radius: var(--radius-md);
+  background: var(--color-gold);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 0 0 0 rgba(184, 134, 11, 0.4);
+  animation: demoBreathe 1.8s ease-in-out infinite;
+  transition: transform 140ms ease;
+}
+
+.demoButtonPressed {
+  transform: scale(0.92);
+  animation-play-state: paused;
+}
+
+@keyframes demoBreathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 134, 11, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(184, 134, 11, 0); }
+}
+
+.ripple {
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid var(--color-gold-light);
+  animation: demoRipple 400ms ease-out;
+}
+
+@keyframes demoRipple {
+  from { opacity: 1; transform: scale(0.8); }
+  to { opacity: 0; transform: scale(1.3); }
+}
+
+.demoInputRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.demoInputLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.demoInput {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+}
+
+.caret {
+  width: 1.5px;
+  height: 14px;
+  margin-left: 2px;
+  background: var(--color-gold-dark);
+  animation: demoCaretBlink 900ms step-end infinite;
+}
+
+@keyframes demoCaretBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.demoCursor {
+  position: absolute;
+  font-size: 20px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  transition: left 650ms cubic-bezier(0.22, 1, 0.36, 1), top 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(-20%, -15%);
+}
+
+.demoCursor[data-at='rest'] {
+  left: 12%;
+  top: 14%;
+}
+
+.demoCursor[data-at='button'] {
+  left: 50%;
+  top: 30%;
+}
+
+.demoCursor[data-at='input'] {
+  left: 32%;
+  top: 78%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demoButton,
+  .demoCursor,
+  .caret {
+    animation: none !important;
+    transition: none !important;
+  }
+}

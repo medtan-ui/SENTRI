@@ -89,7 +89,7 @@ export default function InboxScene({ scenario, interactive, phase, onResolve }) 
 
             <div className={styles.emailHeader}>
               <div className={styles.senderRow}>
-                <span className={`${styles.avatar} ${styles.decorative}`} aria-hidden="true">R</span>
+                <span className={`${styles.avatar} ${styles.decorative}`} aria-hidden="true">J</span>
                 <div className={styles.senderMeta}>
                   <InteractiveTarget
                     targetId="sender-chip"
@@ -97,7 +97,7 @@ export default function InboxScene({ scenario, interactive, phase, onResolve }) 
                     onActivate={handleSenderActivate}
                     disabled={!interactive}
                   >
-                    <span className={styles.senderName}>Prof. R. Delgado</span>
+                    <span className={styles.senderName}>Prof. J. Reyes</span>
                   </InteractiveTarget>
                   {senderExpanded && <span className={styles.senderFullAddress}>{FAKE_SENDER}</span>}
                   {showCallouts && (

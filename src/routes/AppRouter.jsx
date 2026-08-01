@@ -23,6 +23,7 @@ const ScenarioManagerPage    = React.lazy(() => import('../pages/Admin/ScenarioM
 const QuizManagerPage        = React.lazy(() => import('../pages/Admin/QuizManager/QuizManagerPage'))
 const AdminAnalyticsPage     = React.lazy(() => import('../pages/Admin/Analytics/AdminAnalyticsPage'))
 const StudentModulesPage     = React.lazy(() => import('../pages/Student/Modules/StudentModulesPage'))
+const StudentTutorialPage    = React.lazy(() => import('../pages/Student/Tutorial/StudentTutorialPage'))
 const StudentLessonViewerPage= React.lazy(() => import('../pages/Student/Modules/LessonViewer/StudentLessonViewerPage'))
 const ScenarioRunnerPage     = React.lazy(() => import('../pages/Student/Modules/ScenarioRunner/ScenarioRunnerPage'))
 const SimulationCompletePage = React.lazy(() => import('../pages/Student/Modules/SimulationComplete/SimulationCompletePage'))
@@ -121,6 +122,14 @@ export default function AppRouter() {
           element={
             <ProtectedRoute requiredRole="student">
               <StudentModulesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/tutorial"
+          element={
+            <ProtectedRoute requiredRole="student">
+              <StudentTutorialPage />
             </ProtectedRoute>
           }
         />

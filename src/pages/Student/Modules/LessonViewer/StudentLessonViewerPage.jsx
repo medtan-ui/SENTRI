@@ -204,7 +204,10 @@ export default function StudentLessonViewerPage() {
             </Card>
 
             <Card className={styles.sectionCard}>
-              <span className={styles.sectionCount}>Section {currentIndex + 1} of {totalSections}</span>
+              <div className={styles.sectionCardTop}>
+                <span className={styles.sectionCount}>Section {currentIndex + 1} of {totalSections}</span>
+                <span className={styles.requiredBadge}>🔒 Required</span>
+              </div>
               <h2 className={styles.sectionTitle}>{activeSection.title}</h2>
               <p className={styles.sectionContent}>{activeSection.content}</p>
 
@@ -251,6 +254,14 @@ export default function StudentLessonViewerPage() {
                 ))}
               </ul>
             </Card>
+
+            <div className={styles.unlockNotice} data-complete={lessonComplete}>
+              {lessonComplete ? (
+                <>✅ Reading complete, the interactive scenario is unlocked.</>
+              ) : (
+                <>🔒 <strong>Required reading:</strong> go through every section above to unlock the interactive scenario.</>
+              )}
+            </div>
 
             <div className={styles.bottomActions}>
               <Button

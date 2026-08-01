@@ -6,6 +6,7 @@ import Button from '../../../../components/Button/Button'
 import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
 import LoadingScreen from '../../../../features/scenario/components/LoadingScreen'
 import ScenarioEngine from '../../../../features/scenario/engine/ScenarioEngine'
+import ScenarioIntroTutorial from '../../../../features/scenario/engine/ScenarioIntroTutorial'
 import { loadModuleConfig } from '../../../../services/moduleLoader'
 import { useModuleProgress } from '../../../../hooks/useModuleProgress'
 import styles from './ScenarioRunnerPage.module.css'
@@ -33,7 +34,7 @@ export default function ScenarioRunnerPage() {
 
   // undefined = still loading, null = not found, object = loaded
   const [config, setConfig] = useState(undefined)
-  const [phase, setPhase] = useState('entering') // 'entering' | 'engine' | 'exiting' | 'not-found'
+  const [phase, setPhase] = useState('entering') // 'entering' | 'tutorial' | 'engine' | 'exiting' | 'not-found'
   const [messageIndex, setMessageIndex] = useState(0)
 
   useEffect(() => {
@@ -58,12 +59,12 @@ export default function ScenarioRunnerPage() {
   }, [phase, messageIndex])
 
   // Once the config has resolved and the last staged message has shown,
-  // move into the engine (or report a missing config).
+  // move into the pre-scenario tutorial screen (or report a missing config).
   useEffect(() => {
     if (phase !== 'entering') return undefined
     if (config === undefined) return undefined
     if (messageIndex < ENTER_MESSAGES.length - 1) return undefined
-    const timer = setTimeout(() => setPhase(config === null ? 'not-found' : 'engine'), STAGE_MS)
+    const timer = setTimeout(() => setPhase(config === null ? 'not-found' : 'tutorial'), STAGE_MS)
     return () => clearTimeout(timer)
   }, [phase, config, messageIndex])
 
@@ -115,6 +116,19 @@ export default function ScenarioRunnerPage() {
       <DashboardLayout role="student">
         <div className={styles.page}>
           <LoadingScreen label={messages[messageIndex]} />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (phase === 'tutorial') {
+    return (
+      <DashboardLayout role="student">
+        <div className={styles.page}>
+          <ScenarioIntroTutorial
+            moduleTitle={config?.scenario?.module_title}
+            onContinue={() => setPhase('engine')}
+          />
         </div>
       </DashboardLayout>
     )

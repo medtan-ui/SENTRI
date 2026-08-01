@@ -6,8 +6,6 @@ const PLAYING_MS = 1300
 const RESOLVING_MS = 250
 const ADVANCING_MS = 600
 
-const COACH_DELAY_MS = { full: 2500, idle: 8000 }
-const COACH_REAPPEAR_MS = 12000
 const PULSE_IDLE_MS = 15000
 
 /**
@@ -17,10 +15,11 @@ const PULSE_IDLE_MS = 15000
  *     -> consequence (risky only) -> feedback
  *     -> paused_interactive (retry, same pause point) | advancing -> (next scenario | complete)
  *
- * Also owns the affordance-coach scheduling (Layer 2/3) and the target
- * registry scenes/InteractiveTarget/AffordanceCoach share — everything
- * a bespoke scene needs comes back out of this hook; scenes never touch
- * Firestore or timers themselves.
+ * Also owns the idle-pulse scheduling (a quiet breathing highlight on the
+ * target itself, via InteractiveTarget's .idlePulse) and the target
+ * registry scenes/InteractiveTarget share — everything a bespoke scene
+ * needs comes back out of this hook; scenes never touch Firestore or
+ * timers themselves.
  *
  * @param {import('../configs/passwordSecurity.config').ModuleScenarioConfig} config
  * @param {string|null} userId
@@ -32,7 +31,6 @@ export function useScenarioEngine(config, userId) {
   const [selectedChoice, setSelectedChoice] = useState(null)
   const [completedScenarioIds, setCompletedScenarioIds] = useState([])
 
-  const [coachActive, setCoachActive] = useState(false)
   const [pulseIdleActive, setPulseIdleActive] = useState(false)
   const hasInteractedRef = useRef(false)
   const [hasInteractedBefore, setHasInteractedBefore] = useState(false)
@@ -55,14 +53,9 @@ export function useScenarioEngine(config, userId) {
   }, [])
   const getTargetNode = useCallback((id) => targetRegistry.current.get(id) || null, [])
 
-  // ── Coach/idle-pulse timer bookkeeping ──
-  const coachTimerRef = useRef(null)
+  // ── Idle-pulse timer bookkeeping ──
   const pulseTimerRef = useRef(null)
 
-  const clearCoachTimer = () => {
-    if (coachTimerRef.current) clearTimeout(coachTimerRef.current)
-    coachTimerRef.current = null
-  }
   const clearPulseTimer = () => {
     if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current)
     pulseTimerRef.current = null
@@ -72,44 +65,22 @@ export function useScenarioEngine(config, userId) {
     if (hasInteractedRef.current) return
     hasInteractedRef.current = true
     setHasInteractedBefore(true)
-    setCoachActive(false)
     setPulseIdleActive(false)
-    clearCoachTimer()
     clearPulseTimer()
   }, [])
 
-  // Arm the initial coach ('full'/'idle') or idle-pulse ('none') timer
-  // whenever a fresh paused_interactive begins and the student hasn't
-  // shown understanding yet.
+  // Arm the idle-pulse timer whenever a fresh paused_interactive begins
+  // and the student hasn't shown understanding yet. A config can opt a
+  // scenario out entirely with coachLevel: 'none'.
   useEffect(() => {
-    clearCoachTimer()
     clearPulseTimer()
-    if (state !== 'paused_interactive' || hasInteractedRef.current) return undefined
+    if (state !== 'paused_interactive' || hasInteractedRef.current || coachLevel === 'none') return undefined
 
-    if (coachLevel === 'none') {
-      pulseTimerRef.current = setTimeout(() => {
-        if (!hasInteractedRef.current) setPulseIdleActive(true)
-      }, PULSE_IDLE_MS)
-      return clearPulseTimer
-    }
-
-    const delay = COACH_DELAY_MS[coachLevel] ?? COACH_DELAY_MS.full
-    coachTimerRef.current = setTimeout(() => {
-      if (!hasInteractedRef.current) setCoachActive(true)
-    }, delay)
-    return clearCoachTimer
+    pulseTimerRef.current = setTimeout(() => {
+      if (!hasInteractedRef.current) setPulseIdleActive(true)
+    }, PULSE_IDLE_MS)
+    return clearPulseTimer
   }, [state, scenarioIndex, coachLevel])
-
-  // Called by AffordanceCoach after its 3rd loop finishes — re-arm for
-  // another appearance after 12s of continued inactivity.
-  const handleCoachFinished = useCallback(() => {
-    setCoachActive(false)
-    if (hasInteractedRef.current) return
-    clearCoachTimer()
-    coachTimerRef.current = setTimeout(() => {
-      if (!hasInteractedRef.current) setCoachActive(true)
-    }, COACH_REAPPEAR_MS)
-  }, [])
 
   // ── loading -> playing ──
   useEffect(() => {
@@ -206,8 +177,6 @@ export function useScenarioEngine(config, userId) {
     return () => clearTimeout(t)
   }, [state, isLastScenario])
 
-  const coachTargetId = currentScenario.coachTarget || currentScenario.choices[0]?.target || null
-
   return {
     state,
     currentScenario,
@@ -218,8 +187,6 @@ export function useScenarioEngine(config, userId) {
     attemptCount,
     guidedHintActive,
     selectedChoice,
-    coachActive,
-    coachTargetId,
     coachLevel,
     pulseIdleActive,
     hasInteractedBefore,
@@ -235,7 +202,6 @@ export function useScenarioEngine(config, userId) {
       dismissConsequence,
       retry,
       continueToNext,
-      handleCoachFinished,
     },
   }
 }

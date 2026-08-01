@@ -5,6 +5,7 @@ import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton
 import ErrorState from '../../../components/ErrorState/ErrorState'
 import ModuleGrid, { MODULE_STATUS_META, moduleDestination } from '../../../components/ModuleGrid/ModuleGrid'
 import ModuleProgressList from '../../../components/ModuleProgressList/ModuleProgressList'
+import TutorialCard from '../../../components/TutorialCard/TutorialCard'
 import { useAuth } from '../../../context/AuthContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
@@ -63,6 +64,16 @@ export default function StudentDashboard() {
           </div>
         </div>
 
+        {/* ── Game-style interaction tip ── */}
+        <div className={styles.gameTip}>
+          <span className={styles.gameTipIcon} aria-hidden="true">🎮</span>
+          <p>
+            <strong>Tip:</strong> Interactive scenarios are hands-on. Click buttons, fill in forms, and make real
+            choices, just like the real thing. Nothing bad actually happens if you pick wrong, that's how you learn.
+            New to it? Try <strong>Module 0: Tutorial</strong> below first.
+          </p>
+        </div>
+
         {/* ── Continue where you left off ── */}
         {inProgressOrNext && (
           <section className={styles.assignedModule}>
@@ -101,6 +112,8 @@ export default function StudentDashboard() {
         {/* ── Module grid ── */}
         <section className={styles.moduleSection}>
           <h2 className={styles.sectionHeading}>Your Modules</h2>
+
+          <TutorialCard />
 
           {status === 'loading' && <LoadingSkeleton blocks={3} rows={2} />}
           {status === 'error' && <ErrorState message={errorMessage} onRetry={retry} />}
