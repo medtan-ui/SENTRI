@@ -405,13 +405,13 @@ const onlineSafetyDefaults = {
     question(
       'What is a good first step if you are being harassed online?',
       [
-        'Respond angrily to defend yourself',
-        'Report it to a trusted adult or platform moderator',
+        'Screenshot the conversation, profile, and timestamps before anything else',
+        'Report it to a trusted adult or platform moderator right away',
+        'Block the person immediately',
         'Delete all your accounts',
-        'Keep it to yourself',
       ],
-      1,
-      'Reporting to a trusted adult or moderator gets help involved rather than escalating the situation alone.',
+      0,
+      'Screenshotting first means you still have the evidence after you block. The safe order is screenshot, then block, then report.',
       'Hard',
     ),
   ]),

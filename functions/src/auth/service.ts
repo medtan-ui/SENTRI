@@ -5,7 +5,9 @@
  * src/services/adminService.js frontend keeps working without changes.
  */
 import { AppError } from '../shared/errors'
+import { REAL_MODULE_IDS } from '../shared/constants'
 import { initializeAllProgressForUser } from '../modules/progress/service'
+import { aggregateModuleAnalytics } from '../modules/analytics/service'
 import * as repo from './repository'
 import {
   ChangeOwnPasswordInput,
@@ -160,6 +162,27 @@ export async function deleteUserAccount(
     // log and progress-seeding calls in createUserAccount above.
     console.error('[deleteUserAccount] cascade data cleanup failed — continuing:', input.uid, err)
   }
+
+  // moduleAnalytics is a cached singleton per module, not per-student —
+  // deleteStudentData above removes this student's raw progress/quiz/
+  // decision docs, but the last-computed aggregate would otherwise keep
+  // showing this student's numbers baked in until an admin happens to
+  // click Refresh. Recomputing all six now against the now-clean raw data
+  // is what actually removes the deleted student from the admin analytics
+  // dashboard. allSettled (not all) so one module failing — e.g. it was
+  // never configured — doesn't stop the other five from recomputing.
+  const analyticsResults = await Promise.allSettled(
+    REAL_MODULE_IDS.map((moduleId) => aggregateModuleAnalytics(moduleId)),
+  )
+  analyticsResults.forEach((result, i) => {
+    if (result.status === 'rejected') {
+      console.error(
+        `[deleteUserAccount] moduleAnalytics recompute failed for ${REAL_MODULE_IDS[i]} — continuing:`,
+        input.uid,
+        result.reason,
+      )
+    }
+  })
 
   await repo.writeAuditLog({
     action: 'delete_user',
