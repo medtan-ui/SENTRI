@@ -126,6 +126,19 @@ export default function ModuleLearningDetail({ summary }) {
                       </span>
                     )}
                   </span>
+                  {item.distractorCounts && Object.keys(item.distractorCounts).length > 0 && (
+                    <div style={{ fontSize: '0.75rem', marginTop: '4px', color: '#666', gridColumn: '1 / -1' }}>
+                      <strong>Distractor Breakdown:</strong>{' '}
+                      {Object.entries(item.distractorCounts).map(([choiceId, count]) => {
+                        const pct = item.responses > 0 ? Math.round((count / item.responses) * 100) : 0
+                        return (
+                          <span key={choiceId} style={{ marginRight: '8px', background: '#eee', padding: '2px 6px', borderRadius: '4px' }}>
+                            Choice {choiceId}: {count} ({pct}%)
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

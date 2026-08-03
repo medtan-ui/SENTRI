@@ -23,9 +23,11 @@ export interface ResponseRow {
   attemptId?: string
   questionId?: string
   topic?: string | null
+  selectedChoiceId?: string | null
   isCorrect?: boolean
   durationMs?: number | null
 }
+
 
 /** A `scenario_decision_records` row. */
 export interface DecisionRow {
@@ -181,6 +183,7 @@ export interface ItemAnalysis {
   attemptCount: number
   minAttemptsForDiscrimination: number
   medianDurationMs: number | null
+  distractorCounts?: Record<string, number>
 }
 
 function difficultyLabel(p: number): ItemAnalysis['difficultyLabel'] {
@@ -258,6 +261,13 @@ export function itemAnalysis(responses: ResponseRow[]): ItemAnalysis[] {
         .map((r) => r.durationMs)
         .filter((d): d is number => typeof d === 'number')
 
+      const distractorCounts: Record<string, number> = {}
+      questionRows.forEach((r) => {
+        if (r.selectedChoiceId) {
+          distractorCounts[r.selectedChoiceId] = (distractorCounts[r.selectedChoiceId] || 0) + 1
+        }
+      })
+
       results.push({
         questionId,
         assessmentType,
@@ -272,6 +282,7 @@ export function itemAnalysis(responses: ResponseRow[]): ItemAnalysis[] {
         attemptCount: ranked.length,
         minAttemptsForDiscrimination: MIN_ATTEMPTS_FOR_DISCRIMINATION,
         medianDurationMs: median(durations),
+        distractorCounts,
       })
     })
   })
