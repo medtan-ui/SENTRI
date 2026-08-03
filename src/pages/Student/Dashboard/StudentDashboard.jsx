@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
@@ -6,9 +6,11 @@ import ErrorState from '../../../components/ErrorState/ErrorState'
 import ModuleGrid, { MODULE_STATUS_META, moduleDestination } from '../../../components/ModuleGrid/ModuleGrid'
 import ModuleProgressList from '../../../components/ModuleProgressList/ModuleProgressList'
 import TutorialCard from '../../../components/TutorialCard/TutorialCard'
+import BadgeCard from '../../../components/Badges/BadgeCard'
 import { useAuth } from '../../../context/AuthContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
+import { getUserBadges } from '../../../services/badgeService'
 import styles from './StudentDashboard.module.css'
 
 const STATUS_DOT_COLOR = {
@@ -23,6 +25,20 @@ export default function StudentDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules } = useStudentModules()
+  const [recentBadges, setRecentBadges] = useState([])
+
+  useEffect(() => {
+    if (user?.uid) {
+      getUserBadges(user.uid)
+        .then((badges) => {
+          const sorted = [...badges].sort((a, b) =>
+            new Date(b.unlockedAt || 0) - new Date(a.unlockedAt || 0)
+          )
+          setRecentBadges(sorted.slice(0, 3))
+        })
+        .catch(console.error)
+    }
+  }, [user?.uid])
 
   const name = user?.nickname || user?.displayName || 'Student'
 
@@ -108,6 +124,30 @@ export default function StudentDashboard() {
             </div>
           ))}
         </div>
+
+        {/* ── Recent Badges ── */}
+        <section className={styles.panel} style={{ marginBottom: 'var(--space-8)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
+            <h2 className={styles.panelTitle} style={{ marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>🏆 Recent Badges</h2>
+            <button
+              type="button"
+              className={styles.assignedBtn}
+              style={{ fontSize: '12px', padding: '6px 14px' }}
+              onClick={() => navigate('/student/profile')}
+            >
+              View All
+            </button>
+          </div>
+          {recentBadges.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px' }}>
+              {recentBadges.map((badge) => (
+                <BadgeCard key={badge.id} badge={badge} isUnlocked unlockedAt={badge.unlockedAt} />
+              ))}
+            </div>
+          ) : (
+            <p className={styles.emptyText}>No badges earned yet. Complete modules, quizzes, and scenarios to unlock achievements!</p>
+          )}
+        </section>
 
         {/* ── Module grid ── */}
         <section className={styles.moduleSection}>
