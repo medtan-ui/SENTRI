@@ -60,6 +60,23 @@ SENTRI is a comprehensive web-based training platform designed to educate K-12 s
    firebase deploy
    ```
 
+#### Scheduled analytics
+
+`scheduledAnalyticsAggregation` recomputes every analytics aggregate
+(six modules, the whole-cohort rollup, and one rollup per section in use)
+nightly at 02:00 Asia/Manila, so the admin dashboard is never staler than
+a day without anyone clicking Refresh.
+
+It is deployed by `firebase deploy --only functions` like any other
+function, but the first deploy also needs the **Cloud Scheduler API**
+enabled on the project (Firebase prompts for this, or enable it in the
+Google Cloud console). Cloud Scheduler is billed per job beyond the free
+tier's three, and this is one job.
+
+Nothing depends on the schedule having run — every aggregate is still
+recomputable on demand from the Analytics page, and the scheduled run and
+the manual "Refresh All" share the same code path.
+
 ### Project Structure
 
 The codebase follows a modular architecture:

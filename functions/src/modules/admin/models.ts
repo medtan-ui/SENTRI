@@ -15,16 +15,29 @@ export interface CreateModuleConfigurationInput {
 }
 
 export interface LessonReference {
+  id?: string
   title: string
-  url: string
+  link: string
 }
 
+export interface LessonSection {
+  id: string
+  title: string
+  content: string
+}
+
+/**
+ * The published lesson document — the exact shape the student Lesson
+ * Viewer renders (see src/services/lessonService.js). This used to model
+ * a single `lessonContent` blob plus introduction/realWorldExample, which
+ * nothing read; the collection now stores the student's own model, so
+ * these types describe what is actually persisted.
+ */
 export interface LessonContent {
   moduleId?: string
-  introduction?: string
+  videoId?: string
   objectives?: string[]
-  lessonContent?: string
-  realWorldExample?: string
+  sections?: LessonSection[]
   bestPractices?: string[]
   keyTakeaways?: string[]
   references?: LessonReference[]
@@ -35,36 +48,42 @@ export interface UpdateLessonContentInput {
   patch: LessonContent
 }
 
-export interface ScenarioVideo {
-  videoUrl: string
-  videoAvailable: boolean
-  thumbnail?: string
-  duration: number
-}
-
+/**
+ * The Scenario Engine's own configuration — the exact objects
+ * src/features/scenario/engine/ consumes. snake_case because that is what
+ * the engine and the stored documents use; inventing a second vocabulary
+ * for the same data is what let the old admin model drift away from
+ * reality in the first place.
+ */
 export interface ScenarioChoice {
-  id: string
-  text: string
-  isSafe: boolean
-  feedbackTitle: string
-  feedbackText: string
-  consequenceVideo?: ScenarioVideo
+  scenario_choice_id: string
+  target: string
+  choice_text: string
+  is_safe_choice: boolean
+  outcome_title: string
+  consequence_type: string
+  feedback_text: string
+  feedback_media_url?: string | null
 }
 
 export interface ScenarioItem {
-  id: string
-  title: string
-  order: number
-  simulatedUrl?: string
-  video: ScenarioVideo
-  pauseTimestamp: number
+  scenario_id: string
+  scenario_order: number
+  scenario_title: string
+  scenario_description: string
+  videoAvailable: boolean
+  material_url?: string | null
+  posterCaption: string
+  scene: string
+  coachTarget?: string
+  postCompletionReflection?: string
   choices: ScenarioChoice[]
 }
 
 export interface ScenarioConfig {
-  id: string
-  title: string
-  surface: 'browser' | 'phone'
+  module_id: string
+  module_title: string
+  coachLevel: 'full' | 'idle' | 'none'
   scenarios: ScenarioItem[]
 }
 
@@ -86,6 +105,9 @@ export interface QuizQuestion {
   correctChoiceId: string
   explanation: string
   difficulty: Difficulty
+  /** Topic slug shared with the pre/post item bank. Optional so a quiz
+   * authored before topic tagging still validates and grades normally. */
+  topic?: string
 }
 
 export interface QuizSettings {

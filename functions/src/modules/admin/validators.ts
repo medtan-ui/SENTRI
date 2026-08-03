@@ -27,16 +27,28 @@ export const createModuleConfigurationSchema = z.object({
   color: z.string().min(1),
 })
 
-const lessonReferenceSchema = z.object({ title: z.string(), url: z.string() })
+const lessonReferenceSchema = z.object({
+  id: z.string().optional(),
+  title: z.string(),
+  link: z.string(),
+})
+
+const lessonSectionSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1, 'Every lesson section needs a title.'),
+  content: z.string().min(1, 'Every lesson section needs content.'),
+})
 
 export const updateLessonContentSchema = z.object({
   moduleId: z.string().min(1),
   patch: z
     .object({
-      introduction: z.string().optional(),
+      videoId: z.string().optional(),
       objectives: z.array(z.string()).optional(),
-      lessonContent: z.string().optional(),
-      realWorldExample: z.string().optional(),
+      // The ordered reading sections the student Lesson Viewer renders.
+      // At least one, because a lesson with no sections leaves the viewer
+      // indexing into an empty array.
+      sections: z.array(lessonSectionSchema).min(1).optional(),
       bestPractices: z.array(z.string()).optional(),
       keyTakeaways: z.array(z.string()).optional(),
       references: z.array(lessonReferenceSchema).optional(),
@@ -44,39 +56,52 @@ export const updateLessonContentSchema = z.object({
     .refine((obj) => Object.keys(obj).length > 0, { message: 'patch must include at least one field.' }),
 })
 
-const scenarioVideoSchema = z.object({
-  videoUrl: z.string(),
-  videoAvailable: z.boolean(),
-  thumbnail: z.string().optional(),
-  duration: z.number().positive(),
-})
+const consequenceTypeSchema = z.enum([
+  'credential_compromise',
+  'account_takeover',
+  'data_exposure',
+  'device_compromise',
+  'financial_loss',
+  'physical_risk',
+  'none',
+])
 
 const scenarioChoiceSchema = z.object({
-  id: z.string().min(1),
-  text: z.string(),
-  isSafe: z.boolean(),
-  feedbackTitle: z.string(),
-  feedbackText: z.string(),
-  consequenceVideo: scenarioVideoSchema.optional(),
+  scenario_choice_id: z.string().min(1),
+  target: z.string().min(1, 'Every choice must name the interactive target that resolves to it.'),
+  choice_text: z.string(),
+  is_safe_choice: z.boolean(),
+  outcome_title: z.string(),
+  consequence_type: consequenceTypeSchema,
+  feedback_text: z.string(),
+  feedback_media_url: z.string().nullable().optional(),
 })
 
 const scenarioItemSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  order: z.number().int().positive(),
-  simulatedUrl: z.string().optional(),
-  video: scenarioVideoSchema,
-  pauseTimestamp: z.number(),
-  choices: z.array(scenarioChoiceSchema).min(2).max(3),
+  scenario_id: z.string().min(1),
+  scenario_order: z.number().int().positive(),
+  scenario_title: z.string().min(1),
+  scenario_description: z.string(),
+  videoAvailable: z.boolean(),
+  material_url: z.string().nullable().optional(),
+  posterCaption: z.string(),
+  // Names the bespoke React component that renders this scenario. A
+  // scenario with no scene renders nothing at all.
+  scene: z.string().min(1, 'Every scenario must name the scene component that renders it.'),
+  coachTarget: z.string().optional(),
+  postCompletionReflection: z.string().optional(),
+  choices: z.array(scenarioChoiceSchema).min(2),
 })
 
 export const updateScenarioConfigurationSchema = z.object({
   moduleId: z.string().min(1),
   scenarioConfig: z.object({
-    id: z.string().min(1),
-    title: z.string().min(1),
-    surface: z.enum(['browser', 'phone']),
-    scenarios: z.array(scenarioItemSchema).length(3, 'A module always has exactly 3 scenarios.'),
+    module_id: z.string().min(1),
+    module_title: z.string().min(1),
+    coachLevel: z.enum(['full', 'idle', 'none']),
+    // No fixed count: how many scenarios a module has is decided by how
+    // many scene components were authored for it, not by a rule here.
+    scenarios: z.array(scenarioItemSchema).min(1),
   }),
 })
 
@@ -124,46 +149,57 @@ export const validateModuleConfigurationSchema = z.object({ moduleId: z.string()
 export function validateScenarioItem(scenario: ScenarioItem): ValidationIssue[] {
   const issues: ValidationIssue[] = []
 
-  const safeCount = scenario.choices.filter((c) => c.isSafe).length
+  // At least one safe choice, not exactly one — mirrors the client rule
+  // in src/features/admin/scenario-config/hooks/validateScenarioConfig.js.
+  // A scene may legitimately offer several acceptable endings with
+  // different feedback (Password Security's sign-up scenario treats
+  // "three unique strong passwords" and "three unique but weak
+  // passwords" as two distinct safe outcomes). Zero is the real defect:
+  // the engine only advances on a safe choice, so the scenario would be
+  // unwinnable.
+  const safeCount = scenario.choices.filter((c) => c.is_safe_choice).length
   if (safeCount === 0) {
-    issues.push({ field: 'safeChoice', message: 'No safe choice exists — exactly one choice must be marked Safe.' })
-  } else if (safeCount > 1) {
     issues.push({
       field: 'safeChoice',
-      message: `Multiple safe choices exist (${safeCount}) — only one choice may be marked Safe.`,
+      message: 'No safe choice exists — students could never complete this scenario.',
     })
   }
 
-  const duration = scenario.video?.duration
-  const pause = scenario.pauseTimestamp
-  const pauseNumber = Number(pause)
-  const pauseInvalid =
-    pause === null ||
-    pause === undefined ||
-    Number.isNaN(pauseNumber) ||
-    pauseNumber <= 0 ||
-    (typeof duration === 'number' && pauseNumber >= duration)
-  if (pauseInvalid) {
+  if (!scenario.scenario_title || !scenario.scenario_title.trim()) {
+    issues.push({ field: 'scenario_title', message: 'Scenario title is empty.' })
+  }
+  if (!scenario.scenario_description || !scenario.scenario_description.trim()) {
+    issues.push({ field: 'scenario_description', message: 'Scenario description is empty.' })
+  }
+  if (!scenario.posterCaption || !scenario.posterCaption.trim()) {
     issues.push({
-      field: 'pauseTimestamp',
-      message:
-        typeof duration === 'number'
-          ? `Pause timestamp must be a number between 1 and ${duration - 1} seconds.`
-          : 'Pause timestamp must be a positive number.',
+      field: 'posterCaption',
+      message: 'Poster caption is empty — students see it while the scene loads.',
     })
   }
 
+  const targets = new Set<string>()
   scenario.choices.forEach((choice, index) => {
     const label = `Choice ${index + 1}`
-    if (!choice.text || !choice.text.trim()) {
-      issues.push({ field: `choice-${choice.id}-text`, message: `${label}: choice text is empty.` })
+    const id = choice.scenario_choice_id
+    if (!choice.choice_text || !choice.choice_text.trim()) {
+      issues.push({ field: `choice-${id}-choice_text`, message: `${label}: choice description is empty.` })
     }
-    if (!choice.feedbackTitle || !choice.feedbackTitle.trim()) {
-      issues.push({ field: `choice-${choice.id}-feedbackTitle`, message: `${label}: feedback title is empty.` })
+    if (!choice.outcome_title || !choice.outcome_title.trim()) {
+      issues.push({ field: `choice-${id}-outcome_title`, message: `${label}: outcome title is empty.` })
     }
-    if (!choice.feedbackText || !choice.feedbackText.trim()) {
-      issues.push({ field: `choice-${choice.id}-feedbackText`, message: `${label}: feedback text is empty.` })
+    if (!choice.feedback_text || !choice.feedback_text.trim()) {
+      issues.push({ field: `choice-${id}-feedback_text`, message: `${label}: feedback text is empty.` })
     }
+    // Two choices bound to the same interactive element means one of them
+    // is unreachable — the scene can only resolve a target to one choice.
+    if (targets.has(choice.target)) {
+      issues.push({
+        field: `choice-${id}-target`,
+        message: `${label}: target "${choice.target}" is already used by another choice in this scenario.`,
+      })
+    }
+    targets.add(choice.target)
   })
 
   return issues

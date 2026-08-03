@@ -7,13 +7,25 @@ import Input from '../../../../components/Input/Input'
 import LoadingSkeleton from '../../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../../components/ErrorState/ErrorState'
 import ModuleProgressList from '../../../../components/ModuleProgressList/ModuleProgressList'
+import QuizRetryPanel from './QuizRetryPanel'
 import { useAuth } from '../../../../context/AuthContext'
-import { listUsers, deleteUserAccount, resetUserPassword, setUserAccountStatus } from '../../../../services/adminService'
+import {
+  listUsers,
+  deleteUserAccount,
+  resetUserPassword,
+  setUserAccountStatus,
+  setUserSection,
+} from '../../../../services/adminService'
 import { getStudentAnalytics, aggregateStudentAnalytics } from '../../../../services/analyticsService'
 import { getStudentModuleProgressForAdmin } from '../../../../services/moduleProgressService'
 import { validatePassword } from '../../../../utils/passwordPolicy'
+import { MAX_SECTION_LENGTH } from '../../../../utils/sections'
 import { timeAgo } from '../../../../utils/timeAgo'
 import styles from './ViewUserPage.module.css'
+
+// Mirrors sectionSchema in functions/src/auth/validators.ts. The server is
+// authoritative; this only saves a round trip on an obvious typo.
+const SECTION_REGEX = /^[A-Za-z0-9][A-Za-z0-9 ._/-]*$/
 
 /**
  * ViewUserPage — /admin/accounts/:uid
@@ -44,6 +56,11 @@ export default function ViewUserPage() {
 
   const [statusBusy, setStatusBusy] = useState(false)
   const [deleteBusy, setDeleteBusy] = useState(false)
+
+  const [sectionOpen, setSectionOpen] = useState(false)
+  const [sectionValue, setSectionValue] = useState('')
+  const [sectionError, setSectionError] = useState('')
+  const [sectionSubmitting, setSectionSubmitting] = useState(false)
 
   const [analytics, setAnalytics] = useState(undefined) // undefined = loading, null = not yet aggregated
   const [analyticsRefreshing, setAnalyticsRefreshing] = useState(false)
@@ -127,6 +144,37 @@ export default function ViewUserPage() {
       setResetError(err.message)
     } finally {
       setResetSubmitting(false)
+    }
+  }
+
+  function openSectionEditor() {
+    setSectionError('')
+    setSectionValue(targetUser?.section || '')
+    setSectionOpen((v) => !v)
+  }
+
+  async function handleSectionSubmit(e) {
+    e.preventDefault()
+    const next = sectionValue.trim()
+    if (next && !SECTION_REGEX.test(next)) {
+      setSectionError('Section may only contain letters, numbers, spaces, and - _ . /')
+      return
+    }
+    setSectionError('')
+    setSectionSubmitting(true)
+    try {
+      const result = await setUserSection(uid, next)
+      setTargetUser((prev) => ({ ...prev, section: result.section }))
+      setNotice(
+        result.section
+          ? `${targetUser.email} is now in section ${result.section}.`
+          : `${targetUser.email} is no longer assigned to a section.`,
+      )
+      setSectionOpen(false)
+    } catch (err) {
+      setSectionError(err.message)
+    } finally {
+      setSectionSubmitting(false)
     }
   }
 
@@ -228,6 +276,9 @@ export default function ViewUserPage() {
                   <span className={`${styles.statusBadge} ${targetUser.status === 'disabled' ? styles.statusDisabled : styles.statusActive}`}>
                     {targetUser.status === 'disabled' ? 'Disabled' : 'Active'}
                   </span>
+                  {targetUser.role === 'student' && targetUser.section && (
+                    <span className={styles.sectionBadge}>{targetUser.section}</span>
+                  )}
                 </div>
               </div>
             </Card>
@@ -251,6 +302,14 @@ export default function ViewUserPage() {
                   <span className={styles.detailLabel}>Role</span>
                   <span className={`${styles.detailValue} ${styles.capitalize}`}>{targetUser.role}</span>
                 </div>
+                {targetUser.role === 'student' && (
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>Section</span>
+                    <span className={styles.detailValue}>
+                      {targetUser.section || 'Not assigned'}
+                    </span>
+                  </div>
+                )}
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Account Created</span>
                   <span className={styles.detailValue}>
@@ -273,6 +332,11 @@ export default function ViewUserPage() {
                 <Button variant="ghost" onClick={() => setResetOpen((v) => !v)}>
                   {resetOpen ? 'Cancel' : 'Reset Password'}
                 </Button>
+                {targetUser.role === 'student' && (
+                  <Button variant="ghost" onClick={openSectionEditor}>
+                    {sectionOpen ? 'Cancel' : targetUser.section ? 'Change Section' : 'Assign Section'}
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   onClick={handleStatusToggle}
@@ -312,6 +376,29 @@ export default function ViewUserPage() {
                   />
                   <Button type="submit" size="sm" variant="primary" loading={resetSubmitting} disabled={resetSubmitting}>
                     Set Password
+                  </Button>
+                </form>
+              )}
+
+              {sectionOpen && targetUser.role === 'student' && (
+                <form onSubmit={handleSectionSubmit} className={styles.resetForm}>
+                  {sectionError && (
+                    <div className={styles.errorBanner} role="alert">
+                      <span aria-hidden="true">⚠</span> {sectionError}
+                    </div>
+                  )}
+                  <Input
+                    id="viewUserSection"
+                    label="Section"
+                    value={sectionValue}
+                    onChange={(e) => setSectionValue(e.target.value)}
+                    placeholder="BSIT-3A"
+                    autoComplete="off"
+                    maxLength={MAX_SECTION_LENGTH}
+                    helperText="Groups this student's results under a class on the Analytics page. Leave blank to unassign."
+                  />
+                  <Button type="submit" size="sm" variant="primary" loading={sectionSubmitting} disabled={sectionSubmitting}>
+                    Save Section
                   </Button>
                 </form>
               )}
@@ -375,6 +462,10 @@ export default function ViewUserPage() {
                   {moduleStatus === 'error' && <ErrorState message={moduleErrorMessage} onRetry={loadModuleProgress} />}
                   {moduleStatus === 'success' && <ModuleProgressList modules={modules} />}
                 </Card>
+
+                {moduleStatus === 'success' && (
+                  <QuizRetryPanel userId={uid} modules={modules} onGranted={loadModuleProgress} />
+                )}
               </>
             )}
           </>

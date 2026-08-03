@@ -5,18 +5,28 @@
  * only in this server-side read of moduleQuizzes, so a student can no
  * longer see or forge their own result.
  *
- * Exactly one attempt is allowed, ever, and submitting it always completes
+ * ── Attempts ─────────────────────────────────────────────────────────
+ * A quiz is one attempt by default, and submitting it always completes
  * the module and unlocks the next one regardless of score — the score is
- * still recorded (for the student's own record and for admin analytics),
- * it just no longer gates progress. Recording the attempt and unlocking
- * the next module happen in one transaction — the same "gather every read
- * first, then write" shape used in modules/progress/service.ts, since this
- * transaction touches both the current module's progress doc and the next
- * module's.
+ * recorded (for the student's own record and for admin analytics), it
+ * just doesn't gate progress. An admin can grant exactly one extra
+ * attempt through grantQuizRetry (modules/progress), which raises this
+ * student's `attemptsAllowed` on that module; that field, not a hardcoded
+ * 1, is what the transaction below checks. Recording the attempt and
+ * unlocking the next module happen in one transaction — the same "gather
+ * every read first, then write" shape used in modules/progress/service.ts.
+ *
+ * ── Per-question capture ─────────────────────────────────────────────
+ * Every graded answer is also written to `quiz_responses` (one document
+ * per question), which is the grain item difficulty and per-topic
+ * analysis need. That write happens *after* the transaction commits: it
+ * is analytics, and losing a student's graded attempt because an
+ * analytics batch failed would be the wrong trade.
  */
 import { admin, db } from '../../shared/admin'
 import { AppError } from '../../shared/errors'
 import { getModuleOrThrow, getNextModule, ModuleDoc } from '../../shared/moduleGuards'
+import * as assessmentRepo from '../assessment/repository'
 import { ModuleProgressDoc } from '../progress/models'
 import { defaultProgress, progressRef } from '../progress/repository'
 import { applyUnlockPlan, planUnlock } from '../progress/service'
@@ -26,16 +36,20 @@ import { PerQuestionResult, QuizConfig, SubmitQuizResult } from './models'
 export function gradeQuiz(
   quiz: QuizConfig,
   answers: Record<string, string>,
+  durations: Record<string, number> = {},
 ): { perQuestionResults: PerQuestionResult[]; correctCount: number; total: number; score: number } {
   const perQuestionResults: PerQuestionResult[] = quiz.questions.map((question) => {
     const selectedChoiceId = answers[question.id] ?? null
     const correct = selectedChoiceId !== null && selectedChoiceId === question.correctChoiceId
+    const rawDuration = durations[question.id]
     return {
       questionId: question.id,
       correct,
       selectedChoiceId,
       correctChoiceId: question.correctChoiceId,
       explanation: question.explanation,
+      topic: question.topic ?? null,
+      durationMs: typeof rawDuration === 'number' && rawDuration >= 0 ? Math.round(rawDuration) : null,
     }
   })
   const total = quiz.questions.length
@@ -61,6 +75,7 @@ export async function submitQuiz(
   userId: string,
   moduleId: string,
   answers: Record<string, string>,
+  durations: Record<string, number> = {},
 ): Promise<SubmitQuizResult> {
   const moduleDoc: ModuleDoc = await getModuleOrThrow(moduleId)
 
@@ -74,13 +89,15 @@ export async function submitQuiz(
 
   assertAnswersReferenceRealChoices(quiz, answers)
 
-  const { perQuestionResults, correctCount, total, score } = gradeQuiz(quiz, answers)
+  const { perQuestionResults, correctCount, total, score } = gradeQuiz(quiz, answers, durations)
   const passed = score >= quiz.settings.passingScore
-  // One attempt always completes the module and unlocks the next one,
+  // An attempt always completes the module and unlocks the next one,
   // regardless of score — never gated on `passed`.
   const nextModuleDoc = await getNextModule(moduleDoc.moduleOrder)
 
   const attemptRef = repo.newAttemptRef()
+  let attemptNumber = 1
+  let attemptsAllowed = 1
 
   await db.runTransaction(async (txn) => {
     const progressDocRef = progressRef(userId, moduleId)
@@ -96,15 +113,30 @@ export async function submitQuiz(
       ? (progressSnap.data() as ModuleProgressDoc)
       : defaultProgress(userId, moduleId, moduleDoc.moduleOrder, true)
 
-    if ((current.attempts || 0) >= 1) {
+    const used = current.attempts || 0
+    // Documents written before the retry path existed have no
+    // attemptsAllowed; they behave exactly as before (one attempt).
+    attemptsAllowed = typeof current.attemptsAllowed === 'number' ? current.attemptsAllowed : 1
+
+    if (used >= attemptsAllowed) {
       // Re-checked inside the transaction to close the race window between
       // any pre-check and this commit (e.g. a double-submit from two tabs).
-      throw new AppError('failed-precondition', 'This quiz has already been submitted — only one attempt is allowed.')
+      throw new AppError(
+        'failed-precondition',
+        attemptsAllowed > 1
+          ? `All ${attemptsAllowed} allowed attempts for this quiz have been used.`
+          : 'This quiz has already been submitted — only one attempt is allowed.',
+      )
     }
 
+    attemptNumber = used + 1
+
     const patch: Partial<ModuleProgressDoc> = {
-      attempts: 1,
-      score,
+      attempts: attemptNumber,
+      // A retake only replaces the recorded score when it beats the
+      // previous one, so a granted retry can never make a student worse
+      // off than the attempt that prompted the appeal.
+      score: typeof current.score === 'number' ? Math.max(current.score, score) : score,
       quizCompleted: true,
       moduleCompleted: true,
       completionDate: admin.firestore.FieldValue.serverTimestamp(),
@@ -121,6 +153,7 @@ export async function submitQuiz(
       correctCount,
       total,
       passed,
+      attemptNumber,
       submittedAt: admin.firestore.FieldValue.serverTimestamp(),
     })
 
@@ -128,6 +161,25 @@ export async function submitQuiz(
       applyUnlockPlan(txn, planUnlock(nextModuleDoc, nextProgressSnap, userId))
     }
   })
+
+  await assessmentRepo
+    .writeResponses(
+      userId,
+      moduleId,
+      'quiz',
+      attemptRef.id,
+      perQuestionResults.map((r) => ({
+        questionId: r.questionId,
+        topic: r.topic,
+        selectedChoiceId: r.selectedChoiceId,
+        correctChoiceId: r.correctChoiceId,
+        isCorrect: r.correct,
+        durationMs: r.durationMs,
+      })),
+    )
+    .catch((err) => {
+      console.error('[submitQuiz] writeResponses failed — attempt already committed:', err)
+    })
 
   return {
     score,
@@ -137,5 +189,8 @@ export async function submitQuiz(
     passingScore: quiz.settings.passingScore,
     moduleCompleted: true,
     perQuestionResults,
+    attemptNumber,
+    attemptsAllowed,
+    attemptsRemaining: Math.max(0, attemptsAllowed - attemptNumber),
   }
 }

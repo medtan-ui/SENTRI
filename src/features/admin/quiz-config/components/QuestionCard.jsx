@@ -97,6 +97,25 @@ export default function QuestionCard({
           </div>
 
           <div className={forms.fieldGroup}>
+            <label className={forms.fieldLabel} htmlFor={`${question.id}-topic`}>
+              Topic
+            </label>
+            <input
+              id={`${question.id}-topic`}
+              type="text"
+              className={forms.textInput}
+              value={question.topic || ''}
+              onChange={(e) => onUpdateQuestion({ topic: e.target.value })}
+              placeholder="e.g. password-reuse"
+              list="sentri-topic-slugs"
+            />
+            <span className={forms.hintText}>
+              Groups this question with the matching pre/post-test items so per-topic mastery and
+              cross-module transfer can be reported. Leave blank to exclude it from topic analysis.
+            </span>
+          </div>
+
+          <div className={forms.fieldGroup}>
             <span className={forms.fieldLabel}>Choices — select the correct answer</span>
             {(choicesError || correctError) && (
               <div className={styles.choiceIssueBanner}>

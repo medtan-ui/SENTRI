@@ -284,3 +284,70 @@
   line-height: 1.5;
   color: var(--color-text-muted);
 }
+
+/* ── Post-test handoff ────────────────────────────────────────────────
+   The quiz result screen is the one moment a student is guaranteed to
+   be looking, so it's where the post-test is offered. Skipping stays
+   possible (the module is already complete) but is a text link, not a
+   button competing with the primary action. */
+.postTestPrompt {
+  margin-top: var(--space-4);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.skipLink {
+  margin-top: var(--space-4);
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.skipLink:hover {
+  color: var(--color-text);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────
+   The quiz is the page most likely to be taken on a phone, so the
+   "N of M answered ......... [Submit]" row is the one that matters:
+   at narrow widths space-between pushes the button off to a cramped
+   edge. Stacked, the button gets full width and a real tap target. */
+@media (max-width: 600px) {
+  .submitRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .submitRow > button {
+    width: 100%;
+  }
+
+  .progressText {
+    text-align: center;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions > button {
+    width: 100%;
+  }
+
+  .metaRow {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stateCard,
+  .resultCard {
+    padding: var(--space-6) var(--space-4);
+  }
+}

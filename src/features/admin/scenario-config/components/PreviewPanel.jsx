@@ -1,41 +1,48 @@
 import React, { useEffect, useState } from 'react'
-import { BrowserChrome, PhoneFrame, DecisionOverlay, FeedbackPanel, ConsequencePlayer } from '../../../scenario'
+import ConsequenceOverlay from '../../../scenario/engine/ConsequenceOverlay'
+import FeedbackPanel from '../../../scenario/engine/FeedbackPanel'
+import { sceneLabelFor } from '../../../scenario/engine/sceneLabels'
 import PausedVideoPreview from './PausedVideoPreview'
 import styles from './PreviewPanel.module.css'
 
 const MODES = [
-  { key: 'paused', label: 'Paused Video' },
-  { key: 'decision', label: 'Decision' },
-  { key: 'feedback', label: 'Feedback' },
+  { key: 'poster', label: 'Opening' },
   { key: 'consequence', label: 'Consequence' },
+  { key: 'feedback', label: 'Feedback' },
 ]
 
 const noop = () => {}
 
 /**
  * PreviewPanel
- * A live, read-only preview of exactly what the student sees at each
- * moment — built by reusing the Scenario Engine's own presentational
- * components (BrowserChrome/PhoneFrame, DecisionOverlay, FeedbackPanel,
- * ConsequencePlayer) verbatim, fed with the admin's in-progress draft.
- * No gameplay: every callback is a no-op, so clicking a choice or button
- * here never advances anything.
+ * A live, read-only preview of exactly what a student sees — built by
+ * reusing the Scenario Engine's own overlays (ConsequenceOverlay,
+ * FeedbackPanel) verbatim, fed with the admin's in-progress draft. No
+ * gameplay: every callback is a no-op, so clicking a button here never
+ * advances anything.
+ *
+ * The interactive scene itself is not rendered here. Scenes are bespoke
+ * components driven by the engine's state machine (they expect a live
+ * target registry, idle-pulse timers, and a resolve callback); mounting
+ * one inside a static form would start real timers for a session that
+ * isn't happening. The scene is identified by name instead, and its
+ * copy — which is all an admin can change — previews in full.
  */
-export default function PreviewPanel({ scenario, surface }) {
-  const [mode, setMode] = useState('paused')
-  const [choiceId, setChoiceId] = useState(scenario.choices[0]?.id || null)
+export default function PreviewPanel({ scenario }) {
+  const [mode, setMode] = useState('poster')
+  const [choiceId, setChoiceId] = useState(scenario.choices[0]?.scenario_choice_id || null)
 
   useEffect(() => {
-    if (!scenario.choices.some((c) => c.id === choiceId)) {
-      setChoiceId(scenario.choices[0]?.id || null)
+    if (!scenario.choices.some((c) => c.scenario_choice_id === choiceId)) {
+      setChoiceId(scenario.choices[0]?.scenario_choice_id || null)
     }
   }, [scenario.choices, choiceId])
 
-  const riskyChoices = scenario.choices.filter((c) => !c.isSafe)
-  const feedbackChoice = scenario.choices.find((c) => c.id === choiceId) || scenario.choices[0]
-  const consequenceChoice = riskyChoices.find((c) => c.id === choiceId) || riskyChoices[0]
-
-  const Surface = surface === 'phone' ? PhoneFrame : BrowserChrome
+  const riskyChoices = scenario.choices.filter((c) => !c.is_safe_choice)
+  const feedbackChoice =
+    scenario.choices.find((c) => c.scenario_choice_id === choiceId) || scenario.choices[0]
+  const consequenceChoice =
+    riskyChoices.find((c) => c.scenario_choice_id === choiceId) || riskyChoices[0]
 
   return (
     <div className={styles.wrap}>
@@ -60,32 +67,45 @@ export default function PreviewPanel({ scenario, surface }) {
         <div className={styles.choicePicker}>
           <span className={styles.choicePickerLabel}>Previewing choice:</span>
           <select
-            value={mode === 'consequence' ? consequenceChoice?.id : feedbackChoice?.id}
+            value={
+              (mode === 'consequence' ? consequenceChoice : feedbackChoice)?.scenario_choice_id || ''
+            }
             onChange={(e) => setChoiceId(e.target.value)}
           >
             {(mode === 'consequence' ? riskyChoices : scenario.choices).map((c) => (
-              <option key={c.id} value={c.id}>
-                Choice {scenario.choices.indexOf(c) + 1}: {c.text ? c.text.slice(0, 40) : '(empty)'}
+              <option key={c.scenario_choice_id} value={c.scenario_choice_id}>
+                Choice {scenario.choices.indexOf(c) + 1}:{' '}
+                {c.choice_text ? c.choice_text.slice(0, 40) : '(empty)'}
               </option>
             ))}
           </select>
         </div>
       )}
 
-      <Surface url={scenario.simulatedUrl}>
-        {mode === 'paused' && (
-          <PausedVideoPreview video={scenario.video} pauseTimestamp={scenario.pauseTimestamp} />
-        )}
-        {mode === 'decision' && <DecisionOverlay choices={scenario.choices} onSelect={noop} />}
-        {mode === 'feedback' && feedbackChoice && (
-          <FeedbackPanel choice={feedbackChoice} onContinue={noop} onViewConsequence={noop} />
-        )}
-        {mode === 'consequence' && consequenceChoice && (
-          <ConsequencePlayer choice={consequenceChoice} onTryAgain={noop} />
-        )}
-      </Surface>
+      <div className={styles.stage}>
+        <span className={styles.sceneLabel}>{sceneLabelFor(scenario.scene)}</span>
 
-      <p className={styles.readOnlyNote}>Read-only preview — clicking elements here has no effect.</p>
+        {mode === 'poster' && <PausedVideoPreview scenario={scenario} />}
+
+        {mode === 'consequence' && consequenceChoice && (
+          <ConsequenceOverlay choice={consequenceChoice} onContinue={noop} />
+        )}
+
+        {mode === 'feedback' && feedbackChoice && (
+          <FeedbackPanel
+            choice={feedbackChoice}
+            scenario={scenario}
+            attemptCount={0}
+            onRetry={noop}
+            onContinue={noop}
+          />
+        )}
+      </div>
+
+      <p className={styles.readOnlyNote}>
+        Read-only preview, so clicking elements here has no effect. The interactive scene itself renders
+        live in the student simulation.
+      </p>
     </div>
   )
 }

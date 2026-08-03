@@ -60,19 +60,27 @@ export function getDefaultQuiz(moduleId) {
 /**
  * Submits one quiz attempt for grading. The server re-reads this same
  * quiz document itself to grade — `answers` is the only input trusted
- * from the client, never a score. Also records the attempt and (on a
- * pass) completes the module and unlocks the next one, all atomically.
+ * from the client, never a score. Also records the attempt, completes the
+ * module, unlocks the next one, and writes one `quiz_responses` row per
+ * question for item analysis.
+ *
+ * `durations` (questionId -> milliseconds) is purely for analytics and
+ * never affects grading — a client that omits it simply produces items
+ * with no recorded timing.
+ *
  * @param {string} moduleId
  * @param {Record<string,string>} answers  questionId -> choiceId
+ * @param {Record<string,number>} [durations]  questionId -> milliseconds
  * @returns {Promise<{score:number, correctCount:number, total:number, passed:boolean,
- *   passingScore:number, attemptsUsed:number, attemptsRemaining:number|null,
+ *   passingScore:number, attemptNumber:number, attemptsAllowed:number, attemptsRemaining:number,
  *   moduleCompleted:boolean, perQuestionResults:Array<{questionId:string, correct:boolean,
- *   selectedChoiceId:string|null, correctChoiceId:string, explanation:string}>}>}
+ *   selectedChoiceId:string|null, correctChoiceId:string, explanation:string,
+ *   topic:string|null, durationMs:number|null}>}>}
  */
-export async function submitQuiz(moduleId, answers) {
+export async function submitQuiz(moduleId, answers, durations) {
   try {
     const call = httpsCallable(functions, 'submitQuiz')
-    const { data } = await call({ moduleId, answers })
+    const { data } = await call({ moduleId, answers, durations })
     return data
   } catch (err) {
     throw new Error(friendlyCallableError(err))

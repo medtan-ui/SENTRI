@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Card from '../../../../components/Card/Card'
+import { sceneLabelFor } from '../../../scenario/engine/sceneLabels'
 import VideoSection from './VideoSection'
 import ChoiceList from './ChoiceList'
 import PreviewPanel from './PreviewPanel'
@@ -10,27 +11,25 @@ import styles from './ScenarioCard.module.css'
 /**
  * ScenarioCard
  * One predefined scenario, fully expandable/collapsible. Scenario order
- * is fixed and shown read-only — only content (title, video pause point,
- * choices) is editable, never the scenario's position or existence.
+ * and the scene that renders it are fixed and shown read-only — only the
+ * copy and media students encounter are editable, never the scenario's
+ * position, existence, or interaction wiring.
  */
 export default function ScenarioCard({
   scenario,
   validation,
-  surface,
   defaultExpanded = false,
   onUpdateScenario,
   onUpdateChoice,
-  onAddChoice,
-  onRemoveChoice,
-  onMoveChoice,
-  onSetConsequenceEnabled,
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded)
 
-  const scenarioLevelIssues = validation.issues.filter(
-    (issue) => issue.field === 'safeChoice' || issue.field === 'pauseTimestamp',
+  const scenarioLevelIssues = validation.issues.filter((issue) =>
+    ['safeChoice', 'scenario_title', 'scenario_description', 'posterCaption'].includes(issue.field),
   )
-  const pauseError = validation.issues.find((issue) => issue.field === 'pauseTimestamp')?.message
+  const titleError = validation.issues.find((i) => i.field === 'scenario_title')?.message || ''
+  const descriptionError =
+    validation.issues.find((i) => i.field === 'scenario_description')?.message || ''
 
   return (
     <Card className={styles.card}>
@@ -41,12 +40,14 @@ export default function ScenarioCard({
         aria-expanded={expanded}
       >
         <div className={styles.headerLeft}>
-          <span className={styles.orderBadge}>Scenario {scenario.order}</span>
-          <span className={styles.titlePreview}>{scenario.title || '(untitled)'}</span>
+          <span className={styles.orderBadge}>Scenario {scenario.scenario_order}</span>
+          <span className={styles.titlePreview}>{scenario.scenario_title || '(untitled)'}</span>
         </div>
         <div className={styles.headerRight}>
           <span className={`${badges.pill} ${validation.isValid ? badges.valid : badges.invalid}`}>
-            {validation.isValid ? '✓ Valid' : `⚠ ${validation.issues.length} issue${validation.issues.length === 1 ? '' : 's'}`}
+            {validation.isValid
+              ? '✓ Valid'
+              : `⚠ ${validation.issues.length} issue${validation.issues.length === 1 ? '' : 's'}`}
           </span>
           <span className={styles.chevron} data-expanded={expanded} aria-hidden="true">▾</span>
         </div>
@@ -64,43 +65,68 @@ export default function ScenarioCard({
 
           <div className={styles.titleRow}>
             <div className={forms.fieldGroup} style={{ flex: 1 }}>
-              <label className={forms.fieldLabel} htmlFor={`${scenario.id}-title`}>Scenario Title</label>
+              <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-title`}>
+                Scenario Title
+              </label>
               <input
-                id={`${scenario.id}-title`}
-                className={styles.titleInput}
-                value={scenario.title}
-                onChange={(e) => onUpdateScenario({ title: e.target.value })}
+                id={`${scenario.scenario_id}-title`}
+                className={`${styles.titleInput} ${titleError ? forms.textareaError : ''}`}
+                value={scenario.scenario_title}
+                onChange={(e) => onUpdateScenario({ scenario_title: e.target.value })}
               />
             </div>
             <div className={styles.orderDisplay}>
               <span className={forms.fieldLabel}>Order</span>
-              <span className={styles.orderValue}>{scenario.order}</span>
+              <span className={styles.orderValue}>{scenario.scenario_order}</span>
             </div>
+          </div>
+
+          <div className={styles.structuralRow}>
+            <span className={styles.structuralChip} title={`Rendered by the ${scenario.scene} component`}>
+              {sceneLabelFor(scenario.scene)} · <code>{scenario.scene}</code>
+            </span>
+            <span className={styles.structuralNote}>Scene wired in code, not editable here</span>
+          </div>
+
+          <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-4)' }}>
+            <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-description`}>
+              Scenario Description
+            </label>
+            <textarea
+              id={`${scenario.scenario_id}-description`}
+              className={`${forms.textarea} ${descriptionError ? forms.textareaError : ''}`}
+              rows={2}
+              value={scenario.scenario_description}
+              onChange={(e) => onUpdateScenario({ scenario_description: e.target.value })}
+            />
+          </div>
+
+          <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-4)' }}>
+            <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-reflection`}>
+              Closing Reflection <span className={styles.labelHint}>(optional — shown once this scenario is resolved safely)</span>
+            </label>
+            <textarea
+              id={`${scenario.scenario_id}-reflection`}
+              className={forms.textarea}
+              rows={2}
+              value={scenario.postCompletionReflection || ''}
+              onChange={(e) =>
+                onUpdateScenario({ postCompletionReflection: e.target.value || undefined })
+              }
+            />
           </div>
 
           <div className={styles.layout}>
             <div className={styles.editColumn}>
-              <VideoSection
-                video={scenario.video}
-                pauseTimestamp={scenario.pauseTimestamp}
-                pauseError={pauseError}
-                onChangePauseTimestamp={(value) => onUpdateScenario({ pauseTimestamp: value })}
-                onChangeVideoUrl={(value) =>
-                  onUpdateScenario({ video: { ...scenario.video, videoUrl: value, videoAvailable: Boolean(value) } })
-                }
-              />
+              <VideoSection scenario={scenario} errors={validation.issues} onUpdate={onUpdateScenario} />
               <ChoiceList
                 choices={scenario.choices}
                 issues={validation.issues}
                 onUpdateChoice={onUpdateChoice}
-                onRemoveChoice={onRemoveChoice}
-                onMoveChoice={onMoveChoice}
-                onAddChoice={onAddChoice}
-                onSetConsequenceEnabled={onSetConsequenceEnabled}
               />
             </div>
             <div className={styles.previewColumn}>
-              <PreviewPanel scenario={scenario} surface={surface} />
+              <PreviewPanel scenario={scenario} />
             </div>
           </div>
         </div>

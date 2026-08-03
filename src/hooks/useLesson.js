@@ -4,20 +4,32 @@ import { useDraftResource } from './useDraftResource'
 
 function validateLesson(draft) {
   const issues = []
-  if (!draft.introduction || !draft.introduction.trim()) {
-    issues.push({ field: 'introduction', message: 'Introduction is required.' })
+  if (!Array.isArray(draft.sections) || draft.sections.length === 0) {
+    issues.push({ field: 'sections', message: 'A lesson needs at least one section.' })
+    return issues
   }
-  if (!draft.lessonContent || !draft.lessonContent.trim()) {
-    issues.push({ field: 'lessonContent', message: 'Lesson content is required.' })
+  draft.sections.forEach((section, index) => {
+    if (!section.title || !section.title.trim()) {
+      issues.push({ field: `sections.${index}.title`, message: `Section ${index + 1}: title is required.` })
+    }
+    if (!section.content || !section.content.trim()) {
+      issues.push({ field: `sections.${index}.content`, message: `Section ${index + 1}: content is required.` })
+    }
+  })
+  if (!draft.objectives.some((o) => o.trim())) {
+    issues.push({ field: 'objectives', message: 'At least one learning objective is required.' })
   }
   return issues
 }
 
 /**
  * useLesson
- * Loads and edits one module's lesson content (introduction, learning
- * objectives, lesson content, real-world example, best practices, key
- * takeaways, references) — the Lesson Content Editor's data source.
+ * Loads and edits one module's lesson content — the video slot, learning
+ * objectives, ordered reading sections, best practices, key takeaways,
+ * and references. This is the Lesson Content Editor's data source, and
+ * the same document the student Lesson Viewer renders (see
+ * services/moduleLoader.js), so saving here publishes.
+ *
  * Manages loading/error/success and optimistic save.
  *
  * @param {string} moduleId

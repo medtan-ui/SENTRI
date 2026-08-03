@@ -6,12 +6,25 @@ import Input from '../../components/Input/Input'
 import PasswordStrengthMeter from '../../components/PasswordStrengthMeter/PasswordStrengthMeter'
 import { useAuth } from '../../context/AuthContext'
 import { validatePassword } from '../../utils/passwordPolicy'
+import { MAX_SECTION_LENGTH } from '../../utils/sections'
 import logo from '../../assets/images/logo.png'
 import styles from './RegisterAccountPage.module.css'
 
 const SCHOOL_EMAIL_REGEX = /^[^\s@]+@tip\.edu\.ph$/i
 
-const EMPTY_FORM = { displayName: '', nickname: '', email: '', password: '', confirmPassword: '' }
+// Mirrors the sectionSchema regex in functions/src/auth/validators.ts —
+// the server is authoritative; this is only so a typo is caught before the
+// round trip.
+const SECTION_REGEX = /^[A-Za-z0-9][A-Za-z0-9 ._/-]*$/
+
+const EMPTY_FORM = {
+  displayName: '',
+  nickname: '',
+  email: '',
+  section: '',
+  password: '',
+  confirmPassword: '',
+}
 
 /**
  * RegisterAccountPage — /register
@@ -38,6 +51,13 @@ export default function RegisterAccountPage() {
     if (!form.displayName.trim()) return 'Please enter your full name.'
     if (!form.nickname.trim()) return 'Please enter a nickname.'
     if (!SCHOOL_EMAIL_REGEX.test(form.email.trim())) return 'Please enter a valid @tip.edu.ph email address.'
+    const section = form.section.trim()
+    if (section) {
+      if (section.length > MAX_SECTION_LENGTH) return `Section must be ${MAX_SECTION_LENGTH} characters or fewer.`
+      if (!SECTION_REGEX.test(section)) {
+        return 'Section may only contain letters, numbers, spaces, and - _ . /'
+      }
+    }
     const { valid, errors } = validatePassword(form.password)
     if (!valid) return `Password requirements not met: ${errors.join(', ')}.`
     if (form.password !== form.confirmPassword) return 'Passwords do not match.'
@@ -58,6 +78,7 @@ export default function RegisterAccountPage() {
         displayName: form.displayName.trim(),
         nickname: form.nickname.trim(),
         email: form.email.trim(),
+        section: form.section.trim(),
         password: form.password,
       })
       // Freshly registered + signed in, emailVerified is false — land on
@@ -143,6 +164,17 @@ export default function RegisterAccountPage() {
               placeholder="juan.delacruz@tip.edu.ph"
               autoComplete="email"
               required
+            />
+
+            <Input
+              id="regSection"
+              label="Section (optional)"
+              value={form.section}
+              onChange={updateField('section')}
+              placeholder="BSIT-3A"
+              autoComplete="off"
+              maxLength={MAX_SECTION_LENGTH}
+              helperText="Lets your instructor see your class group's results together. You can leave this blank."
             />
 
             <Input

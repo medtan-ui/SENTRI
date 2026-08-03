@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
@@ -8,6 +8,7 @@ import LoadingScreen from '../../../../features/scenario/components/LoadingScree
 import ScenarioEngine from '../../../../features/scenario/engine/ScenarioEngine'
 import ScenarioIntroTutorial from '../../../../features/scenario/engine/ScenarioIntroTutorial'
 import { loadModuleConfig } from '../../../../services/moduleLoader'
+import { recordEvent, startTimedEvent } from '../../../../services/analyticsEventService'
 import { useModuleProgress } from '../../../../hooks/useModuleProgress'
 import styles from './ScenarioRunnerPage.module.css'
 
@@ -36,6 +37,11 @@ export default function ScenarioRunnerPage() {
   const [config, setConfig] = useState(undefined)
   const [phase, setPhase] = useState('entering') // 'entering' | 'tutorial' | 'engine' | 'exiting' | 'not-found'
   const [messageIndex, setMessageIndex] = useState(0)
+
+  // Time-on-simulation, measured from the moment the engine actually
+  // starts — not from page load, which includes the staging animation and
+  // the intro tutorial the student reads at their own pace.
+  const simulationTimerRef = useRef(null)
 
   useEffect(() => {
     let cancelled = false
@@ -82,8 +88,19 @@ export default function ScenarioRunnerPage() {
     return () => clearTimeout(timer)
   }, [phase, messageIndex, moduleId, navigate])
 
+  // Start the simulation stopwatch the first time the engine is shown.
+  useEffect(() => {
+    if (phase !== 'engine' || simulationTimerRef.current) return
+    recordEvent('simulation_started', { moduleId })
+    simulationTimerRef.current = startTimedEvent('simulation_completed', moduleId)
+  }, [phase, moduleId])
+
   function handleContinueToQuiz() {
     actions.completeSimulation()
+    if (simulationTimerRef.current) {
+      simulationTimerRef.current({ scenarios: config?.scenario?.scenarios?.length ?? null })
+      simulationTimerRef.current = null
+    }
     setMessageIndex(0)
     setPhase('exiting')
   }

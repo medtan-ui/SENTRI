@@ -4,12 +4,13 @@ import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
 import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
-import PretestGate from '../../../../components/PretestGate/PretestGate'
+import AssessmentGate from '../../../../components/AssessmentGate/AssessmentGate'
 import YouTubePlayer from '../../../../components/VideoPlayer/YouTubePlayer'
 import Tooltip from '../../../../components/Tooltip/Tooltip'
 import { loadModuleConfig } from '../../../../services/moduleLoader'
+import { recordEvent, startTimedEvent } from '../../../../services/analyticsEventService'
 import { useModuleProgress } from '../../../../hooks/useModuleProgress'
-import { useModulePretest } from '../../../../hooks/useModulePretest'
+import { useModuleAssessment } from '../../../../hooks/useModuleAssessment'
 import styles from './StudentLessonViewerPage.module.css'
 
 const WORDS_PER_MINUTE = 200
@@ -33,11 +34,11 @@ export default function StudentLessonViewerPage() {
     status: pretestStatus,
     errorMessage: pretestErrorMessage,
     retry: retryPretest,
-    pretest,
-    pretestCompleted,
+    assessment: pretest,
+    completed: pretestCompleted,
     submitting: pretestSubmitting,
     submit: submitPretest,
-  } = useModulePretest(moduleId)
+  } = useModuleAssessment(moduleId, 'pretest')
 
   // undefined = loading, null = not found, object = loaded
   const [config, setConfig] = useState(undefined)
@@ -53,6 +54,12 @@ export default function StudentLessonViewerPage() {
   const [skipGate, setSkipGate] = useState(false)
   const [gateCleared, setGateCleared] = useState(false)
   const pretestCaptured = useRef(false)
+
+  // Stopwatch for time-on-lesson. Started when the lesson itself becomes
+  // visible (not when the page mounts, which may still be showing the
+  // pre-test gate), and stopped once on reaching the last section.
+  const lessonTimerRef = useRef(null)
+  const lessonCompletionRecorded = useRef(false)
 
   useEffect(() => {
     if (pretestStatus === 'success' && !pretestCaptured.current) {
@@ -83,7 +90,13 @@ export default function StudentLessonViewerPage() {
   // that seed has landed would try to update a progress doc that
   // doesn't exist yet.
   useEffect(() => {
-    if (config && progressStatus === 'success' && showLesson) actions.startLesson()
+    if (config && progressStatus === 'success' && showLesson) {
+      actions.startLesson()
+      if (!lessonTimerRef.current) {
+        recordEvent('lesson_viewed', { moduleId })
+        lessonTimerRef.current = startTimedEvent('lesson_completed', moduleId)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, progressStatus, showLesson])
 
@@ -92,7 +105,14 @@ export default function StudentLessonViewerPage() {
   useEffect(() => {
     if (!config || progressStatus !== 'success' || !showLesson) return
     const totalSections = config.lesson.sections.length
-    if (furthestIndex === totalSections - 1) actions.completeLesson()
+    if (furthestIndex !== totalSections - 1) return
+    actions.completeLesson()
+    // Guarded so re-navigating back and forth through the last section
+    // doesn't record several completions with meaningless durations.
+    if (!lessonCompletionRecorded.current && lessonTimerRef.current) {
+      lessonCompletionRecorded.current = true
+      lessonTimerRef.current({ sections: totalSections })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, progressStatus, furthestIndex, showLesson])
 
@@ -158,11 +178,12 @@ export default function StudentLessonViewerPage() {
       <div className={styles.page}>
       <ModuleAccessGuard moduleId={moduleId} require="lesson">
         {!showLesson ? (
-          <PretestGate
+          <AssessmentGate
+            variant="pretest"
             status={pretestStatus}
             errorMessage={pretestErrorMessage}
             retry={retryPretest}
-            pretest={pretest}
+            assessment={pretest}
             submitting={pretestSubmitting}
             onSubmit={submitPretest}
             onContinue={() => setGateCleared(true)}

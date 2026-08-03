@@ -341,3 +341,119 @@
   .sectionHeader { padding: var(--space-4) var(--space-5); }
   .sectionBody { padding: var(--space-4) var(--space-5) var(--space-5); }
 }
+
+/* ── Publishing feedback ──────────────────────────────────────────────
+   Saving here now changes what students read, so the editor says so and
+   surfaces validation before Save can be pressed. */
+.liveNote {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  background: var(--color-gold-muted);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.issueBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.issueBanner p {
+  margin: 0;
+}
+
+/* ── Lesson video slot ── */
+.videoPreview {
+  margin-top: var(--space-3);
+}
+
+.videoWarning {
+  margin: var(--space-2) 0 0;
+  font-size: 12px;
+  color: var(--color-error);
+}
+
+/* ── Reading sections ── */
+.sectionsEditor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.sectionRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sectionRowIndex {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.sectionRowActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sectionRowActions button {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.sectionRowActions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sectionRowActions button:not(:disabled):hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold-dark);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .topActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topActions > button {
+    width: 100%;
+  }
+
+  .sectionRowHeader {
+    flex-wrap: wrap;
+  }
+}

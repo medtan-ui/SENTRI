@@ -43,6 +43,29 @@ export async function createUserAccount(input) {
 }
 
 /**
+ * Grants one extra quiz attempt to a student on a module — the appeal
+ * path for SENTRI's deliberately-single-attempt quiz.
+ *
+ * Preferred over resetModuleProgress for a failed quiz: a reset would
+ * also wipe the student's lesson and simulation progress, punishing them
+ * for appealing. This only reopens the quiz. The server records who
+ * granted it and why, and a retake can only raise the recorded score,
+ * never lower it.
+ *
+ * @param {{ userId: string, moduleId: string, reason: string }} input
+ * @returns {Promise<{ attemptsAllowed: number, attemptsUsed: number, attemptsRemaining: number }>}
+ */
+export async function grantQuizRetry({ userId, moduleId, reason }) {
+  try {
+    const call = httpsCallable(functions, 'grantQuizRetry')
+    const { data } = await call({ userId, moduleId, reason })
+    return data
+  } catch (err) {
+    throw new Error(_friendlyCallableError(err))
+  }
+}
+
+/**
  * Permanently remove a student/admin account (Auth + Firestore profile).
  * @param {string} uid
  * @returns {Promise<{ success: boolean }>}
@@ -96,8 +119,27 @@ export async function setUserAccountStatus(uid, status) {
 }
 
 /**
+ * Assign a student to a class group (section), or clear the assignment by
+ * passing null/''. This is what makes the Analytics page's per-section
+ * cohort reporting possible — an unassigned student still counts in the
+ * whole-cohort rollup, just not in any section's.
+ * @param {string} uid
+ * @param {string|null} section
+ * @returns {Promise<{ success: boolean, section: string|null }>}
+ */
+export async function setUserSection(uid, section) {
+  try {
+    const call = httpsCallable(functions, 'setUserSection')
+    const { data } = await call({ uid, section: section || null })
+    return data
+  } catch (err) {
+    throw new Error(_friendlyCallableError(err))
+  }
+}
+
+/**
  * List all student/admin account profiles for the account management screen.
- * @returns {Promise<Array<{ uid, role, displayName, nickname, email, status, createdAt }>>}
+ * @returns {Promise<Array<{ uid, role, displayName, nickname, email, status, section, createdAt }>>}
  */
 export async function listUsers() {
   try {

@@ -190,6 +190,75 @@ export async function resetModuleProgress(userId: string, moduleId: string): Pro
   })
 }
 
+/**
+ * grantQuizRetry
+ * The admin-side appeal path for a quiz. A quiz is deliberately one
+ * attempt; this is the documented, audited exception rather than an
+ * admin editing a score by hand or resetting the whole module (which
+ * would also wipe the student's lesson and simulation progress).
+ *
+ * It raises this student's allowance on this module by one and clears
+ * `quizCompleted` so the quiz page lets them back in. It does NOT clear
+ * `moduleCompleted` or re-lock the next module: the student already
+ * earned that by submitting once, and taking it away as the price of an
+ * appeal would punish them for appealing. The recorded score can only go
+ * up (see submitQuiz), so a retry is never worse than not taking it.
+ *
+ * @returns the new allowance and how many attempts remain.
+ */
+export async function grantQuizRetry(
+  adminUid: string,
+  userId: string,
+  moduleId: string,
+  reason: string,
+): Promise<{ attemptsAllowed: number; attemptsUsed: number; attemptsRemaining: number }> {
+  await getModuleOrThrow(moduleId)
+
+  return db.runTransaction(async (txn) => {
+    const ref = progressRef(userId, moduleId)
+    const snap = await txn.get(ref)
+
+    if (!snap.exists) {
+      throw new AppError('not-found', 'This student has no progress recorded for that module yet.')
+    }
+
+    const current = snap.data() as ModuleProgressDoc
+    if (!current.quizCompleted) {
+      throw new AppError(
+        'failed-precondition',
+        'This student has not submitted the quiz yet — there is nothing to retry.',
+      )
+    }
+
+    const used = current.attempts || 0
+    const currentAllowance = typeof current.attemptsAllowed === 'number' ? current.attemptsAllowed : 1
+    if (currentAllowance > used) {
+      throw new AppError(
+        'failed-precondition',
+        'This student already has an unused attempt available for that module.',
+      )
+    }
+
+    const attemptsAllowed = used + 1
+
+    txn.set(
+      ref,
+      {
+        attemptsAllowed,
+        // Reopens the quiz for this student. moduleCompleted stays true.
+        quizCompleted: false,
+        retryGrantedBy: adminUid,
+        retryGrantedAt: admin.firestore.FieldValue.serverTimestamp(),
+        retryReason: reason,
+        lastAccessed: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    )
+
+    return { attemptsAllowed, attemptsUsed: used, attemptsRemaining: attemptsAllowed - used }
+  })
+}
+
 /** Exposed for the quiz module so a passing attempt can unlock the next
  * module as part of its own single transaction instead of a second one. */
 export { planUnlock, applyUnlockPlan }

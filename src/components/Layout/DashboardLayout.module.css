@@ -4,6 +4,14 @@
   background: var(--color-bg);
 }
 
+/* Groups the navbar and sidebar under one `data-print-hide` marker
+   without becoming a layout box itself — `display: contents` keeps both
+   children exactly where they were as direct participants of .root.
+   The print stylesheet's `display: none` overrides this. */
+.chrome {
+  display: contents;
+}
+
 .main {
   flex: 1;
   margin-top: var(--navbar-height);

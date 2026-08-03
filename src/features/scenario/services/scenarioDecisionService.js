@@ -18,10 +18,31 @@ import { db } from '../../../services/firebase'
 const COLLECTION = 'scenario_decision_records'
 
 /**
- * @param {{ userId: string, moduleId: string, scenarioId: string, choiceId: string, isSafe: boolean }} args
+ * `attemptNumber` and `durationMs` are what the Kirkpatrick Level 3
+ * measures are computed from. First-attempt safe rate has to know which
+ * decision was the student's first on a scenario — an eventual-success
+ * rate is meaningless here, since the engine never lets anyone leave
+ * without eventually choosing safely. `durationMs` separates a risky
+ * choice made without looking from one made after genuinely weighing it,
+ * which call for different interventions.
+ *
+ * `durationMs` is omitted (stored as null) rather than sent as 0 when the
+ * engine couldn't measure it, so an unmeasured decision is excluded from
+ * timing averages instead of dragging them down.
+ *
+ * @param {{ userId: string, moduleId: string, scenarioId: string, choiceId: string,
+ *   isSafe: boolean, attemptNumber?: number, durationMs?: number|null }} args
  * @returns {Promise<string|null>} the new document's id, or null if the write failed
  */
-export async function recordDecision({ userId, moduleId, scenarioId, choiceId, isSafe }) {
+export async function recordDecision({
+  userId,
+  moduleId,
+  scenarioId,
+  choiceId,
+  isSafe,
+  attemptNumber = 1,
+  durationMs = null,
+}) {
   try {
     const ref = await addDoc(collection(db, COLLECTION), {
       user_id: userId,
@@ -29,6 +50,8 @@ export async function recordDecision({ userId, moduleId, scenarioId, choiceId, i
       scenario_id: scenarioId,
       scenario_choice_id: choiceId,
       is_safe_choice: isSafe,
+      attempt_number: attemptNumber,
+      duration_ms: typeof durationMs === 'number' && durationMs >= 0 ? Math.round(durationMs) : null,
       selected_at: serverTimestamp(),
       feedback_viewed: false,
     })

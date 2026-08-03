@@ -107,3 +107,11 @@
   font-weight: 600;
   color: var(--color-text);
 }
+
+/* Explanatory helper under a field — used where the effect of a setting
+   isn't obvious from its label (e.g. the analytics topic slug). */
+.hintText {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--color-text-light);
+}

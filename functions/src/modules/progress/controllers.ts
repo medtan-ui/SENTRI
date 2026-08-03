@@ -3,7 +3,12 @@ import { getModuleOrThrow } from '../../shared/moduleGuards'
 import { parseOrThrow } from '../../shared/validation'
 import { defineCallable } from '../../shared/withCallable'
 import * as service from './service'
-import { initializeStudentProgressSchema, moduleIdOnlySchema, resetModuleProgressSchema } from './validators'
+import {
+  grantQuizRetrySchema,
+  initializeStudentProgressSchema,
+  moduleIdOnlySchema,
+  resetModuleProgressSchema,
+} from './validators'
 
 export const initializeStudentProgress = defineCallable('initializeStudentProgress', async (request) => {
   const input = parseOrThrow(initializeStudentProgressSchema, request.data ?? {})
@@ -46,4 +51,15 @@ export const resetModuleProgress = defineCallable('resetModuleProgress', async (
   const input = parseOrThrow(resetModuleProgressSchema, request.data)
   await service.resetModuleProgress(input.userId, input.moduleId)
   return { success: true }
+})
+
+/**
+ * grantQuizRetry — the admin appeal path for a failed single-attempt
+ * quiz. Admin-only, and the caller's uid is recorded on the progress doc
+ * alongside their stated reason, so a granted retry is attributable.
+ */
+export const grantQuizRetry = defineCallable('grantQuizRetry', async (request) => {
+  const admin = await requireAdmin(request)
+  const input = parseOrThrow(grantQuizRetrySchema, request.data)
+  return service.grantQuizRetry(admin.uid, input.userId, input.moduleId, input.reason)
 })

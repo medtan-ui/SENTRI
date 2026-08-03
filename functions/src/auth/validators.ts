@@ -8,6 +8,7 @@
  */
 import { z } from 'zod'
 import { MIN_PASSWORD_LENGTH } from '../shared/constants'
+import { MAX_SECTION_LENGTH } from '../shared/sections'
 
 export const passwordSchema = z
   .string()
@@ -31,12 +32,29 @@ export const schoolEmailSchema = z
   .email('Please provide a valid email address.')
   .refine((value) => value.toLowerCase().endsWith('@tip.edu.ph'), 'Only @tip.edu.ph email addresses are allowed.')
 
+/**
+ * A class-group label such as "BSIT-3A". Deliberately free text (section
+ * codes change every term), but bounded and stripped of the characters
+ * that would make it unusable as a grouping key. Nullable and optional
+ * everywhere: an account without a section is normal, not an error.
+ */
+export const sectionSchema = z
+  .string()
+  .trim()
+  .max(MAX_SECTION_LENGTH, `Section must be ${MAX_SECTION_LENGTH} characters or fewer.`)
+  // The empty alternative is what "clear this student's section" sends —
+  // rejecting it would leave no way to undo an assignment.
+  .regex(/^$|^[A-Za-z0-9][A-Za-z0-9 ._/-]*$/, 'Section may only contain letters, numbers, spaces, and - _ . /')
+  .nullable()
+  .optional()
+
 export const createUserAccountSchema = z.object({
   email: schoolEmailSchema,
   password: passwordSchema,
   displayName: z.string().trim().min(1, 'displayName is required.'),
   nickname: z.string().trim().min(1).optional(),
   role: roleSchema,
+  section: sectionSchema,
 })
 
 // Public, unauthenticated self-registration — always creates a student
@@ -48,6 +66,9 @@ export const registerStudentAccountSchema = z.object({
   password: passwordSchema,
   displayName: z.string().trim().min(1, 'displayName is required.'),
   nickname: z.string().trim().min(1, 'nickname is required.').max(50, 'Nickname is too long.'),
+  // Optional at registration: a student who doesn't know their section
+  // code yet still gets an account, and an admin can set it later.
+  section: sectionSchema,
 })
 
 export const deleteUserAccountSchema = z.object({
@@ -62,6 +83,11 @@ export const resetUserPasswordSchema = z.object({
 export const setUserAccountStatusSchema = z.object({
   uid: z.string().min(1, 'uid is required.'),
   status: z.enum(['active', 'disabled']),
+})
+
+export const setUserSectionSchema = z.object({
+  uid: z.string().min(1, 'uid is required.'),
+  section: sectionSchema,
 })
 
 export const changeOwnPasswordSchema = z.object({

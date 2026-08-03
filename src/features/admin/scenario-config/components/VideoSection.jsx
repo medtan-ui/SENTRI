@@ -6,54 +6,64 @@ import styles from './VideoSection.module.css'
 
 /**
  * VideoSection
- * The scenario's video: a real YouTube URL field (paste a link, done —
- * videoAvailable is derived automatically from whether it's non-empty)
- * plus the pauseTimestamp field that affects playback. Replaces what used
- * to be three "mock action" buttons with no real effect.
+ * The scenario's opening clip and the poster shown in its place until one
+ * exists. Both feed src/features/scenario/engine/ScenarioPlayer.jsx
+ * directly: paste a YouTube link (or a direct video file URL) into
+ * Material URL and it plays for students on their next run — no code
+ * change, which is the whole point of keeping this field editable.
+ *
+ * `videoAvailable` is derived from whether a URL is present rather than
+ * being a separate switch an admin can leave out of sync with reality.
  */
-export default function VideoSection({ video, pauseTimestamp, pauseError, onChangePauseTimestamp, onChangeVideoUrl }) {
+export default function VideoSection({ scenario, errors, onUpdate }) {
+  const materialUrl = scenario.material_url || ''
+  const captionError = errors.find((e) => e.field === 'posterCaption')?.message || ''
+
   return (
     <div className={styles.wrap}>
-      <h4 className={styles.heading}>Video</h4>
+      <h4 className={styles.heading}>Opening Clip</h4>
 
-      <YouTubePlayer url={video.videoUrl} title="Scenario video" />
+      <YouTubePlayer url={materialUrl} title="Scenario clip" />
 
       <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-4)' }}>
-        <label className={forms.fieldLabel} htmlFor="videoUrl">YouTube Video URL</label>
+        <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-material_url`}>
+          Material URL (YouTube link or video file)
+        </label>
         <input
-          id="videoUrl"
+          id={`${scenario.scenario_id}-material_url`}
           type="text"
           className={styles.urlInput}
-          value={video.videoUrl || ''}
-          onChange={(e) => onChangeVideoUrl(e.target.value)}
+          value={materialUrl}
+          onChange={(e) => {
+            const value = e.target.value
+            onUpdate({ material_url: value || null, videoAvailable: Boolean(value.trim()) })
+          }}
           placeholder="https://www.youtube.com/watch?v=…"
         />
       </div>
 
+      <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-3)' }}>
+        <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-posterCaption`}>
+          Poster Caption <span className={styles.hint}>(shown while the scene loads, and in place of a missing clip)</span>
+        </label>
+        <input
+          id={`${scenario.scenario_id}-posterCaption`}
+          type="text"
+          className={`${styles.urlInput} ${captionError ? forms.textareaError : ''}`}
+          value={scenario.posterCaption || ''}
+          onChange={(e) => onUpdate({ posterCaption: e.target.value })}
+        />
+        {captionError && <span className={forms.errorText}>{captionError}</span>}
+      </div>
+
       <div className={styles.metaGrid}>
         <div className={styles.metaItem}>
-          <span className={forms.fieldLabel}>Video Status</span>
-          <span className={`${badges.pill} ${video.videoAvailable ? badges.available : badges.placeholderStatus}`}>
-            {video.videoAvailable ? 'Available' : 'Placeholder'}
+          <span className={forms.fieldLabel}>Clip Status</span>
+          <span
+            className={`${badges.pill} ${scenario.videoAvailable ? badges.available : badges.placeholderStatus}`}
+          >
+            {scenario.videoAvailable ? 'Available' : 'Poster only'}
           </span>
-        </div>
-
-        <div className={styles.metaItem}>
-          <span className={forms.fieldLabel}>Duration</span>
-          <span className={styles.metaValue}>{video.duration}s</span>
-        </div>
-
-        <div className={forms.fieldGroup}>
-          <label className={forms.fieldLabel} htmlFor="pauseTimestamp">Pause Timestamp (seconds)</label>
-          <input
-            id="pauseTimestamp"
-            type="number"
-            min={0}
-            className={`${styles.numberInput} ${pauseError ? forms.textareaError : ''}`}
-            value={pauseTimestamp}
-            onChange={(e) => onChangePauseTimestamp(e.target.value === '' ? '' : Number(e.target.value))}
-          />
-          {pauseError && <span className={forms.errorText}>{pauseError}</span>}
         </div>
       </div>
     </div>

@@ -6,16 +6,41 @@ import {
 } from '../../src/modules/admin/validators'
 import { QuizConfig, QuizQuestion, ScenarioConfig, ScenarioItem } from '../../src/modules/admin/models'
 
+function makeChoice(overrides: Partial<ScenarioItem['choices'][number]> = {}) {
+  return {
+    scenario_choice_id: 'c1',
+    target: 'link-btn',
+    choice_text: 'Click the link',
+    is_safe_choice: false,
+    outcome_title: 'Credentials Captured',
+    consequence_type: 'credential_compromise',
+    feedback_text: 'That was risky.',
+    feedback_media_url: null,
+    ...overrides,
+  }
+}
+
 function makeScenario(overrides: Partial<ScenarioItem> = {}): ScenarioItem {
   return {
-    id: 'scenario-1',
-    title: 'A Suspicious Email',
-    order: 1,
-    video: { videoUrl: '/video.mp4', videoAvailable: false, duration: 30 },
-    pauseTimestamp: 10,
+    scenario_id: 'scenario-1',
+    scenario_order: 1,
+    scenario_title: 'A Suspicious Email',
+    scenario_description: 'An unexpected email lands in your inbox.',
+    videoAvailable: false,
+    material_url: null,
+    posterCaption: 'One email, one decision.',
+    scene: 'InboxScene',
     choices: [
-      { id: 'c1', text: 'Click the link', isSafe: false, feedbackTitle: 'Risky', feedbackText: 'That was risky.' },
-      { id: 'c2', text: 'Report it', isSafe: true, feedbackTitle: 'Good', feedbackText: 'Well done.' },
+      makeChoice(),
+      makeChoice({
+        scenario_choice_id: 'c2',
+        target: 'report-btn',
+        choice_text: 'Report it',
+        is_safe_choice: true,
+        outcome_title: 'Well Handled',
+        consequence_type: 'none',
+        feedback_text: 'Well done.',
+      }),
     ],
     ...overrides,
   }
@@ -26,53 +51,75 @@ describe('modules/admin/validators — scenario business rules', () => {
     expect(validateScenarioItem(makeScenario())).toEqual([])
   })
 
-  it('flags zero safe choices', () => {
+  it('flags zero safe choices, which would leave the scenario unwinnable', () => {
     const scenario = makeScenario({
-      choices: [
-        { id: 'c1', text: 'A', isSafe: false, feedbackTitle: 't', feedbackText: 'x' },
-        { id: 'c2', text: 'B', isSafe: false, feedbackTitle: 't', feedbackText: 'x' },
-      ],
+      choices: [makeChoice(), makeChoice({ scenario_choice_id: 'c2', target: 'report-btn' })],
     })
     const issues = validateScenarioItem(scenario)
     expect(issues.some((i) => i.field === 'safeChoice')).toBe(true)
   })
 
-  it('flags more than one safe choice', () => {
+  it('accepts more than one safe choice', () => {
+    // A scene may offer several acceptable endings with different
+    // feedback — Password Security's sign-up scenario does exactly this,
+    // distinguishing unique-and-strong from unique-but-weak passwords.
     const scenario = makeScenario({
       choices: [
-        { id: 'c1', text: 'A', isSafe: true, feedbackTitle: 't', feedbackText: 'x' },
-        { id: 'c2', text: 'B', isSafe: true, feedbackTitle: 't', feedbackText: 'x' },
+        makeChoice({ is_safe_choice: true, consequence_type: 'none' }),
+        makeChoice({
+          scenario_choice_id: 'c2',
+          target: 'report-btn',
+          is_safe_choice: true,
+          consequence_type: 'none',
+        }),
+      ],
+    })
+    expect(validateScenarioItem(scenario)).toEqual([])
+  })
+
+  it('flags two choices bound to the same interactive target', () => {
+    // The scene resolves a target to exactly one choice, so a duplicate
+    // makes one of them permanently unreachable.
+    const scenario = makeScenario({
+      choices: [
+        makeChoice(),
+        makeChoice({ scenario_choice_id: 'c2', is_safe_choice: true, consequence_type: 'none' }),
       ],
     })
     const issues = validateScenarioItem(scenario)
-    expect(issues.some((i) => i.field === 'safeChoice')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c2-target')).toBe(true)
   })
 
-  it('flags a pause timestamp at or past the video duration', () => {
-    const scenario = makeScenario({ pauseTimestamp: 30, video: { videoUrl: '/v.mp4', videoAvailable: false, duration: 30 } })
-    const issues = validateScenarioItem(scenario)
-    expect(issues.some((i) => i.field === 'pauseTimestamp')).toBe(true)
+  it('flags empty student-visible scenario copy', () => {
+    const issues = validateScenarioItem(makeScenario({ scenario_title: '  ', posterCaption: '' }))
+    expect(issues.some((i) => i.field === 'scenario_title')).toBe(true)
+    expect(issues.some((i) => i.field === 'posterCaption')).toBe(true)
   })
 
-  it('flags empty choice text/feedback', () => {
+  it('flags empty choice copy per field', () => {
     const scenario = makeScenario({
       choices: [
-        { id: 'c1', text: '', isSafe: false, feedbackTitle: '', feedbackText: '' },
-        { id: 'c2', text: 'B', isSafe: true, feedbackTitle: 't', feedbackText: 'x' },
+        makeChoice({ choice_text: '', outcome_title: '', feedback_text: '' }),
+        makeChoice({
+          scenario_choice_id: 'c2',
+          target: 'report-btn',
+          is_safe_choice: true,
+          consequence_type: 'none',
+        }),
       ],
     })
     const issues = validateScenarioItem(scenario)
-    expect(issues.some((i) => i.field === 'choice-c1-text')).toBe(true)
-    expect(issues.some((i) => i.field === 'choice-c1-feedbackTitle')).toBe(true)
-    expect(issues.some((i) => i.field === 'choice-c1-feedbackText')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c1-choice_text')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c1-outcome_title')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c1-feedback_text')).toBe(true)
   })
 
   it('validateScenarioConfig aggregates issues across all scenarios', () => {
     const config: ScenarioConfig = {
-      id: 'm1',
-      title: 'Module',
-      surface: 'browser',
-      scenarios: [makeScenario(), makeScenario({ id: 'scenario-2', choices: [] as any })],
+      module_id: 'phishing-awareness',
+      module_title: 'Phishing Awareness',
+      coachLevel: 'full',
+      scenarios: [makeScenario(), makeScenario({ scenario_id: 'scenario-2', choices: [] as any })],
     }
     const result = validateScenarioConfig(config)
     expect(result.valid).toBe(false)

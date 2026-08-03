@@ -72,3 +72,36 @@
   color: var(--color-text-muted);
   line-height: 1.5;
 }
+
+.select {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-input);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12);
+}
+
+.optional {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-light);
+}
+
+.mediaPreview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}

@@ -7,5 +7,12 @@ import { submitScenarioDecisionSchema } from './validators'
 export const submitScenarioDecision = defineCallable('submitScenarioDecision', async (request) => {
   const { uid } = requireAuth(request)
   const input = parseOrThrow(submitScenarioDecisionSchema, request.data)
-  return service.submitScenarioDecision(uid, input.moduleId, input.scenarioId, input.choiceId)
+  return service.submitScenarioDecision(
+    uid,
+    input.moduleId,
+    input.scenarioId,
+    input.choiceId,
+    input.attemptNumber,
+    input.durationMs,
+  )
 })

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
 import Button from '../../../components/Button/Button'
@@ -17,10 +18,15 @@ import styles from './StudentProgressPage.module.css'
  * Overall completion + average score, computed client-side from the same
  * data useStudentModules already fetches (no extra network round trip),
  * plus the per-module progress bars shared with the Dashboard (see
- * components/ModuleProgressList). The "Decision Analytics" panel is the
- * one thing client-computed stats can't provide — it comes from the
- * aggregateStudentAnalytics Cloud Function (safe/risky scenario decision
- * counts, last activity), refreshed on demand.
+ * components/ModuleProgressList). The "Decision Analytics" and "What
+ * You've Learned" panels are the things client-computed stats can't
+ * provide — both come from the aggregateStudentAnalytics Cloud Function,
+ * refreshed on demand.
+ *
+ * The learning panel is where a student sees their own pre-test →
+ * post-test movement per module. It also surfaces the modules where a
+ * post-test is still outstanding, since a missing post-test is exactly
+ * what makes a gain unreportable.
  */
 export default function StudentProgressPage() {
   const { user } = useAuth()
@@ -48,6 +54,13 @@ export default function StudentProgressPage() {
       setRefreshing(false)
     }
   }
+
+  // Modules where the quiz is done but the post-test isn't — the students
+  // most worth nudging, since their learning gain can't be computed until
+  // they finish that last step.
+  const pendingPostTests = modules.filter(
+    (m) => m.progress?.quizCompleted && !m.progress?.postTestCompleted,
+  )
 
   const completedCount = modules.filter((m) => m.status === MODULE_STATUS.COMPLETED).length
   const scores = modules.map((m) => m.progress?.score).filter((s) => typeof s === 'number')
@@ -85,6 +98,81 @@ export default function StudentProgressPage() {
             <Card className={styles.panel}>
               <h2 className={styles.panelTitle}>Module Progress</h2>
               <ModuleProgressList modules={modules} />
+            </Card>
+
+            {pendingPostTests.length > 0 && (
+              <Card className={styles.panel}>
+                <h2 className={styles.panelTitle}>Post-Tests Waiting</h2>
+                <p className={styles.emptyText}>
+                  You've finished the quiz for {pendingPostTests.length} module
+                  {pendingPostTests.length === 1 ? '' : 's'} but haven't taken the post-test yet. It's the same
+                  short set of questions you answered at the start, and it's what shows you how much you picked
+                  up.
+                </p>
+                <ul className={styles.pendingList}>
+                  {pendingPostTests.map((m) => (
+                    <li key={m.moduleId}>
+                      <Link className={styles.pendingLink} to={`/student/modules/${m.moduleId}/post-test`}>
+                        {m.title}: take the post-test →
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
+            <Card className={styles.panel}>
+              <h2 className={styles.panelTitle}>What You've Learned</h2>
+              {analytics === undefined && <p className={styles.emptyText}>Loading…</p>}
+              {analytics === null && (
+                <p className={styles.emptyText}>
+                  Not yet aggregated — use "Refresh My Analytics" below to compute.
+                </p>
+              )}
+              {analytics && !analytics.pairedCount && (
+                <p className={styles.emptyText}>
+                  Nothing to compare yet. Once you've taken both the pre-test and the post-test for a module,
+                  your before-and-after shows up here.
+                </p>
+              )}
+              {analytics && analytics.pairedCount > 0 && (
+                <>
+                  <div className={styles.analyticsGrid}>
+                    <div className={styles.analyticsStat}>
+                      <span className={styles.analyticsValue}>{analytics.avgPreTestScore}%</span>
+                      <span className={styles.analyticsLabel}>Average Before</span>
+                    </div>
+                    <div className={styles.analyticsStat}>
+                      <span className={styles.analyticsValue}>{analytics.avgPostTestScore}%</span>
+                      <span className={styles.analyticsLabel}>Average After</span>
+                    </div>
+                    <div className={styles.analyticsStat}>
+                      <span className={styles.analyticsValue}>
+                        {analytics.behaviour?.firstAttemptSafeRate ?? 0}%
+                      </span>
+                      <span className={styles.analyticsLabel}>Safe on First Try</span>
+                    </div>
+                  </div>
+
+                  {Array.isArray(analytics.timeline) && analytics.timeline.length > 0 && (
+                    <ul className={styles.timelineList}>
+                      {analytics.timeline
+                        .filter((point) => point.preTestScore !== null || point.postTestScore !== null)
+                        .map((point) => {
+                          const module = modules.find((m) => m.moduleId === point.moduleId)
+                          return (
+                            <li key={point.moduleId} className={styles.timelineRow}>
+                              <span className={styles.timelineName}>{module?.title || point.moduleId}</span>
+                              <span className={styles.timelineScores}>
+                                {point.preTestScore ?? '—'}% → {point.postTestScore ?? '—'}%
+                              </span>
+                            </li>
+                          )
+                        })}
+                    </ul>
+                  )}
+                </>
+              )}
             </Card>
 
             <Card className={styles.panel}>

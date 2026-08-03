@@ -45,13 +45,13 @@ service cloud.firestore {
 
     // ── Training Curriculum configuration data ──────────────────────
     // Still admin-only for write everywhere — content authoring stays on
-    // the admin Module Configuration pages. `modules` and `moduleQuizzes`
-    // are now also readable by any signed-in student: the student
-    // dashboard/progress system reads `modules` for moduleOrder/status,
-    // and the student Quiz page reads `moduleQuizzes` to render
-    // questions. The lesson/scenario content pages still read local mock
-    // data (see src/services/moduleLoader.js), so those two collections
-    // stay admin-only until that changes.
+    // the admin Module Configuration pages. Every collection here is now
+    // readable by any signed-in student, because the student pages now
+    // genuinely read them: the dashboard/progress system reads `modules`
+    // for moduleOrder/status, the Quiz page reads `moduleQuizzes`, and
+    // the Lesson Viewer and Scenario Engine read `moduleLessons` and
+    // `moduleScenarios` through src/services/moduleLoader.js (which used
+    // to serve local mock data instead).
     //
     // Known accepted tradeoff: moduleQuizzes documents store
     // correctChoiceId alongside the questions, so a student who inspects
@@ -77,12 +77,23 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Published lesson content and scenario configuration. Any signed-in
+    // user may read — that read IS the student Lesson Viewer / Scenario
+    // Engine. Unlike `modules` and `moduleQuizzes` there is deliberately
+    // no student lazy-seed create here: the student path
+    // (readLesson/readScenario) never writes, and falls back to the
+    // authored content in src/data/moduleContent and
+    // src/features/scenario/configs when a document doesn't exist yet.
+    // So a student who opens a module before any admin has is served
+    // real content without ever needing write access.
     match /moduleLessons/{moduleId} {
-      allow read, write: if isAdmin();
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
     }
 
     match /moduleScenarios/{moduleId} {
-      allow read, write: if isAdmin();
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
     }
 
     match /moduleQuizzes/{moduleId} {
@@ -170,6 +181,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // One document per answered question, across the pre-test, the quiz,
+    // and the post-test. Written only by submitQuiz/submitAssessment
+    // (Admin SDK). Nothing here may be client-writable: it is the
+    // evidence item difficulty, discrimination, and per-topic mastery are
+    // computed from, and a student able to write it could manufacture
+    // their own learning gain. Read is admin-only — a student sees their
+    // own results in the submit response, not by querying this.
+    match /quiz_responses/{responseId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     match /analyticsEvents/{eventId} {
       allow read, write: if false;
     }
@@ -185,6 +208,14 @@ service cloud.firestore {
     }
 
     match /learningAnalytics/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Cross-module, class-level rollup (aggregateCohortAnalytics). Admin
+    // read only — it aggregates every student's progress, so it is not
+    // something an individual student may see.
+    match /cohortAnalytics/{docId} {
       allow read: if isAdmin();
       allow write: if false;
     }

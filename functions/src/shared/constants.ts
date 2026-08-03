@@ -24,15 +24,32 @@ export const COLLECTIONS = {
   MODULE_LESSONS: 'moduleLessons',
   MODULE_SCENARIOS: 'moduleScenarios',
   MODULE_QUIZZES: 'moduleQuizzes',
+  MODULE_PRETESTS: 'modulePretests',
   MODULE_ASSIGNMENTS: 'moduleAssignments',
   MODULE_PROGRESS: 'moduleProgress',
   SCENARIO_DECISION_RECORDS: 'scenario_decision_records',
   QUIZ_ATTEMPTS: 'quizAttempts',
+  /** One document per answered question, across pre-test, quiz, and
+   * post-test. This is the grain item analysis needs — a quizAttempts
+   * document only carries a whole-attempt score. */
+  QUIZ_RESPONSES: 'quiz_responses',
   ANALYTICS_EVENTS: 'analyticsEvents',
   MODULE_ANALYTICS: 'moduleAnalytics',
   STUDENT_ANALYTICS: 'studentAnalytics',
   LEARNING_ANALYTICS: 'learningAnalytics',
+  /** Cross-module, cohort-level rollup — the one aggregate that isn't
+   * keyed by a single module or a single student. */
+  COHORT_ANALYTICS: 'cohortAnalytics',
 } as const
+
+/**
+ * The three points a student is measured at. Pre-test and post-test use
+ * the *same* instrument (modulePretests/{moduleId}) on purpose — a
+ * normalized learning gain is only interpretable when both measurements
+ * come from identical items.
+ */
+export const ASSESSMENT_TYPES = ['pretest', 'quiz', 'posttest'] as const
+export type AssessmentType = (typeof ASSESSMENT_TYPES)[number]
 
 export const ROLES = {
   STUDENT: 'student',

@@ -21,6 +21,7 @@ import {
 } from '../../src/auth/controllers'
 import { aggregateStudentAnalytics } from '../../src/modules/analytics/controllers'
 import { COLLECTIONS } from '../../src/shared/constants'
+import { cohortDocId } from '../../src/shared/sections'
 import { makeRequest } from './helpers'
 
 const ADMIN_UID = `admin-${Date.now()}`
@@ -225,6 +226,129 @@ describe('account management: register -> nickname -> deactivate -> reactivate -
 
     await expect(authAdmin.getUser(studentUid)).rejects.toMatchObject({ code: 'auth/user-not-found' })
   })
+})
+
+/**
+ * Deleting an account must take every row keyed to that uid with it.
+ *
+ * This is written as an exhaustive sweep rather than a spot check for a
+ * concrete reason: `quiz_responses` was added later, for item analysis,
+ * and was missed from the cascade. A deleted student's per-question
+ * answers stayed in the corpus and kept feeding topic mastery, item
+ * difficulty, and discrimination forever. Nothing on screen revealed it;
+ * the numbers were just quietly wrong.
+ *
+ * So when a new uid-bearing collection is added, add it here too. A test
+ * that only checks the collections someone remembered is a test that
+ * fails the same way the code did.
+ */
+describe('account deletion: cascading data cleanup', () => {
+  const ADMIN = `cascade-admin-${Date.now()}`
+  const MODULE_ID = 'password-security'
+  let uid: string
+
+  beforeAll(async () => {
+    await seedAdmin(ADMIN)
+
+    const created = (await createUserAccount.run(
+      makeRequest(
+        {
+          email: `cascade-${Date.now()}@tip.edu.ph`,
+          password: 'Str0ngPass1',
+          displayName: 'Cascade Student',
+          nickname: 'Cascade',
+          role: 'student',
+          section: 'BSIT-9Z',
+        },
+        ADMIN,
+      ),
+    )) as { uid: string }
+    uid = created.uid
+
+    // One row in every collection that stores this student's uid.
+    await Promise.all([
+      db.collection(COLLECTIONS.MODULE_PROGRESS).doc(`${uid}_${MODULE_ID}`).set({
+        userId: uid,
+        moduleId: MODULE_ID,
+        moduleCompleted: true,
+        pretestScore: 40,
+        postTestScore: 80,
+      }),
+      db.collection(COLLECTIONS.LEARNING_ANALYTICS).doc(`${uid}_${MODULE_ID}`).set({
+        userId: uid,
+        moduleId: MODULE_ID,
+        safeChoices: 2,
+        riskyChoices: 1,
+        totalDecisions: 3,
+      }),
+      db.collection(COLLECTIONS.STUDENT_ANALYTICS).doc(uid).set({ userId: uid, modulesCompleted: 1 }),
+      db.collection(COLLECTIONS.QUIZ_ATTEMPTS).add({ userId: uid, moduleId: MODULE_ID, score: 80, passed: true }),
+      db.collection(COLLECTIONS.QUIZ_RESPONSES).add({
+        userId: uid,
+        moduleId: MODULE_ID,
+        assessmentType: 'quiz',
+        questionId: 'q1',
+        topic: 'mfa',
+        isCorrect: true,
+      }),
+      db.collection(COLLECTIONS.SCENARIO_DECISION_RECORDS).add({
+        user_id: uid,
+        module_id: MODULE_ID,
+        scenario_id: 's1',
+        scenario_choice_id: 'c1',
+        is_safe_choice: true,
+        attempt_number: 1,
+      }),
+      db.collection(COLLECTIONS.ANALYTICS_EVENTS).add({ userId: uid, moduleId: MODULE_ID, eventType: 'quiz_submitted' }),
+    ])
+  }, 60000)
+
+  it('leaves no row behind in any collection keyed to the deleted uid', async () => {
+    await deleteUserAccount.run(makeRequest({ uid }, ADMIN))
+
+    const [progress, learning, studentAnalytics] = await Promise.all([
+      db.collection(COLLECTIONS.MODULE_PROGRESS).doc(`${uid}_${MODULE_ID}`).get(),
+      db.collection(COLLECTIONS.LEARNING_ANALYTICS).doc(`${uid}_${MODULE_ID}`).get(),
+      db.collection(COLLECTIONS.STUDENT_ANALYTICS).doc(uid).get(),
+    ])
+    expect(progress.exists).toBe(false)
+    expect(learning.exists).toBe(false)
+    expect(studentAnalytics.exists).toBe(false)
+
+    const queried: Array<[string, string]> = [
+      [COLLECTIONS.QUIZ_ATTEMPTS, 'userId'],
+      [COLLECTIONS.QUIZ_RESPONSES, 'userId'],
+      [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'user_id'],
+      [COLLECTIONS.ANALYTICS_EVENTS, 'userId'],
+    ]
+    for (const [collectionName, field] of queried) {
+      // eslint-disable-next-line no-await-in-loop
+      const snap = await db.collection(collectionName).where(field, '==', uid).get()
+      expect({ collection: collectionName, remaining: snap.size }).toEqual({
+        collection: collectionName,
+        remaining: 0,
+      })
+    }
+  }, 60000)
+
+  it('keeps the audit trail, which must outlive the account it describes', async () => {
+    const logs = await db
+      .collection(COLLECTIONS.AUDIT_LOGS)
+      .where('action', '==', 'delete_user')
+      .where('targetUid', '==', uid)
+      .get()
+    expect(logs.size).toBe(1)
+  })
+
+  it('removes the deleted student from the cohort rollup immediately', async () => {
+    // Not on the next nightly run: the cohort card is a cached singleton,
+    // so without an immediate recompute it would keep counting a student
+    // who no longer exists.
+    const snap = await db.collection(COLLECTIONS.COHORT_ANALYTICS).doc(cohortDocId('BSIT-9Z')).get()
+    if (snap.exists) {
+      expect(snap.data()!.totalStudents).toBe(0)
+    }
+  }, 60000)
 })
 
 describe('public self-registration: no auth required, always creates a student account', () => {

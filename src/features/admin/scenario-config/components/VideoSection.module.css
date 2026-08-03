@@ -65,3 +65,10 @@
   box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12);
 }
 
+
+.hint {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-light);
+}

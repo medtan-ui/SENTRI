@@ -110,3 +110,72 @@ input, textarea, select {
   clip: rect(0,0,0,0);
   white-space: nowrap;
 }
+
+/* ══ Responsive conventions ════════════════════════════════════════════
+   Media queries can't read custom properties, so these breakpoints
+   can't be tokens — they're a written convention instead, and every
+   `@media` in the app should use one of them rather than inventing a
+   near-miss value:
+
+     900px — desktop → tablet. Multi-column page layouts collapse to one
+             column (sidebar under content, two-pane editors stacked).
+     600px — tablet → phone. Rows that read as "label ......... action"
+             stack vertically; stat grids drop to a single column;
+             horizontal padding tightens.
+     480px — small phone. Anything still too wide at 600px.
+
+   Only three, deliberately: a layout needing a fourth is usually a
+   layout that should be simpler.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Anything that must never force the page itself to scroll sideways —
+   wide tables, code, diagrams — scrolls inside its own box instead. */
+@media (max-width: 600px) {
+  html, body {
+    overflow-x: hidden;
+  }
+}
+
+/* ══ Print ═════════════════════════════════════════════════════════════
+   "Save as PDF" in the browser's print dialog is this app's PDF export
+   (see the Analytics page's Export bar) — a real one, without shipping a
+   PDF engine in the bundle. For that to produce something worth handing
+   in, the printed page has to be the report and not a screenshot of an
+   app: navigation, sidebars, and the buttons that only do something when
+   clicked all have to go.
+
+   `data-print-hide` is the opt-out marker, set on the app chrome and on
+   any control that is meaningless on paper. Screen layout is unwound too
+   — the fixed navbar's offset and the sidebar's left margin would
+   otherwise print as a large empty band down the left of every page.
+   ═══════════════════════════════════════════════════════════════════ */
+@media print {
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  html, body {
+    background: #FFFFFF;
+    font-size: 11pt;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Cards are borders-and-shadows on screen; on paper a shadow is a grey
+     smear, and a card broken across a page boundary is unreadable. */
+  [class*='card'], [class*='Card'] {
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

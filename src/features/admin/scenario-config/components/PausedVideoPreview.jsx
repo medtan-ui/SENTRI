@@ -1,28 +1,25 @@
 import React from 'react'
+import ScenarioPlayer from '../../../scenario/engine/ScenarioPlayer'
 import styles from './PausedVideoPreview.module.css'
 
 /**
  * PausedVideoPreview
- * A static illustration of "the video paused at pauseTimestamp" for the
- * admin preview. Deliberately NOT the engine's real ScenarioPlayer —
- * that component runs real intervals/timers meant for an actual student
- * session, which would be wrong to trigger from a static admin form.
- * This shows the same visual language (dark frame, placeholder icon,
- * progress fill) sized to the *configured* pause ratio instead.
+ * The scenario's opening beat as students see it, rendered by the
+ * engine's own ScenarioPlayer — so a pasted clip URL previews as a real
+ * embed, and an empty one previews as the same poster card the engine
+ * falls back to. Presentational only: ScenarioPlayer owns no timers or
+ * state, so mounting it in a static admin form is safe (unlike the
+ * interactive scenes, which the engine's state machine drives).
  */
-export default function PausedVideoPreview({ video, pauseTimestamp }) {
-  const pct = video.duration > 0 ? Math.min(100, (Number(pauseTimestamp || 0) / video.duration) * 100) : 0
-
+export default function PausedVideoPreview({ scenario }) {
   return (
     <div className={styles.wrap}>
-      <span className={styles.icon} aria-hidden="true">🎬</span>
-      <p className={styles.label}>Video paused for decision</p>
-      <div className={styles.track}>
-        <div className={styles.fill} style={{ width: `${pct}%` }} />
-      </div>
-      <span className={styles.time}>
-        {pauseTimestamp || 0}s / {video.duration}s
-      </span>
+      <ScenarioPlayer
+        videoAvailable={scenario.videoAvailable}
+        materialUrl={scenario.material_url}
+        posterCaption={scenario.posterCaption}
+        scenarioTitle={scenario.scenario_title || '(untitled scenario)'}
+      />
     </div>
   )
 }

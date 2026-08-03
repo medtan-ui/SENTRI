@@ -21,7 +21,15 @@ function choice(text) {
   return { id: `choice-${choiceCounter}`, text }
 }
 
-function question(text, choiceTexts, correctIndex, explanation, difficulty) {
+/**
+ * `topic` uses the same slug taxonomy as the pre/post item bank
+ * (src/data/modulePretestContent.js). Sharing one vocabulary across all
+ * three assessment points is what lets the analytics layer report a
+ * single per-topic mastery figure instead of three unrelated ones — and
+ * it's how a topic measured in two different modules becomes a
+ * cross-module transfer signal.
+ */
+function question(text, choiceTexts, correctIndex, explanation, difficulty, topic) {
   const choices = choiceTexts.map((t) => choice(t))
   return {
     id: choices[0].id.replace('choice-', 'question-seed-') + `-${text.slice(0, 6)}`,
@@ -30,6 +38,7 @@ function question(text, choiceTexts, correctIndex, explanation, difficulty) {
     correctChoiceId: choices[correctIndex].id,
     explanation,
     difficulty,
+    topic,
   }
 }
 
@@ -60,6 +69,7 @@ const passwordSecurityDefaults = {
       2,
       'Length and unpredictability matter more than symbol substitution — a long passphrase is harder to crack than a short, "complex" password.',
       'Easy',
+      'password-strength',
     ),
     question(
       'What is credential stuffing?',
@@ -72,6 +82,7 @@ const passwordSecurityDefaults = {
       0,
       'Credential stuffing automates trying leaked credentials from one breach against many other services, exploiting password reuse.',
       'Medium',
+      'credential-attacks',
     ),
     question(
       'Why should you enable multi-factor authentication (MFA)?',
@@ -84,6 +95,7 @@ const passwordSecurityDefaults = {
       2,
       'MFA requires a second factor — like a code or approval on another device — so a stolen password alone is not enough to log in.',
       'Easy',
+      'mfa',
     ),
     question(
       'What should you do first if a service you use reports a data breach?',
@@ -96,6 +108,7 @@ const passwordSecurityDefaults = {
       1,
       'Changing the password right away limits how long a potentially leaked credential remains useful to an attacker.',
       'Medium',
+      'breach-response',
     ),
     question(
       "What makes a passphrase like 'correct horse battery staple' strong?",
@@ -108,6 +121,7 @@ const passwordSecurityDefaults = {
       2,
       'Length is the dominant factor in resisting brute-force attacks, and a memorable passphrase avoids the temptation to write it down or reuse it.',
       'Hard',
+      'password-strength',
     ),
   ]),
 }
@@ -127,6 +141,7 @@ const phishingAwarenessDefaults = {
       1,
       'Verifying through a channel you already trust — not the email itself — confirms whether the request is real.',
       'Easy',
+      'link-verification',
     ),
     question(
       'Which of these is a common sign of a phishing email?',
@@ -139,6 +154,7 @@ const phishingAwarenessDefaults = {
       0,
       'Mismatched sender domains are one of the most reliable signs of a spoofed or phishing email.',
       'Easy',
+      'phishing-red-flags',
     ),
     question(
       'What should you do with an unexpected attachment from an unknown sender?',
@@ -151,6 +167,7 @@ const phishingAwarenessDefaults = {
       1,
       'Reporting an unopened suspicious attachment protects both you and anyone else who may have received the same email.',
       'Medium',
+      'attachment-handling',
     ),
     question(
       'What is a fake login page designed to do?',
@@ -163,6 +180,7 @@ const phishingAwarenessDefaults = {
       1,
       'A convincing lookalike login page exists solely to capture whatever credentials are typed into it.',
       'Medium',
+      'phishing-basics',
     ),
     question(
       'Why is verifying through a known channel better than replying to a suspicious email?',
@@ -175,6 +193,7 @@ const phishingAwarenessDefaults = {
       1,
       'Replying only keeps the conversation with whoever sent the email — which may be the attacker. A known channel bypasses them entirely.',
       'Hard',
+      'social-engineering-tactics',
     ),
   ]),
 }
@@ -189,6 +208,7 @@ const malwareAwarenessDefaults = {
       1,
       'Unofficial download sources frequently bundle malicious software alongside the free tool being offered.',
       'Easy',
+      'download-sources',
     ),
     question(
       'What should you do if you find an unknown USB drive?',
@@ -201,6 +221,7 @@ const malwareAwarenessDefaults = {
       1,
       'Unknown USB drives are a known malware delivery method — IT can safely inspect them without exposing your device.',
       'Easy',
+      'removable-media',
     ),
     question(
       'What is ransomware?',
@@ -213,6 +234,7 @@ const malwareAwarenessDefaults = {
       1,
       'Ransomware encrypts a victim\'s files and demands payment for the (unguaranteed) key to unlock them.',
       'Medium',
+      'malware-basics',
     ),
     question(
       'What is the recommended response to a ransomware pop-up?',
@@ -225,6 +247,7 @@ const malwareAwarenessDefaults = {
       1,
       'Disconnecting limits further spread while IT investigates and restores from backup.',
       'Medium',
+      'ransomware',
     ),
     question(
       "Why doesn't paying a ransomware demand guarantee your files back?",
@@ -237,6 +260,7 @@ const malwareAwarenessDefaults = {
       1,
       'Paying funds the attacker with no enforceable guarantee that access will actually be restored.',
       'Hard',
+      'ransomware',
     ),
   ]),
 }
@@ -251,6 +275,7 @@ const safeBrowsingDefaults = {
       1,
       'Open networks let others sharing the same Wi-Fi potentially intercept unencrypted traffic.',
       'Easy',
+      'public-wifi',
     ),
     question(
       'What should you do before entering payment details on an unfamiliar site?',
@@ -263,6 +288,7 @@ const safeBrowsingDefaults = {
       1,
       'A quick reputation check can reveal a scam site before any payment details are entered.',
       'Medium',
+      'scam-sites',
     ),
     question(
       'What is a warning sign of a scam shopping site?',
@@ -270,6 +296,7 @@ const safeBrowsingDefaults = {
       0,
       'Unrealistic discounts on unfamiliar sites are a common tactic used to harvest payment details.',
       'Easy',
+      'scam-sites',
     ),
     question(
       'Why should you be cautious about browser extensions demanded by a random website?',
@@ -282,6 +309,7 @@ const safeBrowsingDefaults = {
       1,
       'Extensions demanded by an unrelated site are a common malware delivery method disguised as a requirement.',
       'Medium',
+      'fake-updates',
     ),
     question(
       "What is the safest way to access a sensitive account like banking?",
@@ -289,6 +317,7 @@ const safeBrowsingDefaults = {
       1,
       'A trusted network or VPN protects sensitive traffic from others who may share the same public Wi-Fi.',
       'Hard',
+      'network-protection',
     ),
   ]),
 }
@@ -308,6 +337,7 @@ const dataPrivacyDefaults = {
       1,
       "A flashlight app has no legitimate reason to need your contacts — that request goes beyond the app's actual function.",
       'Easy',
+      'app-permissions',
     ),
     question(
       'What is a risk of posting travel dates and your address publicly?',
@@ -315,6 +345,7 @@ const dataPrivacyDefaults = {
       0,
       'Combining public travel details with an address can indicate exactly when a home is unoccupied.',
       'Medium',
+      'oversharing',
     ),
     question(
       'What should you do with app permission requests that seem unnecessary?',
@@ -327,6 +358,7 @@ const dataPrivacyDefaults = {
       1,
       'Only granting permissions an app actually needs limits what data it can collect.',
       'Easy',
+      'app-permissions',
     ),
     question(
       'What is one benefit of requesting data deletion from unused accounts?',
@@ -334,6 +366,7 @@ const dataPrivacyDefaults = {
       1,
       'Removing data from accounts you no longer use limits what a future breach could expose.',
       'Medium',
+      'data-brokers',
     ),
     question(
       'Why is limiting your audience when sharing photos a good privacy habit?',
@@ -346,6 +379,7 @@ const dataPrivacyDefaults = {
       0,
       'Limiting who can see personal photos and their timing reduces what an unknown viewer can learn and act on.',
       'Hard',
+      'privacy-habits',
     ),
   ]),
 }
@@ -365,6 +399,7 @@ const onlineSafetyDefaults = {
       1,
       'Declining and tightening visibility settings reduces exposure to accounts with no real connection to you.',
       'Easy',
+      'stranger-contact',
     ),
     question(
       'Why is it okay to skip a risky viral challenge?',
@@ -377,6 +412,7 @@ const onlineSafetyDefaults = {
       1,
       'Opting out of unsafe viral trends is always a valid choice, regardless of peer pressure.',
       'Medium',
+      'peer-pressure',
     ),
     question(
       'What is the right response to seeing cyberbullying in a group chat?',
@@ -389,6 +425,7 @@ const onlineSafetyDefaults = {
       1,
       'Reporting gives someone with authority the chance to step in and stop the harm being done.',
       'Easy',
+      'cyberbullying',
     ),
     question(
       'Why can peer pressure online still be harmful even though it is not in person?',
@@ -401,6 +438,7 @@ const onlineSafetyDefaults = {
       0,
       'Peer pressure online can push someone into unsafe choices just as effectively as in-person pressure.',
       'Medium',
+      'peer-pressure',
     ),
     question(
       'What is a good first step if you are being harassed online?',
@@ -413,6 +451,7 @@ const onlineSafetyDefaults = {
       0,
       'Screenshotting first means you still have the evidence after you block. The safe order is screenshot, then block, then report.',
       'Hard',
+      'harassment-response',
     ),
   ]),
 }

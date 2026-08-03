@@ -155,7 +155,7 @@ export async function loginWithEmail(email, password, rememberMe = false) {
  * Does not sign the caller in; see AuthContext's register(), which signs
  * in immediately after this succeeds so the new student doesn't have to
  * retype what they just entered.
- * @param {{ displayName: string, nickname: string, email: string, password: string }} input
+ * @param {{ displayName: string, nickname: string, email: string, password: string, section?: string }} input
  * @returns {Promise<void>}
  * @throws {Error} user-friendly message on failure
  */
@@ -171,6 +171,9 @@ export async function registerStudentAccount(input) {
       nickname: input.nickname,
       email: input.email,
       password: input.password,
+      // Optional — a student who doesn't know their section code yet
+      // still gets an account, and an admin can set it afterwards.
+      section: input.section || null,
     })
   } catch (err) {
     throw new Error(friendlyCallableError(err))

@@ -78,3 +78,53 @@
   color: var(--color-text-light);
   text-align: center;
 }
+
+/* Holds one engine overlay at a time. The engine's overlays position
+   themselves absolutely against their stage, so this establishes the
+   containing block and a fixed aspect the admin can judge layout by. */
+.stage {
+  position: relative;
+  width: 100%;
+  min-height: 260px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #1a1a2e;
+}
+
+.sceneLabel {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-white);
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────
+   The mode switcher wraps rather than scrolling: an admin needs to see
+   all three states are available, not discover them by swiping. */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .modeRow {
+    flex-wrap: wrap;
+  }
+
+  .stage {
+    min-height: 200px;
+  }
+
+  .choicePicker {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+}

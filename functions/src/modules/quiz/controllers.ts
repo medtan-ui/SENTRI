@@ -7,5 +7,5 @@ import { submitQuizSchema } from './validators'
 export const submitQuiz = defineCallable('submitQuiz', async (request) => {
   const { uid } = requireAuth(request)
   const input = parseOrThrow(submitQuizSchema, request.data)
-  return service.submitQuiz(uid, input.moduleId, input.answers)
+  return service.submitQuiz(uid, input.moduleId, input.answers, input.durations)
 })

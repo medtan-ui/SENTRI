@@ -4,6 +4,7 @@ import Button from '../../../../components/Button/Button'
 import LoadingSkeleton from '../../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../../components/ErrorState/ErrorState'
 import { useQuiz } from '../../../../hooks/useQuiz'
+import { TOPIC_LABELS } from '../../../../data/modulePretestContent'
 import QuizSettingsCard from './QuizSettingsCard'
 import QuizSummaryCard from './QuizSummaryCard'
 import QuestionList from './QuestionList'
@@ -67,6 +68,17 @@ export default function QuizConfigTab({ moduleId, moduleName, overview }) {
           Fix the issues marked below before saving.
         </div>
       )}
+
+      {/* Rendered once for the whole tab: every QuestionCard's topic
+          field points at this list, so an admin picks from the existing
+          taxonomy instead of inventing a near-duplicate slug that would
+          silently split a topic in two on the analytics dashboard. Still
+          a free-text input, so a genuinely new topic is possible. */}
+      <datalist id="sentri-topic-slugs">
+        {Object.entries(TOPIC_LABELS).map(([slug, label]) => (
+          <option key={slug} value={slug}>{label}</option>
+        ))}
+      </datalist>
 
       <Card className={styles.overviewCard}>
         <h2 className={styles.moduleName}>{moduleName}</h2>

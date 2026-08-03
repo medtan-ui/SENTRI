@@ -1,6 +1,9 @@
 export interface SubmitQuizInput {
   moduleId: string
   answers: Record<string, string>
+  /** questionId -> milliseconds spent on that question. Optional; a
+   * missing entry is stored as null, never as a fabricated 0. */
+  durations?: Record<string, number>
 }
 
 export interface QuizChoice {
@@ -16,6 +19,10 @@ export interface QuizQuestion {
   correctChoiceId: string
   explanation: string
   difficulty: string
+  /** Topic slug, shared with the pre/post item bank. Optional so a quiz
+   * document authored before topic tagging still grades normally — it
+   * just doesn't contribute to per-topic analysis. */
+  topic?: string
 }
 
 export interface QuizSettings {
@@ -38,6 +45,8 @@ export interface PerQuestionResult {
   selectedChoiceId: string | null
   correctChoiceId: string
   explanation: string
+  topic: string | null
+  durationMs: number | null
 }
 
 export interface SubmitQuizResult {
@@ -48,4 +57,7 @@ export interface SubmitQuizResult {
   passingScore: number
   moduleCompleted: boolean
   perQuestionResults: PerQuestionResult[]
+  attemptNumber: number
+  attemptsAllowed: number
+  attemptsRemaining: number
 }

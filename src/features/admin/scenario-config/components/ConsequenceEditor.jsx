@@ -1,62 +1,68 @@
 import React from 'react'
-import YouTubePlayer from '../../../../components/VideoPlayer/YouTubePlayer'
+import { CONSEQUENCE_TYPES, CONSEQUENCE_TYPE_LABELS } from '../types/scenarioConfigAdmin.types'
 import forms from '../styles/formControls.module.css'
 import styles from './ConsequenceEditor.module.css'
 
 /**
  * ConsequenceEditor
- * Only rendered for a risky choice. Lets an admin toggle whether this
- * choice's consequence is a video (choice.consequenceVideo present) or a
- * still-image placeholder (no consequenceVideo at all) — the exact two
- * modes ConsequencePlayer already supports — and, when a video, paste its
- * real YouTube URL. There is no separate "title" or "explanation" field
- * here: those ARE choice.feedbackTitle/feedbackText, edited once in
- * ChoiceEditor and reused by both the FeedbackPanel and the
- * ConsequencePlayer's explanation card.
+ * Only rendered for a risky choice. Configures the dramatic beat the
+ * engine shows before the explanatory feedback panel — see
+ * src/features/scenario/engine/ConsequenceOverlay.jsx, which is what
+ * actually renders this.
+ *
+ * `consequence_type` picks the illustrative icon the overlay falls back
+ * to; `feedback_media_url` replaces that icon with a real image once one
+ * exists. There is no separate title or body field here: those ARE the
+ * choice's outcome_title/feedback_text, edited once in ChoiceEditor and
+ * reused by both the overlay and the feedback panel.
  */
-export default function ConsequenceEditor({ choice, onSetEnabled, onChangeVideoUrl }) {
-  const hasVideo = Boolean(choice.consequenceVideo)
+export default function ConsequenceEditor({ choice, error, onUpdate }) {
+  const id = choice.scenario_choice_id
+  const mediaUrl = choice.feedback_media_url || ''
 
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
         <span className={styles.heading}>Consequence</span>
-        <div className={styles.typeToggle}>
-          <button
-            type="button"
-            className={`${styles.typeBtn} ${!hasVideo ? styles.typeBtnActive : ''}`}
-            onClick={() => onSetEnabled(false)}
-          >
-            Still Image
-          </button>
-          <button
-            type="button"
-            className={`${styles.typeBtn} ${hasVideo ? styles.typeBtnActive : ''}`}
-            onClick={() => onSetEnabled(true)}
-          >
-            Video
-          </button>
-        </div>
       </div>
 
-      {hasVideo ? (
-        <div className={styles.videoInfo}>
-          <YouTubePlayer url={choice.consequenceVideo.videoUrl} title="Consequence video" />
-          <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-3)' }}>
-            <label className={forms.fieldLabel} htmlFor={`${choice.id}-consequence-url`}>YouTube Video URL</label>
-            <input
-              id={`${choice.id}-consequence-url`}
-              type="text"
-              className={styles.urlInput}
-              value={choice.consequenceVideo.videoUrl || ''}
-              onChange={(e) => onChangeVideoUrl(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=…"
-            />
-          </div>
-        </div>
+      <div className={forms.fieldGroup}>
+        <label className={forms.fieldLabel} htmlFor={`${id}-consequence_type`}>Consequence Type</label>
+        <select
+          id={`${id}-consequence_type`}
+          className={`${styles.select} ${error ? forms.textareaError : ''}`}
+          value={choice.consequence_type}
+          onChange={(e) => onUpdate({ consequence_type: e.target.value })}
+        >
+          {CONSEQUENCE_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {CONSEQUENCE_TYPE_LABELS[type] || type}
+            </option>
+          ))}
+        </select>
+        {error && <span className={forms.errorText}>{error}</span>}
+      </div>
+
+      <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-3)' }}>
+        <label className={forms.fieldLabel} htmlFor={`${id}-feedback_media_url`}>
+          Consequence Image URL <span className={styles.optional}>(optional)</span>
+        </label>
+        <input
+          id={`${id}-feedback_media_url`}
+          type="text"
+          className={styles.urlInput}
+          value={mediaUrl}
+          onChange={(e) => onUpdate({ feedback_media_url: e.target.value || null })}
+          placeholder="Leave empty to use the illustrative icon"
+        />
+      </div>
+
+      {mediaUrl ? (
+        <img className={styles.mediaPreview} src={mediaUrl} alt="" />
       ) : (
         <p className={styles.note}>
-          This choice shows the engine's generic warning placeholder — no consequence video configured.
+          No image set, so the consequence beat shows the icon for “
+          {CONSEQUENCE_TYPE_LABELS[choice.consequence_type] || choice.consequence_type}”.
         </p>
       )}
     </div>

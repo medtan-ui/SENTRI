@@ -117,3 +117,77 @@
   .statsGrid { grid-template-columns: 1fr; }
   .analyticsGrid { grid-template-columns: 1fr; }
 }
+
+/* ── Post-tests waiting ────────────────────────────────────────────────
+   A missing post-test is the single thing that makes a student's own
+   learning gain unreportable, so it gets its own call to action rather
+   than being buried in the module list. */
+.pendingList {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pendingLink {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-gold-dark);
+  text-decoration: none;
+}
+
+.pendingLink:hover {
+  text-decoration: underline;
+}
+
+/* ── Per-module before/after ── */
+.timelineList {
+  list-style: none;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timelineRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: 13px;
+  padding: 7px 10px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+.timelineName {
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timelineScores {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--color-gold-dark);
+  white-space: nowrap;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────
+   The per-module before/after row keeps its two parts side by side down
+   to the smallest width — "Module ....... 40% → 80%" is the whole point
+   of the row, and stacking it would read as two unrelated lines. */
+@media (max-width: 600px) {
+  .timelineRow {
+    gap: var(--space-2);
+  }
+
+  .timelineName {
+    flex: 1 1 auto;
+  }
+}

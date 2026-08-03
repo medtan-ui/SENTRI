@@ -20,6 +20,7 @@ export {
   registerStudentAccount,
   resetUserPassword,
   setUserAccountStatus,
+  setUserSection,
   updateOwnNickname,
 } from './auth/controllers'
 
@@ -36,18 +37,24 @@ export { submitScenarioDecision } from './modules/scenario/controllers'
 
 export { submitQuiz } from './modules/quiz/controllers'
 
+export { submitAssessment } from './modules/assessment/controllers'
+
 export {
   completeLesson,
   completeModule,
   completeSimulation,
+  grantQuizRetry,
   initializeStudentProgress,
   resetModuleProgress,
   unlockNextModule,
 } from './modules/progress/controllers'
 
 export {
+  aggregateCohortAnalytics,
   aggregateModuleAnalytics,
   aggregateStudentAnalytics,
+  listSections,
   recordAnalyticsEvent,
+  scheduledAnalyticsAggregation,
   updateLearningAnalytics,
 } from './modules/analytics/controllers'

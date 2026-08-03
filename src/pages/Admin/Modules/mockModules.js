@@ -2,8 +2,8 @@
  * mockModules.js
  * SENTRI's curriculum is fixed: exactly six cybersecurity training
  * modules, always present. There is no create/delete/duplicate — admins
- * manage each predefined module's content and settings (via the future
- * Module Configuration page), not the roster of modules itself.
+ * manage each predefined module's content and settings (on the Module
+ * Configuration page), not the roster of modules itself.
  */
 
 export const MODULES = [
@@ -95,22 +95,4 @@ export const MODULES = [
 
 export function getModuleName(id) {
   return MODULES.find((m) => m.id === id)?.name || null
-}
-
-/**
- * CATEGORY_META
- * Legacy export kept for backward compatibility — ModulePreview's mock
- * data (src/pages/Admin/ModulePreview/mockPreviewModule.js) still reads
- * this by category name. The curriculum itself has no category concept
- * anymore (each of the six modules is its own fixed entry above).
- */
-export const CATEGORY_META = {
-  'Password Security':  { icon: '🔑', color: '#B8860B' },
-  'Phishing':            { icon: '🎣', color: '#C0392B' },
-  'Social Engineering':  { icon: '🎭', color: '#7B2D8B' },
-  'Network Security':    { icon: '🌐', color: '#2E86AB' },
-  'Safe Browsing':       { icon: '🧭', color: '#1E7E34' },
-  'Malware':             { icon: '🦠', color: '#16697A' },
-  'Data Privacy':        { icon: '🔐', color: '#34495E' },
-  'Email Security':      { icon: '📧', color: '#CA6F1E' },
 }

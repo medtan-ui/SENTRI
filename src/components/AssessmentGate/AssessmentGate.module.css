@@ -143,3 +143,91 @@
   margin-top: var(--space-6);
   width: 100%;
 }
+
+/* ── Post-test only: the before/after comparison ──────────────────────
+   Shown once, on the post-test result screen, because it is the single
+   moment a student can actually see their own improvement. */
+.gainPanel {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-gold-muted);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.gainRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--space-3);
+}
+
+.gainStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.gainValue {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-gold-dark);
+}
+
+.gainLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.gainArrow {
+  font-size: 20px;
+  color: var(--color-gold-dark);
+}
+
+.gainNote {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────
+   Same shape as the quiz: the submit row stacks so the button is a full
+   -width tap target, and the post-test's before/after panel keeps its
+   three parts on one line by shrinking rather than wrapping mid-arrow. */
+@media (max-width: 600px) {
+  .submitRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .submitRow > button {
+    width: 100%;
+  }
+
+  .progressText {
+    text-align: center;
+  }
+
+  .resultCard {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .choiceRow {
+    padding: var(--space-3);
+    align-items: flex-start;
+  }
+
+  .gainValue {
+    font-size: 20px;
+  }
+}

@@ -59,6 +59,10 @@ function defaultProgress(userId, moduleId, moduleOrder, isUnlocked) {
     pretestCompleted: false,
     pretestScore: null,
     pretestCompletedAt: null,
+    postTestCompleted: false,
+    postTestScore: null,
+    postTestCompletedAt: null,
+    normalizedGain: null,
     lessonStarted: false,
     lessonCompleted: false,
     simulationCompleted: false,
@@ -66,6 +70,8 @@ function defaultProgress(userId, moduleId, moduleOrder, isUnlocked) {
     moduleCompleted: false,
     score: null,
     attempts: 0,
+    // One quiz attempt unless an admin grants an appeal (grantQuizRetry).
+    attemptsAllowed: 1,
     lastAccessed: serverTimestamp(),
     completionDate: null,
     createdAt: serverTimestamp(),
@@ -201,23 +207,10 @@ export async function markSimulationCompleted(userId, moduleId) {
   }
 }
 
-/**
- * Records a completed pre-test attempt — unlike the markers above, this
- * one does NOT fail soft: the student is actively looking at a submit
- * button waiting for this to land, so a failure must surface as an error
- * they can retry, not disappear silently while the gate stays stuck.
- * @param {string} userId
- * @param {string} moduleId
- * @param {number} score  0-100, informational only — a pre-test has no
- *   passing threshold, this is purely for later comparison against the
- *   module's quiz score.
- */
-export async function markPretestCompleted(userId, moduleId, score) {
-  await mergeDoc(COLLECTION, progressDocId(userId, moduleId), {
-    pretestCompleted: true,
-    pretestScore: score,
-    pretestCompletedAt: serverTimestamp(),
-    lastAccessed: serverTimestamp(),
-  })
-}
+// Pre-test and post-test completion are no longer written from here.
+// Both are recorded by the submitAssessment Cloud Function, which has to
+// own that write anyway: it grades server-side, writes the per-question
+// `quiz_responses` rows no client may touch, and stores the normalized
+// gain computed against a pre-test score a client must not be able to
+// influence. See src/services/assessmentService.js.
 

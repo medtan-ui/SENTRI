@@ -5,9 +5,10 @@
  * mockModules.js, imported read-only from there — not duplicated here).
  * No Firestore, no backend — everything here is local, static content.
  *
- * Lesson content lives separately in ./LessonEditor/mockLessonContent.js
- * (the Lesson Content Editor manages its own state, independent of the
- * rest of this configuration form).
+ * Lesson content lives separately in Firestore's `moduleLessons`
+ * collection (see src/services/lessonService.js) — the Lesson Content
+ * Editor manages its own state, independent of the rest of this
+ * configuration form.
  */
 
 export const DIFFICULTY_OPTIONS = ['Easy', 'Medium', 'Hard']
@@ -20,6 +21,16 @@ export const DIFFICULTY_FROM_CURRICULUM = {
   Beginner: 'Easy',
   Intermediate: 'Medium',
   Advanced: 'Hard',
+}
+
+// The inverse, used by services/moduleLoader.js: the student Lesson
+// Viewer's difficulty badge is styled per Beginner/Intermediate/Advanced,
+// so an admin's Easy/Medium/Hard edit has to be translated back on its
+// way to the student.
+export const DIFFICULTY_TO_CURRICULUM = {
+  Easy: 'Beginner',
+  Medium: 'Intermediate',
+  Hard: 'Advanced',
 }
 
 

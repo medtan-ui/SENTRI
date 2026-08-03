@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
@@ -6,6 +6,7 @@ import Button from '../../../../components/Button/Button'
 import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
 import { useModuleProgress } from '../../../../hooks/useModuleProgress'
 import { getQuiz, submitQuiz } from '../../../../services/quizService'
+import { recordEvent, startTimedEvent } from '../../../../services/analyticsEventService'
 import styles from './StudentQuizPage.module.css'
 
 /**
@@ -13,11 +14,20 @@ import styles from './StudentQuizPage.module.css'
  * Reads the same moduleQuizzes document the admin editor authors (to
  * render questions/choices), but grading and recording the attempt
  * happens authoritatively server-side via the submitQuiz Cloud Function
- * — this page never computes a score itself. There is exactly one attempt:
- * submitting always completes the module and unlocks the next one, pass or
- * fail, so there is no retry path here. After a successful submit,
- * useModuleProgress is refetched so attempts/moduleCompleted reflect the
- * server's write.
+ * — this page never computes a score itself. Submitting always completes
+ * the module and unlocks the next one, pass or fail. After a successful
+ * submit, useModuleProgress is refetched so attempts/moduleCompleted
+ * reflect the server's write.
+ *
+ * One attempt by default. A student who appealed and was granted a retry
+ * has `attemptsAllowed > attempts` on their progress doc, and this page
+ * simply lets them back into the form — the server is what enforces the
+ * allowance, this is only the matching UI.
+ *
+ * Per-question time is measured here (first interaction → submit) and
+ * sent alongside the answers. It is what the time-to-answer and item
+ * analysis metrics are built from; a question never touched sends no
+ * duration at all rather than a zero.
  */
 export default function StudentQuizPage() {
   const { moduleId } = useParams()
@@ -33,12 +43,24 @@ export default function StudentQuizPage() {
   const [submitError, setSubmitError] = useState('')
   const [showReview, setShowReview] = useState(false)
 
+  // questionId -> epoch ms of first interaction. A ref, not state: it
+  // only feeds the submit payload, and re-rendering on every keystroke of
+  // timing data would be pointless churn.
+  const firstTouchedAt = useRef({})
+
+  // Whole-attempt stopwatch, separate from the per-question timings above:
+  // this one answers "how long did the quiz take", they answer "which
+  // question did they labour over".
+  const quizTimerRef = useRef(null)
+
   useEffect(() => {
     let cancelled = false
     setQuiz(undefined)
     setQuizError('')
     setAnswers({})
     setResult(null)
+    firstTouchedAt.current = {}
+    quizTimerRef.current = null
     getQuiz(moduleId)
       .then((data) => {
         if (!cancelled) setQuiz(data)
@@ -53,7 +75,21 @@ export default function StudentQuizPage() {
     }
   }, [moduleId])
 
+  // Start the attempt clock once the question form is genuinely on screen
+  // — not while loading, and not on a revisit that only shows a summary.
+  useEffect(() => {
+    if (!quiz || quizTimerRef.current) return
+    if (progressStatus !== 'success') return
+    if (progress?.quizCompleted) return
+    if (quiz.settings?.available === false) return
+    recordEvent('quiz_started', { moduleId })
+    quizTimerRef.current = startTimedEvent('quiz_submitted', moduleId)
+  }, [quiz, progressStatus, progress?.quizCompleted, moduleId])
+
   function selectAnswer(questionId, choiceId) {
+    if (!firstTouchedAt.current[questionId]) {
+      firstTouchedAt.current[questionId] = Date.now()
+    }
     setAnswers((prev) => ({ ...prev, [questionId]: choiceId }))
   }
 
@@ -61,9 +97,18 @@ export default function StudentQuizPage() {
     if (!quiz || submitting) return
     setSubmitting(true)
     setSubmitError('')
+    const submittedAt = Date.now()
+    const durations = {}
+    Object.entries(firstTouchedAt.current).forEach(([questionId, startedAt]) => {
+      durations[questionId] = submittedAt - startedAt
+    })
     try {
-      const data = await submitQuiz(moduleId, answers)
+      const data = await submitQuiz(moduleId, answers, durations)
       setResult(data)
+      if (quizTimerRef.current) {
+        quizTimerRef.current({ score: data.score, attemptNumber: data.attemptNumber })
+        quizTimerRef.current = null
+      }
       retryProgress() // resync attempts/moduleCompleted from the server's write
     } catch (err) {
       setSubmitError(err?.message || 'Something went wrong submitting your quiz. Please try again.')
@@ -109,11 +154,13 @@ export default function StudentQuizPage() {
       )
     }
 
-    // Only one attempt is ever allowed — a student returning to this page
-    // after already completing it gets a read-only summary instead of the
-    // question form. `!result` distinguishes that revisit from having just
-    // submitted this same quiz a moment ago in this session.
+    // A student returning to this page after already completing it gets a
+    // read-only summary instead of the question form. `!result`
+    // distinguishes that revisit from having just submitted this same quiz
+    // a moment ago in this session. An admin-granted retry clears
+    // quizCompleted, which is exactly what lets them back into the form.
     const alreadyCompleted = Boolean(progress?.quizCompleted) && !result
+    const postTestDone = Boolean(progress?.postTestCompleted)
 
     if (alreadyCompleted) {
       return (
@@ -123,7 +170,17 @@ export default function StudentQuizPage() {
           <p className={styles.stateText}>
             You've already taken this quiz — only one attempt is allowed. Your score was {progress?.score ?? '—'}%.
           </p>
-          <Button variant="primary" onClick={() => navigate('/student/dashboard')}>Return to Dashboard</Button>
+          <div className={styles.actions}>
+            {!postTestDone && (
+              <Button
+                variant="primary"
+                onClick={() => navigate(`/student/modules/${moduleId}/post-test`)}
+              >
+                Take the Post-Test →
+              </Button>
+            )}
+            <Button variant="ghost" onClick={() => navigate('/student/dashboard')}>Return to Dashboard</Button>
+          </div>
         </Card>
       )
     }
@@ -143,14 +200,31 @@ export default function StudentQuizPage() {
             </p>
             <span className={styles.statusBadge}>Module Completed</span>
 
+            <p className={styles.postTestPrompt}>
+              One last step: answer the same questions you saw before the lesson, so you can see how much
+              you've learned.
+            </p>
+
             <div className={styles.actions}>
               <Button variant="ghost" onClick={() => setShowReview((v) => !v)}>
                 {showReview ? 'Hide Answer Review' : 'Review Your Answers'}
               </Button>
-              <Button variant="primary" size="lg" onClick={() => navigate('/student/dashboard')}>
-                Continue to Dashboard
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => navigate(`/student/modules/${moduleId}/post-test`)}
+              >
+                Take the Post-Test →
               </Button>
             </div>
+
+            <button
+              type="button"
+              className={styles.skipLink}
+              onClick={() => navigate('/student/dashboard')}
+            >
+              Skip for now, return to Dashboard
+            </button>
           </Card>
 
           {showReview && (

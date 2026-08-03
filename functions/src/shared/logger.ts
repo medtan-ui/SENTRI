@@ -12,7 +12,10 @@ export interface LogFields {
   uid?: string | null
   moduleId?: string | null
   durationMs?: number
-  outcome?: 'success' | 'error'
+  /** 'partial' is for batch work (the nightly aggregation) where some
+   * targets succeeded and others didn't — collapsing that into either
+   * 'success' or 'error' would hide half the run. */
+  outcome?: 'success' | 'error' | 'partial'
   errorCode?: string
   [key: string]: unknown
 }

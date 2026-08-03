@@ -10,10 +10,16 @@ import styles from './ScenarioConfigTab.module.css'
 
 /**
  * ScenarioConfigTab
- * The Scenario tab inside Module Configuration. Administrators only
- * configure the content the reusable Scenario Engine consumes for this
- * module's three predefined scenarios — no creating, deleting, or
- * reordering scenarios, no drag-and-drop, no arbitrary branching.
+ * The Scenario tab inside Module Configuration. What's saved here is the
+ * Scenario Engine's own configuration, and students run it: see
+ * services/moduleLoader.js, which layers this document over the authored
+ * config before handing it to the engine.
+ *
+ * Administrators configure content only — scenario and choice copy, the
+ * opening clip, and consequence framing. Scenarios are never created,
+ * deleted, or reordered, and choice wiring (which scene renders a
+ * scenario, which interactive target maps to which choice, which choice
+ * is safe) is code-owned and shown read-only.
  *
  * Data comes from useScenario() (Hooks layer, backed by scenarioService
  * → Firestore). This component only renders — it never talks to
@@ -79,6 +85,10 @@ export default function ScenarioConfigTab({ moduleId, moduleName, overview }) {
             </div>
           )}
 
+          <p className={styles.liveNote}>
+            Saved changes go live for students the next time they open this module's simulation.
+          </p>
+
           <ScenarioOverviewCard
             moduleName={moduleName}
             overviewDescription={overview?.description}
@@ -89,17 +99,12 @@ export default function ScenarioConfigTab({ moduleId, moduleName, overview }) {
           <div className={styles.cardList}>
             {draft.scenarios.map((scenario) => (
               <ScenarioCard
-                key={scenario.id}
+                key={scenario.scenario_id}
                 scenario={scenario}
-                surface={draft.surface}
-                validation={validations.find((v) => v.scenarioId === scenario.id)}
-                onUpdateScenario={(patch) => actions.updateScenario(scenario.id, patch)}
-                onUpdateChoice={(choiceId, patch) => actions.updateChoice(scenario.id, choiceId, patch)}
-                onAddChoice={() => actions.addChoice(scenario.id)}
-                onRemoveChoice={(choiceId) => actions.removeChoice(scenario.id, choiceId)}
-                onMoveChoice={(choiceId, direction) => actions.moveChoice(scenario.id, choiceId, direction)}
-                onSetConsequenceEnabled={(choiceId, enabled) =>
-                  actions.setConsequenceEnabled(scenario.id, choiceId, enabled)
+                validation={validations.find((v) => v.scenarioId === scenario.scenario_id)}
+                onUpdateScenario={(patch) => actions.updateScenario(scenario.scenario_id, patch)}
+                onUpdateChoice={(choiceId, patch) =>
+                  actions.updateChoice(scenario.scenario_id, choiceId, patch)
                 }
               />
             ))}

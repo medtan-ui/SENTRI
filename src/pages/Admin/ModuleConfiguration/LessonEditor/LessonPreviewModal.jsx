@@ -5,8 +5,10 @@ import styles from './LessonContentTab.module.css'
 
 /**
  * LessonPreviewModal
- * Read-only, formatted preview of the lesson being edited — lets an
- * admin see roughly how the assembled lesson will read before saving.
+ * Read-only, formatted preview of the lesson being edited, laid out in
+ * the same order the student Lesson Viewer renders it — objectives, then
+ * every reading section in sequence, then best practices, key takeaways,
+ * and references.
  */
 export default function LessonPreviewModal({ open, onClose, lesson }) {
   const objectives = lesson.objectives.filter((o) => o.trim())
@@ -23,11 +25,6 @@ export default function LessonPreviewModal({ open, onClose, lesson }) {
     >
       <div className={styles.preview}>
         <section className={styles.previewSection}>
-          <h4 className={styles.previewHeading}>Introduction</h4>
-          <p className={styles.previewText}>{lesson.introduction || 'No introduction written yet.'}</p>
-        </section>
-
-        <section className={styles.previewSection}>
           <h4 className={styles.previewHeading}>Learning Objectives</h4>
           {objectives.length > 0 ? (
             <ul className={styles.previewList}>
@@ -38,15 +35,14 @@ export default function LessonPreviewModal({ open, onClose, lesson }) {
           )}
         </section>
 
-        <section className={styles.previewSection}>
-          <h4 className={styles.previewHeading}>Lesson Content</h4>
-          <p className={styles.previewText}>{lesson.lessonContent || 'No lesson content written yet.'}</p>
-        </section>
-
-        <section className={styles.previewSection}>
-          <h4 className={styles.previewHeading}>Real-World Example</h4>
-          <p className={styles.previewText}>{lesson.realWorldExample || 'No example written yet.'}</p>
-        </section>
+        {lesson.sections.map((section, i) => (
+          <section key={section.id} className={styles.previewSection}>
+            <h4 className={styles.previewHeading}>
+              Section {i + 1}: {section.title || '(untitled section)'}
+            </h4>
+            <p className={styles.previewText}>{section.content || 'No content written yet.'}</p>
+          </section>
+        ))}
 
         <section className={styles.previewSection}>
           <h4 className={styles.previewHeading}>Best Practices</h4>

@@ -16,8 +16,6 @@ const ViewUserPage           = React.lazy(() => import('../pages/Admin/Accounts/
 const CreateAdminAccountPage = React.lazy(() => import('../pages/Admin/Accounts/CreateAdmin/CreateAdminAccountPage'))
 const AdminProfilePage       = React.lazy(() => import('../pages/Admin/Profile/AdminProfilePage'))
 const ModulesPage            = React.lazy(() => import('../pages/Admin/Modules/ModulesPage'))
-const ModuleContentEditor    = React.lazy(() => import('../pages/Admin/ModuleEditor/ModuleContentEditor'))
-const ModulePreviewPage      = React.lazy(() => import('../pages/Admin/ModulePreview/ModulePreviewPage'))
 const ModuleConfigurationPage= React.lazy(() => import('../pages/Admin/ModuleConfiguration/ModuleConfigurationPage'))
 const ScenarioManagerPage    = React.lazy(() => import('../pages/Admin/ScenarioManager/ScenarioManagerPage'))
 const QuizManagerPage        = React.lazy(() => import('../pages/Admin/QuizManager/QuizManagerPage'))
@@ -28,6 +26,7 @@ const StudentLessonViewerPage= React.lazy(() => import('../pages/Student/Modules
 const ScenarioRunnerPage     = React.lazy(() => import('../pages/Student/Modules/ScenarioRunner/ScenarioRunnerPage'))
 const SimulationCompletePage = React.lazy(() => import('../pages/Student/Modules/SimulationComplete/SimulationCompletePage'))
 const StudentQuizPage        = React.lazy(() => import('../pages/Student/Modules/Quiz/StudentQuizPage'))
+const StudentPostTestPage    = React.lazy(() => import('../pages/Student/Modules/PostTest/StudentPostTestPage'))
 const StudentQuizOverviewPage= React.lazy(() => import('../pages/Student/Quiz/StudentQuizOverviewPage'))
 const StudentProgressPage    = React.lazy(() => import('../pages/Student/Progress/StudentProgressPage'))
 const StudentProfilePage     = React.lazy(() => import('../pages/Student/Profile/StudentProfilePage'))
@@ -166,6 +165,14 @@ export default function AppRouter() {
           }
         />
         <Route
+          path="/student/modules/:moduleId/post-test"
+          element={
+            <ProtectedRoute requiredRole="student">
+              <StudentPostTestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/student/quiz"
           element={
             <ProtectedRoute requiredRole="student">
@@ -236,22 +243,6 @@ export default function AppRouter() {
           element={
             <ProtectedRoute requiredRole="admin">
               <ModulesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/modules/editor"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ModuleContentEditor />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/modules/preview"
-          element={
-            <ProtectedRoute requiredRole="admin">
-              <ModulePreviewPage />
             </ProtectedRoute>
           }
         />

@@ -37,6 +37,18 @@ export function defaultProgress(
     lastAccessed: admin.firestore.FieldValue.serverTimestamp(),
     completionDate: null,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    pretestCompleted: false,
+    pretestScore: null,
+    pretestCompletedAt: null,
+    postTestCompleted: false,
+    postTestScore: null,
+    postTestCompletedAt: null,
+    normalizedGain: null,
+    // One attempt unless an admin explicitly grants another.
+    attemptsAllowed: 1,
+    retryGrantedBy: null,
+    retryGrantedAt: null,
+    retryReason: null,
   }
 }
 

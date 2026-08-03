@@ -38,6 +38,12 @@ export function useScenarioEngine(config, userId) {
   const currentDecisionIdRef = useRef(null)
   const targetRegistry = useRef(new Map())
 
+  // When the current scene last became interactive. The difference
+  // between this and the moment a choice lands is the time-to-decide
+  // measure — set on every entry into paused_interactive, so a retry is
+  // timed from the retry, not from the scenario's original start.
+  const decisionStartedAtRef = useRef(null)
+
   const currentScenario = config.scenarios[scenarioIndex]
   const totalScenarios = config.scenarios.length
   const isLastScenario = scenarioIndex === totalScenarios - 1
@@ -68,6 +74,13 @@ export function useScenarioEngine(config, userId) {
     setPulseIdleActive(false)
     clearPulseTimer()
   }, [])
+
+  // Start the decision clock the moment the scene becomes interactive.
+  // Runs on every entry into paused_interactive, including a retry, so
+  // each attempt is timed on its own rather than accumulating.
+  useEffect(() => {
+    if (state === 'paused_interactive') decisionStartedAtRef.current = Date.now()
+  }, [state, scenarioIndex])
 
   // Arm the idle-pulse timer whenever a fresh paused_interactive begins
   // and the student hasn't shown understanding yet. A config can opt a
@@ -111,6 +124,9 @@ export function useScenarioEngine(config, userId) {
       const choice = currentScenario.choices.find((c) => c.scenario_choice_id === choiceId)
       if (!choice) return
 
+      const startedAt = decisionStartedAtRef.current
+      const durationMs = startedAt ? Date.now() - startedAt : null
+
       setSelectedChoice(choice)
       setState('resolving')
 
@@ -120,11 +136,15 @@ export function useScenarioEngine(config, userId) {
         scenarioId: currentScenario.scenario_id,
         choiceId: choice.scenario_choice_id,
         isSafe: choice.is_safe_choice,
+        // attemptCount counts *risky* attempts already made on this
+        // scenario, so the attempt now being recorded is the next one.
+        attemptNumber: attemptCount + 1,
+        durationMs,
       }).then((decisionId) => {
         currentDecisionIdRef.current = decisionId
       })
     },
-    [state, currentScenario, userId, config.module_id],
+    [state, currentScenario, userId, config.module_id, attemptCount],
   )
 
   // ── resolving -> consequence (risky) | feedback (safe) ──

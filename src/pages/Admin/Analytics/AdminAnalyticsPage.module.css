@@ -25,6 +25,86 @@
   color: var(--color-text-muted);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Matches the select styling used on the Accounts page toolbar so the two
+   admin screens' filters read as the same control. */
+.sectionSelect {
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.sectionSelect:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12);
+}
+
+.sectionSelect:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Export bar ── */
+.exportBar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.exportLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-right: var(--space-1);
+}
+
+.exportHint {
+  font-size: 12px;
+  color: var(--color-text-light);
+  font-style: italic;
+  flex-basis: 100%;
+}
+
+.gridHeading {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.gridHeadingNote {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -107,4 +187,352 @@
 @media (max-width: 480px) {
   .grid { grid-template-columns: 1fr; }
   .header { flex-direction: column; }
+}
+
+/* ══ Learning Analytics framework ══════════════════════════════════════
+   Everything below renders figures computed by
+   functions/src/modules/analytics/metrics.ts. Kept visually quieter than
+   the headline stat tiles: these are diagnostics an admin drills into,
+   not numbers to scan at a glance. */
+
+/* ── Cohort card ── */
+.cohortCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.cohortHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.cohortTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.cohortSubtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.section {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.sectionHeading {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.sectionNote {
+  margin-top: var(--space-3);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+/* ── Transfer ── */
+.transferList {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.transferItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: 13px;
+  padding: 6px 10px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+.transferTopic {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.transferDelta {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.transferDelta[data-positive='true'] {
+  color: var(--color-success);
+}
+
+.transferDelta[data-positive='false'] {
+  color: var(--color-error);
+}
+
+/* ── Trend chart ──────────────────────────────────────────────────────
+   Deliberately CSS-only: no charting library to load, nothing to break
+   offline or on a projector during a demo. */
+.trendWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trendChart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 90px;
+  padding: 4px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+.trendBar {
+  flex: 1 0 4px;
+  min-height: 2px;
+  background: var(--color-gold);
+  border-radius: 2px 2px 0 0;
+}
+
+.trendAxis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--color-text-light);
+}
+
+/* ── Per-module detail ── */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.detailSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.detailHeading {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.detailNote {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.miniStatRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.miniStat strong {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.miniArrow {
+  color: var(--color-gold-dark);
+}
+
+/* ── Topic mastery ── */
+.topicList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topicRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px 56px;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+}
+
+.topicName {
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topicBarTrack {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.topicBarFill {
+  display: block;
+  height: 100%;
+  background: var(--color-gold);
+}
+
+.topicDelta {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.topicDelta[data-positive='true'] {
+  color: var(--color-success);
+}
+
+.topicDelta[data-positive='false'] {
+  color: var(--color-error);
+}
+
+/* ── Item analysis ── */
+.detailToggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-gold-dark);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.itemList {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: 11.5px;
+  padding: 5px 8px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+.itemMeta {
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 40%;
+}
+
+.itemDifficulty {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.itemDifficulty[data-label='Very hard'],
+.itemDifficulty[data-label='Hard'] {
+  color: var(--color-error);
+}
+
+.itemDiscrimination {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.itemFlag {
+  color: var(--color-error);
+}
+
+/* A discrimination index still waiting on data, not a failed one — dotted
+   underline marks it as explained on hover rather than simply missing. */
+.itemPending {
+  border-bottom: 1px dotted var(--color-border);
+  cursor: help;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────
+   The analytics page is the densest screen in the app. On a phone the
+   paired stat tiles become a single column, and the topic-mastery rows
+   drop their progress bar rather than squeezing three columns into
+   ~300px — the label and the number are the parts that carry meaning. */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .cohortHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .statGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .moduleCard {
+    padding: var(--space-4);
+  }
+
+  .topicRow {
+    grid-template-columns: minmax(0, 1fr) 56px;
+  }
+
+  .topicBarTrack {
+    display: none;
+  }
+
+  .itemRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .transferItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
 }

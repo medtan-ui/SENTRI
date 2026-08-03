@@ -57,3 +57,14 @@
   padding: var(--space-6) 0;
   text-align: center;
 }
+
+/* Makes the admin -> student connection explicit, now that saving here
+   really does change what students run. */
+.liveNote {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  background: var(--color-gold-muted);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
