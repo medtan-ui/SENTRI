@@ -6,9 +6,15 @@
 }
 
 .icon {
-  font-size: 42px;
-  display: block;
-  margin-bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  margin-bottom: var(--space-4);
 }
 
 .heading {

@@ -220,6 +220,24 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ── Gamification (points, rank, badges, streak) ──────────────────
+    // One document per student, written exclusively by the
+    // updateGamificationOnProgress trigger and the gamification callables
+    // (Admin SDK, bypasses these rules). Write is closed to every client:
+    // points are derived from moduleProgress, and a student able to write
+    // here could award themselves a rank they never earned.
+    //
+    // Read is deliberately narrow — own document, or an admin. The
+    // leaderboard does NOT read this collection from the client; it goes
+    // through the getLeaderboard callable, which returns only the columns
+    // a board needs about other students. Opening this collection up for
+    // reads instead would expose every classmate's full record to satisfy
+    // a view that shows five names and five numbers.
+    match /gamification/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if false;
+    }
+
     // Default deny for anything not explicitly matched above.
     match /{document=**} {
       allow read, write: if false;

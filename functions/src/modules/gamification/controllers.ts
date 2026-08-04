@@ -1,0 +1,121 @@
+import { onDocumentWritten } from 'firebase-functions/v2/firestore'
+import { requireAuth, resolveTargetUid } from '../../shared/authGuards'
+import { COLLECTIONS } from '../../shared/constants'
+import { logError, logInfo } from '../../shared/logger'
+import { parseOrThrow } from '../../shared/validation'
+import { defineCallable } from '../../shared/withCallable'
+import { ModuleProgressDoc } from '../progress/models'
+import * as service from './service'
+import { getGamificationSchema, getLeaderboardSchema } from './validators'
+
+/**
+ * getMyGamification — points, rank, badges and streak for the caller
+ * (or, for an admin, for a named student). Self-heals a missing document
+ * from existing progress, so accounts created before this feature shipped
+ * see a real score the first time they open the page rather than a zero
+ * that fills in later.
+ */
+export const getMyGamification = defineCallable('getMyGamification', async (request) => {
+  const input = parseOrThrow(getGamificationSchema, request.data ?? {})
+  const userId = await resolveTargetUid(request, input.userId)
+  const state = await service.getMine(userId)
+  return { gamification: state, catalog: service.getBadgeCatalog() }
+})
+
+/**
+ * recordDailyVisit — "I showed up today." The one write a student's own
+ * page load is allowed to cause, and the only thing that advances a
+ * streak on a day with no completed step. Idempotent within a day.
+ */
+export const recordDailyVisit = defineCallable('recordDailyVisit', async (request) => {
+  const { uid } = requireAuth(request)
+  const state = await service.recordDailyVisit(uid)
+  return { gamification: state }
+})
+
+/**
+ * getLeaderboard — a callable rather than an open collection read.
+ * Students never get blanket read access to each other's records; this
+ * returns exactly the columns a board needs (name, points, rank, streak,
+ * badge count) and nothing else about anyone.
+ */
+export const getLeaderboard = defineCallable('getLeaderboard', async (request) => {
+  const { uid } = requireAuth(request)
+  const input = parseOrThrow(getLeaderboardSchema, request.data ?? {})
+  return service.getLeaderboard(uid, input)
+})
+
+/**
+ * Fields whose change means a student actually got somewhere. Every
+ * progress write also bumps `lastAccessed`, so without this check simply
+ * opening a lesson would trigger a full recompute; with it, a recompute
+ * only follows a step that was genuinely finished.
+ */
+const REWARDABLE_FIELDS: Array<keyof ModuleProgressDoc> = [
+  'lessonCompleted',
+  'simulationCompleted',
+  'quizCompleted',
+  'moduleCompleted',
+  'pretestCompleted',
+  'postTestCompleted',
+  'score',
+]
+
+function rewardableChange(
+  before: Partial<ModuleProgressDoc> | undefined,
+  after: Partial<ModuleProgressDoc> | undefined,
+): boolean {
+  if (!after) return false
+  if (!before) return true
+  return REWARDABLE_FIELDS.some((field) => before[field] !== after[field])
+}
+
+/**
+ * updateGamificationOnProgress — the trigger that keeps points current.
+ *
+ * A trigger, not a call from each place progress is written, because
+ * progress is written from two directions in this app: the student client
+ * writes lesson and simulation milestones straight to Firestore, while
+ * quiz and assessment results are written server-side by their own
+ * callables. One trigger covers both without touching either, which is
+ * also why adding rewards did not require editing a single line of the
+ * code that already worked.
+ *
+ * Failures are logged and swallowed. Points are a reward layer; a
+ * student's actual progress has already committed by the time this runs,
+ * and losing a recompute costs nothing permanent since the next one
+ * rebuilds the whole score from scratch anyway.
+ */
+export const updateGamificationOnProgress = onDocumentWritten(
+  `${COLLECTIONS.MODULE_PROGRESS}/{progressId}`,
+  async (event) => {
+    const before = event.data?.before?.data() as Partial<ModuleProgressDoc> | undefined
+    const after = event.data?.after?.data() as Partial<ModuleProgressDoc> | undefined
+    const userId = after?.userId ?? before?.userId
+    if (!userId || !rewardableChange(before, after)) return
+
+    const startedAt = Date.now()
+    try {
+      const state = await service.recomputeFromProgress(userId, true)
+      logInfo('[updateGamificationOnProgress] succeeded', {
+        function: 'updateGamificationOnProgress',
+        uid: userId,
+        moduleId: after?.moduleId ?? null,
+        durationMs: Date.now() - startedAt,
+        outcome: 'success',
+        points: state.points,
+        level: state.level,
+        badges: state.badges.length,
+      })
+    } catch (err) {
+      logError('[updateGamificationOnProgress] failed', {
+        function: 'updateGamificationOnProgress',
+        uid: userId,
+        moduleId: after?.moduleId ?? null,
+        durationMs: Date.now() - startedAt,
+        outcome: 'error',
+        error: err instanceof Error ? { message: err.message, stack: err.stack } : String(err),
+      })
+    }
+  },
+)

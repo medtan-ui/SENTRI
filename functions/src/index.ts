@@ -4,7 +4,8 @@
  * sets the global region/instance options, then re-exports every callable
  * and trigger. Organized by the modules described in the project spec:
  * auth/ (account management), modules/admin (content configuration),
- * modules/scenario, modules/quiz, modules/progress, modules/analytics.
+ * modules/scenario, modules/quiz, modules/progress, modules/analytics,
+ * modules/gamification.
  */
 import { setGlobalOptions } from 'firebase-functions/v2'
 import './shared/admin'
@@ -48,6 +49,13 @@ export {
   resetModuleProgress,
   unlockNextModule,
 } from './modules/progress/controllers'
+
+export {
+  getLeaderboard,
+  getMyGamification,
+  recordDailyVisit,
+  updateGamificationOnProgress,
+} from './modules/gamification/controllers'
 
 export {
   aggregateCohortAnalytics,

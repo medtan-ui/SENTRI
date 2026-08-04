@@ -11,9 +11,66 @@
 }
 
 .icon {
-  font-size: 42px;
-  display: block;
-  margin-bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Reward callouts ───────────────────────────────────────────────
+   Both of these are conditional. On a module a student has already
+   earned everything from, this page is exactly what it was before. */
+.xpBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+  animation: xpIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes xpIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: none; }
+}
+
+.xpValue {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.xpTotal {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.newBadges {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  text-align: left;
+}
+
+.newBadgesTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-align: center;
 }
 
 .heading {

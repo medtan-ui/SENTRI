@@ -6,14 +6,15 @@ import ErrorState from '../../../components/ErrorState/ErrorState'
 import { useAuth } from '../../../context/AuthContext'
 import { useAdminOverview } from '../../../hooks/useAdminOverview'
 import { timeAgo } from '../../../utils/timeAgo'
+import Icon from '../../../components/Icon/Icon'
 import styles from './AdminDashboard.module.css'
 
 const QUICK_LINKS = [
-  { label: 'Modules', path: '/admin/modules', icon: '📚' },
-  { label: 'Scenarios', path: '/admin/scenarios', icon: '🎬' },
-  { label: 'Quizzes', path: '/admin/quizzes', icon: '📝' },
-  { label: 'Analytics', path: '/admin/analytics', icon: '📊' },
-  { label: 'Accounts', path: '/admin/accounts', icon: '👥' },
+  { label: 'Modules', path: '/admin/modules', icon: 'book' },
+  { label: 'Scenarios', path: '/admin/scenarios', icon: 'shield' },
+  { label: 'Quizzes', path: '/admin/quizzes', icon: 'quiz' },
+  { label: 'Analytics', path: '/admin/analytics', icon: 'analytics' },
+  { label: 'Accounts', path: '/admin/accounts', icon: 'users' },
 ]
 
 export default function AdminDashboard() {
@@ -42,10 +43,10 @@ export default function AdminDashboard() {
       <div className={styles.page}>
 
         {/* ── Hero ── */}
-        <div className={styles.hero}>
+        <div className={styles.hero} data-surface="dark">
           <div>
             <span className={styles.heroEyebrow}>Welcome back</span>
-            <h1 className={styles.heroTitle}>Hey, {name}! 👋</h1>
+            <h1 className={styles.heroTitle}>Hey, {name}</h1>
             <p className={styles.heroSubtitle}>Here's how SENTRI is looking today.</p>
           </div>
           <div className={styles.heroDateBadge}>
@@ -58,35 +59,27 @@ export default function AdminDashboard() {
 
         {status === 'success' && (
           <>
-            {/* ── Stats ── */}
+            {/* ── Stats ──
+                Number-first tiles, matching the student dashboard. The
+                icon-in-a-tinted-square treatment these used to have put
+                four unrelated accent colours across the top of the page
+                and pushed the figures themselves to second billing. */}
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
-                <span className={styles.statIcon} style={{ background: '#2E86AB18' }}>👥</span>
-                <div>
-                  <p className={styles.statValue}>{users.length}</p>
-                  <p className={styles.statLabel}>Total Accounts</p>
-                </div>
+                <p className={styles.statValue}>{users.length}</p>
+                <p className={styles.statLabel}>Total accounts</p>
               </div>
               <div className={styles.statCard}>
-                <span className={styles.statIcon} style={{ background: '#1E7E3418' }}>🎓</span>
-                <div>
-                  <p className={styles.statValue}>{studentCount}</p>
-                  <p className={styles.statLabel}>Students</p>
-                </div>
+                <p className={styles.statValue}>{studentCount}</p>
+                <p className={styles.statLabel}>Students</p>
               </div>
               <div className={styles.statCard}>
-                <span className={styles.statIcon} style={{ background: '#B8860B18' }}>📚</span>
-                <div>
-                  <p className={styles.statValue}>{modules.length}</p>
-                  <p className={styles.statLabel}>Curriculum Modules</p>
-                </div>
+                <p className={styles.statValue}>{modules.length}</p>
+                <p className={styles.statLabel}>Curriculum modules</p>
               </div>
               <div className={styles.statCard}>
-                <span className={styles.statIcon} style={{ background: '#7B2D8B18' }}>📊</span>
-                <div>
-                  <p className={styles.statValue}>{avgScore === null ? '—' : `${avgScore}%`}</p>
-                  <p className={styles.statLabel}>Avg. Recent Quiz Score</p>
-                </div>
+                <p className={styles.statValue}>{avgScore === null ? '—' : `${avgScore}%`}</p>
+                <p className={styles.statLabel}>Avg. recent quiz score</p>
               </div>
             </div>
 
@@ -131,7 +124,8 @@ export default function AdminDashboard() {
                         className={styles.quickLink}
                         onClick={() => navigate(link.path)}
                       >
-                        <span aria-hidden="true">{link.icon}</span> {link.label}
+                        <Icon name={link.icon} size={17} />
+                        {link.label}
                       </button>
                     ))}
                   </div>

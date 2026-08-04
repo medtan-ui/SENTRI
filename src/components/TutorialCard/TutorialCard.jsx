@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import styles from './TutorialCard.module.css'
@@ -35,7 +36,7 @@ export default function TutorialCard() {
   return (
     <div className={styles.card}>
       <div className={styles.left}>
-        <span className={styles.iconTile} aria-hidden="true">🧭</span>
+        <span className={styles.iconTile} aria-hidden="true"><Icon name="play" size={22} strokeWidth={1.6} /></span>
         <div>
           <span className={styles.badge}>Module 0 · Tutorial</span>
           <h3 className={styles.title}>
@@ -48,7 +49,8 @@ export default function TutorialCard() {
         </div>
       </div>
       <button type="button" className={styles.cta} onClick={() => navigate('/student/tutorial')}>
-        {done ? '✓ Completed · Review →' : 'Start Tutorial →'}
+        {done ? 'Review tutorial' : 'Start tutorial'}
+        <Icon name="arrowRight" size={16} />
       </button>
     </div>
   )

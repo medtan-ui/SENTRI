@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import Icon from '../../../../components/Icon/Icon'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
@@ -198,7 +199,7 @@ export default function StudentLessonViewerPage() {
               <span className={styles.difficultyBadge} data-difficulty={config.difficulty.toLowerCase()}>
                 {config.difficulty}
               </span>
-              <span className={styles.timeBadge}>⏱ {readingMinutes} min read</span>
+              <span className={styles.timeBadge}><Icon name="clock" size={13} /> {readingMinutes} min read</span>
             </div>
           </div>
           <div className={styles.headerProgress}>
@@ -227,7 +228,7 @@ export default function StudentLessonViewerPage() {
             <Card className={styles.sectionCard}>
               <div className={styles.sectionCardTop}>
                 <span className={styles.sectionCount}>Section {currentIndex + 1} of {totalSections}</span>
-                <span className={styles.requiredBadge}>🔒 Required</span>
+                <span className={styles.requiredBadge}><Icon name="lock" size={12} /> Required</span>
               </div>
               <h2 className={styles.sectionTitle}>{activeSection.title}</h2>
               <p className={styles.sectionContent}>{activeSection.content}</p>
@@ -278,9 +279,9 @@ export default function StudentLessonViewerPage() {
 
             <div className={styles.unlockNotice} data-complete={lessonComplete}>
               {lessonComplete ? (
-                <>✅ Reading complete, the interactive scenario is unlocked.</>
+                <><Icon name="check" size={15} /> Reading complete, the interactive scenario is unlocked.</>
               ) : (
-                <>🔒 <strong>Required reading:</strong> go through every section above to unlock the interactive scenario.</>
+                <><Icon name="lock" size={15} /> <strong>Required reading:</strong> go through every section above to unlock the interactive scenario.</>
               )}
             </div>
 

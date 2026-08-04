@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Icon from '../../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
@@ -9,8 +10,8 @@ import { listUsers } from '../../../services/adminService'
 import styles from './AdminProfilePage.module.css'
 
 const QUICK_LINKS = [
-  { label: 'Manage Accounts', path: '/admin/accounts', icon: '👥' },
-  { label: 'View Analytics', path: '/admin/analytics', icon: '📊' },
+  { label: 'Manage Accounts', path: '/admin/accounts', icon: 'users' },
+  { label: 'View Analytics', path: '/admin/analytics', icon: 'analytics' },
 ]
 
 /**
@@ -104,7 +105,8 @@ export default function AdminProfilePage() {
                 className={styles.quickLink}
                 onClick={() => navigate(link.path)}
               >
-                <span aria-hidden="true">{link.icon}</span> {link.label}
+                <Icon name={link.icon} size={17} />
+                {link.label}
               </button>
             ))}
           </div>

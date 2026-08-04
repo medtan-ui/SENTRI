@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
@@ -49,7 +50,7 @@ export default function StudentQuizOverviewPage() {
                         <p className={styles.rowMeta}>Completed — scored {m.progress?.score ?? 0}%</p>
                       </div>
                     </div>
-                    <span className={styles.badgeDone}>✓ Passed</span>
+                    <span className={styles.badgeDone}><Icon name="check" size={13} /> Passed</span>
                   </Card>
                 )
               }
@@ -82,7 +83,7 @@ export default function StudentQuizOverviewPage() {
                 <Card key={m.moduleId} className={styles.row} data-locked="true">
                   <div className={styles.rowInfo}>
                     <span className={styles.rowIcon} style={{ background: `${m.color}18`, color: m.color }}>
-                      🔒
+                      <Icon name="lock" size={18} />
                     </span>
                     <div>
                       <h2 className={styles.rowTitle}>{m.title}</h2>

@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../components/Icon/Icon'
 import YouTubePlayer, { parseYouTubeId } from '../../../components/VideoPlayer/YouTubePlayer'
 import styles from './ScenarioPlayer.module.css'
 
@@ -34,7 +35,7 @@ export default function ScenarioPlayer({ videoAvailable, materialUrl, posterCapt
 
   return (
     <div className={styles.poster}>
-      <span className={styles.posterIcon} aria-hidden="true">🎬</span>
+      <span className={styles.posterIcon} aria-hidden="true"><Icon name="play" size={26} strokeWidth={1.6} /></span>
       <h3 className={styles.posterTitle}>{scenarioTitle}</h3>
       {posterCaption && <p className={styles.posterCaption}>{posterCaption}</p>}
     </div>

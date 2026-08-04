@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../components/Icon/Icon'
 import { useAuth } from '../../../context/AuthContext'
 import { useScenarioEngine } from './useScenarioEngine'
 import { ScenarioInteractionProvider } from './ScenarioInteractionContext'
@@ -34,6 +35,7 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
     totalScenarios,
     completedScenarioIds,
     attemptCount,
+    cleanCalls,
     guidedHintActive,
     selectedChoice,
     interaction,
@@ -52,6 +54,7 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
             total={totalScenarios}
             currentIndex={scenarioIndex}
             completedCount={completedScenarioIds.length}
+            cleanCalls={cleanCalls}
           />
         </div>
 
@@ -94,11 +97,33 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
 
           {state === 'complete' && (
             <div className={styles.completeCard}>
-              <span className={styles.completeIcon} aria-hidden="true">🎉</span>
-              <h3 className={styles.completeTitle}>Simulation Complete</h3>
+              <span className={styles.completeIcon} aria-hidden="true">
+                <Icon name="shield" size={30} strokeWidth={1.6} />
+              </span>
+              <h3 className={styles.completeTitle}>Simulation complete</h3>
               <p className={styles.completeText}>
-                You made it through all {totalScenarios} scenarios safely. Your quiz is ready when you are.
+                You made it through all {totalScenarios} scenes safely. Your quiz is ready when you are.
               </p>
+
+              {/* The run's own scoreline. Completion is guaranteed here —
+                  the engine never lets anyone leave on a risky choice —
+                  so the only figure worth reporting is how many calls
+                  needed no second go. */}
+              <div className={styles.scoreline}>
+                <span className={styles.scorelineValue}>
+                  {cleanCalls}
+                  <span className={styles.scorelineTotal}>/ {totalScenarios}</span>
+                </span>
+                <span className={styles.scorelineLabel}>called right first time</span>
+              </div>
+
+              {cleanCalls === totalScenarios ? (
+                <p className={styles.completeNote}>A clean run. Not one wrong turn.</p>
+              ) : (
+                <p className={styles.completeNote}>
+                  The ones that caught you out are the ones worth remembering. You can replay this any time.
+                </p>
+              )}
             </div>
           )}
         </div>

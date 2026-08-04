@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Icon from '../../components/Icon/Icon'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Card from '../../components/Card/Card'
@@ -137,7 +138,7 @@ export default function LoginPage() {
       className={styles.toggleBtn}
       aria-label={showPwd ? 'Hide password' : 'Show password'}
     >
-      {showPwd ? '🙈' : '👁'}
+      {showPwd ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 

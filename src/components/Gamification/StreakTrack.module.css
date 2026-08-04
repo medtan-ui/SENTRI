@@ -1,0 +1,104 @@
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.headline {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.flame {
+  color: var(--color-text-light);
+  align-self: center;
+  display: flex;
+}
+
+.flame[data-live] {
+  color: var(--color-flame);
+}
+
+.count {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text);
+}
+
+.unit {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+
+.dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+}
+
+.dot[data-active] {
+  background: var(--color-flame);
+  border-color: var(--color-flame);
+}
+
+/* Today is ringed whether or not it has been earned yet, so an unfilled
+   ring reads as "still open" rather than "already missed". */
+.dot[data-today] {
+  box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 3.5px var(--color-flame);
+}
+
+.dayLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-light);
+}
+
+.caption {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ── On the navy hero ── */
+.track[data-variant='dark'] .count {
+  color: #fff;
+}
+
+.track[data-variant='dark'] .unit,
+.track[data-variant='dark'] .caption {
+  color: var(--color-navy-text);
+}
+
+.track[data-variant='dark'] .dayLabel {
+  color: rgba(176,184,204,0.7);
+}
+
+.track[data-variant='dark'] .dot {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.16);
+}
+
+.track[data-variant='dark'] .dot[data-active] {
+  background: var(--color-flame);
+  border-color: var(--color-flame);
+}
+
+.track[data-variant='dark'] .dot[data-today] {
+  box-shadow: 0 0 0 2px var(--color-navy), 0 0 0 3.5px var(--color-flame);
+}

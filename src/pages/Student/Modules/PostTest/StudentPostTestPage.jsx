@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../../components/Icon/Icon'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
@@ -34,7 +35,7 @@ export default function StudentPostTestPage() {
     if (status === 'success' && !eligible) {
       return (
         <Card className={styles.stateCard}>
-          <span className={styles.stateIcon} aria-hidden="true">🔒</span>
+          <span className={styles.stateIcon} data-tone="locked" aria-hidden="true"><Icon name="lock" size={26} strokeWidth={1.6} /></span>
           <h1 className={styles.stateTitle}>Post-Test Not Available Yet</h1>
           <p className={styles.stateText}>
             The post-test opens once you've submitted this module's quiz.
@@ -49,7 +50,7 @@ export default function StudentPostTestPage() {
     if (status === 'success' && completed) {
       return (
         <Card className={styles.stateCard}>
-          <span className={styles.stateIcon} aria-hidden="true">✅</span>
+          <span className={styles.stateIcon} data-tone="done" aria-hidden="true"><Icon name="check" size={26} strokeWidth={1.6} /></span>
           <h1 className={styles.stateTitle}>Post-Test Already Completed</h1>
           <p className={styles.stateText}>
             You've already taken this module's post-test. It's a one-time measurement, and your

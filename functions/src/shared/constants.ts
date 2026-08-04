@@ -40,6 +40,11 @@ export const COLLECTIONS = {
   /** Cross-module, cohort-level rollup — the one aggregate that isn't
    * keyed by a single module or a single student. */
   COHORT_ANALYTICS: 'cohortAnalytics',
+  /** One document per student: points, rank, badges, streak. Derived from
+   * MODULE_PROGRESS on every meaningful write (see modules/gamification),
+   * so it is a cache of the reward layer, never a second source of truth
+   * about what a student has actually completed. */
+  GAMIFICATION: 'gamification',
 } as const
 
 /**

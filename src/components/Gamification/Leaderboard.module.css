@@ -1,0 +1,180 @@
+.board {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Scope toggle ── */
+.scopeToggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  align-self: flex-start;
+  margin-bottom: var(--space-4);
+}
+
+.scopeBtn {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.scopeBtn[data-active] {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-quiet);
+}
+
+/* ── Rows ── */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 9px var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.row:hover {
+  background: var(--color-bg);
+}
+
+/* Your own row is marked by a gold edge rather than a filled background:
+   it has to be findable in a scan without outshouting the rank above it,
+   which is the whole comparison the row exists to make. */
+.row[data-you] {
+  background: var(--color-gold-muted);
+  box-shadow: inset 2px 0 0 var(--color-gold);
+}
+
+.rank {
+  width: 26px;
+  flex-shrink: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-light);
+}
+
+/* Top three get the tier colours the badges already use, so "gold" means
+   the same thing in both places. */
+.rank[data-medal='1'] { color: var(--tier-gold); }
+.rank[data-medal='2'] { color: var(--tier-silver); }
+.rank[data-medal='3'] { color: var(--tier-bronze); }
+
+.identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.youTag {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  background: var(--color-white);
+  border-radius: var(--radius-full);
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+
+.subline {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-flame);
+  flex-shrink: 0;
+}
+
+.points {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  min-width: 46px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* The vertical ellipsis between the visible top rows and a lower-ranked
+   "you" row, so the jump in rank numbers reads as a gap and not a bug. */
+.gap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: var(--space-2) 0;
+  width: 26px;
+}
+
+.gap span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--color-text-light);
+}
+
+.note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  padding: var(--space-2) 0;
+}
+
+.retryBtn {
+  margin-top: var(--space-2);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.retryBtn:hover {
+  border-color: var(--color-gold);
+}
+
+.footnote {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: 11.5px;
+  color: var(--color-text-light);
+}

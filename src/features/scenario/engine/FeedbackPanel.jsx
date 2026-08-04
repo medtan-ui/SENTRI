@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../components/Icon/Icon'
 import styles from './FeedbackPanel.module.css'
 
 /**
@@ -17,16 +18,32 @@ import styles from './FeedbackPanel.module.css'
  * is actually done, never mid-scenario. Config-driven and optional so
  * this stays generic across every module instead of hardcoding any one
  * scenario's copy into this shared component.
+ *
+ * The "First try" ribbon marks a safe call made with no risky attempts
+ * behind it. It is the only place in a run where doing well is
+ * acknowledged in the moment rather than tallied at the end, and it costs
+ * nothing to a student who needed a second go — they simply don't see it,
+ * rather than seeing a marker saying they missed it.
  */
 export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry, onContinue }) {
   const isSafe = choice.is_safe_choice
   const guided = !isSafe && attemptCount >= 3
   const reflection = isSafe ? scenario?.postCompletionReflection : null
+  const firstTry = isSafe && attemptCount === 0
 
   return (
     <div className={styles.overlay}>
       <div className={[styles.panel, isSafe ? styles.safe : styles.risky].join(' ')}>
-        <span className={styles.icon} aria-hidden="true">{isSafe ? '✅' : '⚠️'}</span>
+        {firstTry && (
+          <span className={styles.firstTry}>
+            <Icon name="target" size={13} />
+            First try
+          </span>
+        )}
+
+        <span className={styles.icon} data-tone={isSafe ? 'safe' : 'risky'} aria-hidden="true">
+          <Icon name={isSafe ? 'check' : 'alert'} size={26} strokeWidth={1.7} />
+        </span>
         <h3 className={styles.title}>{choice.outcome_title}</h3>
         <p className={styles.text}>{choice.feedback_text}</p>
 
@@ -34,14 +51,14 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
 
         {guided && (
           <div className={styles.guidedHint}>
-            <span aria-hidden="true">💡</span>
-            Look for the highlighted element — that's the safer move here.
+            <Icon name="sparkle" size={15} />
+            Look for the highlighted element. That's the safer move here.
           </div>
         )}
 
         {isSafe ? (
           <button type="button" className={styles.primaryBtn} onClick={onContinue}>
-            Continue →
+            Continue
           </button>
         ) : (
           <button type="button" className={styles.primaryBtn} onClick={onRetry}>

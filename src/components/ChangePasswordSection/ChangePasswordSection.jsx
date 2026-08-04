@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Icon from '../Icon/Icon'
 import Card from '../Card/Card'
 import Button from '../Button/Button'
 import Input from '../Input/Input'
@@ -69,7 +70,7 @@ export default function ChangePasswordSection() {
       className={styles.toggleBtn}
       aria-label={showCurrent ? 'Hide password' : 'Show password'}
     >
-      {showCurrent ? '🙈' : '👁'}
+      {showCurrent ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 
@@ -80,7 +81,7 @@ export default function ChangePasswordSection() {
       className={styles.toggleBtn}
       aria-label={showNew ? 'Hide password' : 'Show password'}
     >
-      {showNew ? '🙈' : '👁'}
+      {showNew ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 

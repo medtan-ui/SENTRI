@@ -31,6 +31,13 @@ export function useScenarioEngine(config, userId) {
   const [selectedChoice, setSelectedChoice] = useState(null)
   const [completedScenarioIds, setCompletedScenarioIds] = useState([])
 
+  // How many scenarios were resolved safely without a single risky
+  // attempt. Purely for the run's own feedback — a student who needed
+  // three goes still finishes, and the engine still records every
+  // attempt to scenario_decision_records exactly as before. This is the
+  // number that makes a second playthrough worth doing.
+  const [cleanCalls, setCleanCalls] = useState(0)
+
   const [pulseIdleActive, setPulseIdleActive] = useState(false)
   const hasInteractedRef = useRef(false)
   const [hasInteractedBefore, setHasInteractedBefore] = useState(false)
@@ -175,11 +182,15 @@ export function useScenarioEngine(config, userId) {
   const continueToNext = useCallback(() => {
     markFeedbackViewed(currentDecisionIdRef.current)
     currentDecisionIdRef.current = null
+    // Only reachable from a safe resolution (the feedback panel offers
+    // Continue for safe choices and Try Again for risky ones), so
+    // attemptCount === 0 here means the student got it right first go.
+    if (attemptCount === 0) setCleanCalls((n) => n + 1)
     setCompletedScenarioIds((prev) =>
       prev.includes(currentScenario.scenario_id) ? prev : [...prev, currentScenario.scenario_id],
     )
     setState('advancing')
-  }, [currentScenario])
+  }, [currentScenario, attemptCount])
 
   // ── advancing -> next scenario's loading, or complete ──
   useEffect(() => {
@@ -205,6 +216,7 @@ export function useScenarioEngine(config, userId) {
     isLastScenario,
     completedScenarioIds,
     attemptCount,
+    cleanCalls,
     guidedHintActive,
     selectedChoice,
     coachLevel,

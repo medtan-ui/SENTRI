@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
@@ -10,8 +11,8 @@ import { MODULE_STATUS } from '../../../services/moduleProgressService'
 import styles from './StudentProfilePage.module.css'
 
 const QUICK_LINKS = [
-  { label: 'View My Progress', path: '/student/progress', icon: '📈' },
-  { label: 'My Modules', path: '/student/modules', icon: '📚' },
+  { label: 'View My Progress', path: '/student/progress', icon: 'chart' },
+  { label: 'My Modules', path: '/student/modules', icon: 'book' },
 ]
 
 /**
@@ -86,7 +87,8 @@ export default function StudentProfilePage() {
                 className={styles.quickLink}
                 onClick={() => navigate(link.path)}
               >
-                <span aria-hidden="true">{link.icon}</span> {link.label}
+                <Icon name={link.icon} size={17} />
+                {link.label}
               </button>
             ))}
           </div>

@@ -3,26 +3,53 @@ import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../components/ErrorState/ErrorState'
+import Icon from '../../../components/Icon/Icon'
 import ModuleGrid, { MODULE_STATUS_META, moduleDestination } from '../../../components/ModuleGrid/ModuleGrid'
-import ModuleProgressList from '../../../components/ModuleProgressList/ModuleProgressList'
 import TutorialCard from '../../../components/TutorialCard/TutorialCard'
+import RankMeter from '../../../components/Gamification/RankMeter'
+import StreakTrack from '../../../components/Gamification/StreakTrack'
+import BadgeShelf from '../../../components/Gamification/BadgeShelf'
+import Leaderboard from '../../../components/Gamification/Leaderboard'
 import { useAuth } from '../../../context/AuthContext'
+import { useGamificationState } from '../../../context/GamificationContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
 import styles from './StudentDashboard.module.css'
 
-const STATUS_DOT_COLOR = {
-  [MODULE_STATUS.LOCKED]: '#AAAAAA',
-  [MODULE_STATUS.AVAILABLE]: '#2E86AB',
-  [MODULE_STATUS.IN_PROGRESS]: '#B8860B',
-  [MODULE_STATUS.QUIZ_AVAILABLE]: '#B8860B',
-  [MODULE_STATUS.COMPLETED]: '#1E7E34',
-}
-
+/**
+ * StudentDashboard — /student/dashboard
+ *
+ * ── Why this page is shorter than it was ─────────────────────────────
+ * It used to carry six stacked blocks: a greeting hero, a tip banner, a
+ * "continue where you left off" panel, four stat cards, the module grid,
+ * then two more panels called "What's Next" and "Module Progress". Three
+ * of those answered the same question. "What's Next" listed the modules
+ * that weren't finished, "Module Progress" showed a bar per module, and
+ * the module grid showed both of those things already, on cards, with the
+ * buttons attached. A student scrolling this page met their next module
+ * three times and could act on it in three different places.
+ *
+ * So the redundant panels are gone rather than restyled, and the space
+ * they held now carries something the page genuinely didn't have:
+ * rewards. The layout is four blocks.
+ *
+ *   1. Hero        — who you are, how far into your rank, your streak,
+ *                    and the single button that resumes training. The old
+ *                    hero, tip banner and continue panel collapsed into
+ *                    one, because they were all the top of the page.
+ *   2. Stat strip  — four figures, no icons, no colour tiles.
+ *   3. Your Modules— the grid, which is the actual curriculum.
+ *   4. Rewards row — badges and the leaderboard, side by side.
+ *
+ * The interaction tip that used to sit in a banner here now lives in the
+ * scenario intro screen (ScenarioIntroTutorial), which is where a student
+ * is about to need it rather than several clicks earlier.
+ */
 export default function StudentDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules } = useStudentModules()
+  const { status: rewardStatus, gamification, catalog } = useGamificationState()
 
   const name = user?.nickname || user?.displayName || 'Student'
 
@@ -37,81 +64,99 @@ export default function StudentDashboard() {
       ? Math.round(scoredModules.reduce((sum, m) => sum + m.progress.score, 0) / scoredModules.length)
       : null
   const scenariosCompleted = modules.filter((m) => m.progress?.simulationCompleted).length
-  const curriculumPct = modules.length > 0 ? Math.round((completedModules.length / modules.length) * 100) : 0
+  const totalModules = modules.length || 6
 
+  const rewardsReady = rewardStatus === 'success' && gamification
+  const earnedBadges = gamification?.badges ?? []
+
+  // Four figures, chosen so no two of them say the same thing: how much
+  // of the curriculum is done, how much of the hands-on part is done, how
+  // well the graded part went, and how much of the reward set is claimed.
   const stats = [
-    { label: 'Modules Completed', value: `${completedModules.length} / ${modules.length || 6}`, icon: '📚', accent: '#B8860B' },
-    { label: 'Quiz Average', value: quizAverage === null ? '—' : `${quizAverage}%`, icon: '✎', accent: '#2E86AB' },
-    { label: 'Scenarios Completed', value: `${scenariosCompleted} / ${modules.length || 6}`, icon: '🎬', accent: '#1E7E34' },
-    { label: 'Curriculum Progress', value: `${curriculumPct}%`, icon: '📈', accent: '#C0392B' },
+    { label: 'Modules completed', value: `${completedModules.length}`, suffix: `/ ${totalModules}` },
+    { label: 'Scenarios cleared', value: `${scenariosCompleted}`, suffix: `/ ${totalModules}` },
+    { label: 'Quiz average', value: quizAverage === null ? '—' : `${quizAverage}`, suffix: quizAverage === null ? '' : '%' },
+    {
+      label: 'Badges earned',
+      value: rewardsReady ? `${earnedBadges.length}` : '—',
+      suffix: catalog.length > 0 ? `/ ${catalog.length}` : '',
+    },
   ]
-
-  const upNext = modules.filter((m) => m.status !== MODULE_STATUS.COMPLETED).slice(0, 3)
 
   return (
     <DashboardLayout role="student">
       <div className={styles.page}>
 
-        {/* ── Hero ── */}
-        <div className={styles.hero}>
-          <div>
+        {/* ── 1. Hero: identity, standing, and the one action ── */}
+        <section className={styles.hero} data-surface="dark">
+          <div className={styles.heroMain}>
             <span className={styles.heroEyebrow}>Welcome back</span>
-            <h1 className={styles.heroTitle}>Hey, {name}! 👋</h1>
-            <p className={styles.heroSubtitle}>Here's how your training is going.</p>
-          </div>
-          <div className={styles.heroDateBadge}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </div>
-        </div>
+            <h1 className={styles.heroTitle}>Hey, {name}</h1>
 
-        {/* ── Game-style interaction tip ── */}
-        <div className={styles.gameTip}>
-          <span className={styles.gameTipIcon} aria-hidden="true">🎮</span>
-          <p>
-            <strong>Tip:</strong> Interactive scenarios are hands-on. Click buttons, fill in forms, and make real
-            choices, just like the real thing. Nothing bad actually happens if you pick wrong, that's how you learn.
-            New to it? Try <strong>Module 0: Tutorial</strong> below first.
-          </p>
-        </div>
+            {inProgressOrNext ? (
+              <>
+                <p className={styles.heroSubtitle}>
+                  {inProgressOrNext.status === MODULE_STATUS.AVAILABLE
+                    ? 'Next up in your training:'
+                    : 'Pick up where you left off:'}{' '}
+                  <strong>{inProgressOrNext.title}</strong>
+                </p>
+                <button
+                  type="button"
+                  className={styles.heroCta}
+                  onClick={() => navigate(moduleDestination(inProgressOrNext))}
+                >
+                  {MODULE_STATUS_META[inProgressOrNext.status].cta}
+                  <Icon name="arrowRight" size={17} />
+                </button>
+              </>
+            ) : (
+              <p className={styles.heroSubtitle}>
+                {status === 'success'
+                  ? 'Every module is done. That is the whole curriculum cleared, nice work.'
+                  : 'Loading your training.'}
+              </p>
+            )}
+          </div>
 
-        {/* ── Continue where you left off ── */}
-        {inProgressOrNext && (
-          <section className={styles.assignedModule}>
-            <div>
-              <span className={styles.assignedEyebrow}>
-                {inProgressOrNext.status === MODULE_STATUS.AVAILABLE ? 'Up Next' : 'Continue'}
-              </span>
-              <h2 className={styles.assignedTitle}>{inProgressOrNext.title}</h2>
-              <span className={styles.assignedStatus}>{MODULE_STATUS_META[inProgressOrNext.status].label}</span>
+          {rewardsReady && (
+            <div className={styles.heroRewards}>
+              <RankMeter
+                variant="dark"
+                points={gamification.points}
+                level={gamification.level}
+                rankName={gamification.rankName}
+                rankFloor={gamification.rankFloor}
+                nextRankAt={gamification.nextRankAt}
+                nextRankName={gamification.nextRankName}
+              />
+              <div className={styles.heroDivider} aria-hidden="true" />
+              <StreakTrack
+                variant="dark"
+                currentStreak={gamification.currentStreak}
+                longestStreak={gamification.longestStreak}
+                lastActiveDate={gamification.lastActiveDate}
+              />
             </div>
-            <button
-              type="button"
-              className={styles.assignedBtn}
-              onClick={() => navigate(moduleDestination(inProgressOrNext))}
-            >
-              {MODULE_STATUS_META[inProgressOrNext.status].cta}
-            </button>
-          </section>
-        )}
+          )}
+        </section>
 
-        {/* ── Stats row ── */}
+        {/* ── 2. Stat strip ── */}
         <div className={styles.statsGrid}>
-          {stats.map((s) => (
-            <div key={s.label} className={styles.statCard}>
-              <span className={styles.statIcon} style={{ background: s.accent + '18' }}>
-                {s.icon}
-              </span>
-              <div>
-                <p className={styles.statValue}>{s.value}</p>
-                <p className={styles.statLabel}>{s.label}</p>
-              </div>
+          {stats.map((stat) => (
+            <div key={stat.label} className={styles.statCard}>
+              <p className={styles.statValue}>
+                {stat.value}
+                {stat.suffix && <span className={styles.statSuffix}>{stat.suffix}</span>}
+              </p>
+              <p className={styles.statLabel}>{stat.label}</p>
             </div>
           ))}
         </div>
 
-        {/* ── Module grid ── */}
+        {/* ── 3. The curriculum ── */}
         <section className={styles.moduleSection}>
-          <h2 className={styles.sectionHeading}>Your Modules</h2>
+          <h2 className={styles.sectionHeading}>Your modules</h2>
 
           <TutorialCard />
 
@@ -120,45 +165,28 @@ export default function StudentDashboard() {
           {status === 'success' && <ModuleGrid modules={modules} />}
         </section>
 
-        {/* ── Content columns ── */}
+        {/* ── 4. Rewards ── */}
         <div className={styles.columns}>
-
-          {/* What's next in the curriculum */}
           <section className={styles.panel}>
-            <h2 className={styles.panelTitle}>What's Next</h2>
-            {upNext.length === 0 ? (
-              <p className={styles.emptyText}>You've completed every module. Nice work!</p>
-            ) : (
-              <ul className={styles.taskList}>
-                {upNext.map((m) => {
-                  const destination = moduleDestination(m)
-                  return (
-                    <li key={m.moduleId} className={styles.taskItem}>
-                      <button
-                        type="button"
-                        className={styles.taskButton}
-                        disabled={!destination}
-                        onClick={() => destination && navigate(destination)}
-                      >
-                        <div className={styles.taskMeta}>
-                          <span className={styles.statusDot} style={{ background: STATUS_DOT_COLOR[m.status] }} />
-                          <div>
-                            <p className={styles.taskTitle}>{m.title}</p>
-                            <p className={styles.taskDue}>{MODULE_STATUS_META[m.status].label}</p>
-                          </div>
-                        </div>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Badges</h2>
+              <button type="button" className={styles.panelLink} onClick={() => navigate('/student/progress')}>
+                See all
+                <Icon name="chevronRight" size={14} />
+              </button>
+            </div>
+            {rewardStatus === 'loading' && <p className={styles.emptyText}>Loading your badges…</p>}
+            {rewardStatus === 'error' && (
+              <p className={styles.emptyText}>Your badges could not be loaded right now.</p>
             )}
+            {rewardsReady && <BadgeShelf catalog={catalog} earnedIds={earnedBadges} limit={4} compact />}
           </section>
 
-          {/* Progress overview — same six modules, real data */}
           <section className={styles.panel}>
-            <h2 className={styles.panelTitle}>Module Progress</h2>
-            <ModuleProgressList modules={modules} />
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Leaderboard</h2>
+            </div>
+            <Leaderboard scope="all" limit={5} />
           </section>
         </div>
       </div>

@@ -1,31 +1,62 @@
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import Icon from '../Icon/Icon'
 import logo from '../../assets/images/logo.png'
 import styles from './Sidebar.module.css'
 
+/**
+ * Nav items are grouped rather than listed flat. Seven admin links in one
+ * unbroken column read as seven equally-weighted choices; split into
+ * "what students see" and "what I configure", the same seven links become
+ * two short decisions. The group label is the cheapest structure
+ * available — no extra clicks, no collapsing, no state to get wrong.
+ */
 const STUDENT_NAV = [
-  { label: 'Dashboard',        path: '/student/dashboard', icon: '⊞' },
-  { label: 'Modules',          path: '/student/modules',   icon: '📚' },
-  { label: 'Quiz',             path: '/student/quiz',      icon: '✎' },
-  { label: 'Progress',         path: '/student/progress',  icon: '📈' },
-  { label: 'Profile',          path: '/student/profile',   icon: '👤' },
+  {
+    items: [
+      { label: 'Dashboard', path: '/student/dashboard', icon: 'dashboard' },
+      { label: 'Modules', path: '/student/modules', icon: 'book' },
+      { label: 'Quiz', path: '/student/quiz', icon: 'quiz' },
+    ],
+  },
+  {
+    title: 'You',
+    items: [
+      { label: 'Progress', path: '/student/progress', icon: 'chart' },
+      { label: 'Profile', path: '/student/profile', icon: 'user' },
+    ],
+  },
 ]
 
 const ADMIN_NAV = [
-  { label: 'Dashboard',    path: '/admin/dashboard',  icon: '⊞' },
-  { label: 'Accounts',     path: '/admin/accounts',   icon: '👥' },
-  { label: 'Modules',      path: '/admin/modules',    icon: '📚' },
-  { label: 'Scenarios',    path: '/admin/scenarios',  icon: '🛡' },
-  { label: 'Quiz Manager', path: '/admin/quizzes',    icon: '✎' },
-  { label: 'Analytics',    path: '/admin/analytics',  icon: '📊' },
-  { label: 'Profile',      path: '/admin/profile',    icon: '👤' },
+  {
+    items: [
+      { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
+      { label: 'Analytics', path: '/admin/analytics', icon: 'analytics' },
+    ],
+  },
+  {
+    title: 'Content',
+    items: [
+      { label: 'Modules', path: '/admin/modules', icon: 'book' },
+      { label: 'Scenarios', path: '/admin/scenarios', icon: 'shield' },
+      { label: 'Quiz Manager', path: '/admin/quizzes', icon: 'quiz' },
+    ],
+  },
+  {
+    title: 'People',
+    items: [
+      { label: 'Accounts', path: '/admin/accounts', icon: 'users' },
+      { label: 'Profile', path: '/admin/profile', icon: 'user' },
+    ],
+  },
 ]
 
 export default function Sidebar({ role = 'student', isOpen, onClose }) {
   const navigate = useNavigate()
   const { logout } = useAuth()
-  const navItems = role === 'admin' ? ADMIN_NAV : STUDENT_NAV
+  const navGroups = role === 'admin' ? ADMIN_NAV : STUDENT_NAV
 
   async function handleLogout() {
     await logout()
@@ -46,6 +77,7 @@ export default function Sidebar({ role = 'student', isOpen, onClose }) {
       <nav
         className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}
         aria-label="Main navigation"
+        data-surface="dark"
       >
         {/* Brand */}
         <div className={styles.brand}>
@@ -57,27 +89,38 @@ export default function Sidebar({ role = 'student', isOpen, onClose }) {
         </div>
 
         {/* Nav items */}
-        <ul className={styles.navList} role="list">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `${styles.navLink} ${isActive ? styles.active : ''}`
-                }
-                onClick={onClose}
-              >
-                <span className={styles.icon} aria-hidden="true">{item.icon}</span>
-                <span className={styles.label}>{item.label}</span>
-              </NavLink>
-            </li>
+        <div className={styles.navScroll}>
+          {navGroups.map((group, groupIndex) => (
+            <div key={group.title ?? `group-${groupIndex}`} className={styles.navGroup}>
+              {group.title && <p className={styles.navGroupTitle}>{group.title}</p>}
+              <ul className={styles.navList} role="list">
+                {group.items.map((item) => (
+                  <li key={item.path}>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `${styles.navLink} ${isActive ? styles.active : ''}`
+                      }
+                      onClick={onClose}
+                    >
+                      <span className={styles.iconSlot}>
+                        <Icon name={item.icon} size={18} />
+                      </span>
+                      <span className={styles.label}>{item.label}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
 
         {/* Logout at bottom */}
         <div className={styles.footer}>
           <button className={styles.logoutBtn} onClick={handleLogout}>
-            <span className={styles.icon} aria-hidden="true">⎋</span>
+            <span className={styles.iconSlot}>
+              <Icon name="logout" size={18} />
+            </span>
             <span className={styles.label}>Logout</span>
           </button>
         </div>

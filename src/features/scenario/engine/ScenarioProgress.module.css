@@ -6,32 +6,52 @@
 }
 
 .label {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
 
-.dots {
+.label strong {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  color: var(--color-text);
+}
+
+/* Segments rather than dots: a bar reads as a route with a position on
+   it, where equal dots read as a count. */
+.steps {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
-.dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
+.step {
+  height: 5px;
+  width: 22px;
+  border-radius: var(--radius-full);
   background: var(--color-border);
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-med), width var(--transition-med);
 }
 
-.dotCurrent {
-  background: var(--color-gold);
-  transform: scale(1.25);
-}
-
-.dotCompleted {
+.step[data-state='done'] {
   background: var(--color-success);
+}
+
+.step[data-state='current'] {
+  width: 34px;
+  background: var(--color-gold);
+}
+
+.cleanCalls {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-radius: var(--radius-full);
+  padding: 4px 11px;
 }

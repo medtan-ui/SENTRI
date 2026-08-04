@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import Icon from '../../../../components/Icon/Icon'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../../../components/Layout/DashboardLayout'
 import Card from '../../../../components/Card/Card'
@@ -146,7 +147,7 @@ export default function StudentQuizPage() {
     if (quiz.settings?.available === false) {
       return (
         <Card className={styles.stateCard}>
-          <span className={styles.stateIcon} aria-hidden="true">🔒</span>
+          <span className={styles.stateIcon} data-tone="locked" aria-hidden="true"><Icon name="lock" size={26} strokeWidth={1.6} /></span>
           <h1 className={styles.stateTitle}>Quiz Not Yet Available</h1>
           <p className={styles.stateText}>Your instructor hasn't opened this quiz yet. Check back soon.</p>
           <Button variant="ghost" onClick={() => navigate('/student/dashboard')}>← Return to Dashboard</Button>
@@ -165,7 +166,7 @@ export default function StudentQuizPage() {
     if (alreadyCompleted) {
       return (
         <Card className={styles.stateCard}>
-          <span className={styles.stateIcon} aria-hidden="true">✅</span>
+          <span className={styles.stateIcon} data-tone="done" aria-hidden="true"><Icon name="check" size={26} strokeWidth={1.6} /></span>
           <h1 className={styles.stateTitle}>Quiz Already Completed</h1>
           <p className={styles.stateText}>
             You've already taken this quiz — only one attempt is allowed. Your score was {progress?.score ?? '—'}%.
@@ -189,7 +190,9 @@ export default function StudentQuizPage() {
       return (
         <>
           <Card className={styles.resultCard}>
-            <span className={styles.stateIcon} aria-hidden="true">{result.passed ? '🎉' : '📋'}</span>
+            <span className={styles.stateIcon} data-tone={result.passed ? 'done' : undefined} aria-hidden="true">
+              <Icon name={result.passed ? 'trophy' : 'quiz'} size={26} strokeWidth={1.6} />
+            </span>
             <h1 className={styles.stateTitle}>{result.passed ? 'Quiz Passed!' : 'Quiz Complete'}</h1>
             <p className={styles.scoreText}>{result.score}%</p>
             <p className={styles.stateText}>

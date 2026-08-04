@@ -3,26 +3,35 @@
   margin: 0 auto;
 }
 
-/* ── Header ── */
-/* ── Hero ── */
+/* ── 1. Hero ───────────────────────────────────────────────────────
+   Two columns on desktop: the greeting and the resume button on the
+   left, the reward figures on the right. Deliberately one panel — the
+   greeting, the "continue" prompt and the streak used to be three
+   separate navy blocks stacked down the page, which meant the same dark
+   surface interrupted three times before any content appeared. */
 .hero {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: var(--space-8);
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  background: var(--color-sidebar-bg);
-  border-radius: var(--radius-md);
-  padding: var(--space-8) var(--space-6);
-  margin-bottom: var(--space-8);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(184,134,11,0.16) 0%, rgba(184,134,11,0) 55%),
+    var(--color-navy);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.heroMain {
+  min-width: 0;
 }
 
 .heroEyebrow {
   display: block;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: var(--color-gold-light);
 }
 
@@ -32,146 +41,118 @@
   font-weight: 700;
   color: #fff;
   margin-top: var(--space-2);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .heroSubtitle {
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
   font-size: 14px;
-  color: var(--color-sidebar-text);
+  line-height: 1.6;
+  color: var(--color-navy-text);
 }
 
-.heroDateBadge {
-  font-size: 12.5px;
-  color: var(--color-sidebar-text);
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: var(--radius-full);
-  padding: 5px 14px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* ── Game-style interaction tip ── */
-.gameTip {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  background: var(--color-gold-muted);
-  border-left: 3px solid var(--color-gold);
-  border-radius: var(--radius-sm);
-  padding: var(--space-4) var(--space-5);
-  margin-bottom: var(--space-8);
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--color-gold-dark);
-}
-
-.gameTipIcon {
-  font-size: 18px;
-  line-height: 1.4;
-  flex-shrink: 0;
-}
-
-/* ── Assigned module ── */
-.assignedModule {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  background: var(--color-sidebar-bg);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-  margin-bottom: var(--space-8);
-}
-
-.assignedEyebrow {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-gold-light);
-}
-
-.assignedTitle {
-  font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 700;
+.heroSubtitle strong {
   color: #fff;
-  margin-top: var(--space-1);
-}
-
-.assignedStatus {
-  display: inline-block;
-  margin-top: var(--space-2);
-  font-size: 12px;
   font-weight: 600;
-  color: var(--color-sidebar-text);
 }
 
-.assignedBtn {
+.heroCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
   border: none;
   border-radius: var(--radius-md);
   background: var(--color-gold);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
-  padding: var(--space-3) var(--space-6);
+  padding: 11px var(--space-6);
   box-shadow: var(--shadow-button);
-  transition: background var(--transition-fast);
-  flex-shrink: 0;
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
-.assignedBtn:hover {
-  background: var(--color-gold-dark);
+.heroCta:hover {
+  background: var(--color-gold-light);
+  transform: translateY(-1px);
 }
 
-/* ── Stats ── */
+.heroCta:active {
+  transform: translateY(0);
+}
+
+.heroRewards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--color-navy-line);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  min-width: 0;
+}
+
+.heroDivider {
+  height: 1px;
+  background: var(--color-navy-line);
+}
+
+/* ── 2. Stat strip ─────────────────────────────────────────────────
+   No icon tiles. Each of these used to be a coloured square holding an
+   emoji, which put four competing accent colours above the module grid
+   and made the numbers the second thing you read. The number is the
+   whole point, so it goes first and largest, and the accent is a single
+   hairline at the top of each tile. */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-5);
+  gap: var(--space-4);
   margin-bottom: var(--space-8);
 }
 
 .statCard {
+  position: relative;
   background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-quiet);
   padding: var(--space-5);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  overflow: hidden;
 }
 
-.statIcon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
+.statCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--color-gold);
+  opacity: 0.85;
 }
 
 .statValue {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--color-text);
   line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statSuffix {
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-light);
 }
 
 .statLabel {
   font-size: 12px;
   color: var(--color-text-muted);
-  margin-top: 4px;
+  margin-top: var(--space-2);
 }
 
-/* ── Module grid ── (card/grid styles live in components/ModuleGrid) */
+/* ── 3. Module grid ── (card styles live in components/ModuleGrid) */
 .moduleSection {
   margin-bottom: var(--space-8);
 }
@@ -184,19 +165,33 @@
   margin-bottom: var(--space-4);
 }
 
-/* ── Columns ── */
+/* ── 4. Rewards row ── */
+/* align-items: start so each panel is as tall as its own content. With
+   the default stretch, the shorter badges panel grew to match the
+   leaderboard and ended in a block of empty white. */
 .columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-6);
+  align-items: start;
 }
 
-/* ── Panel ── */
 .panel {
   background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-quiet);
   padding: var(--space-6);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .panelTitle {
@@ -204,42 +199,22 @@
   font-size: 15px;
   font-weight: 700;
   color: var(--color-text);
-  margin-bottom: var(--space-5);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
 }
 
-/* ── Task list ── */
-.taskList {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+.panelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-gold-dark);
 }
 
-.taskItem {
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.taskButton {
-  width: 100%;
-  text-align: left;
-  padding: var(--space-4);
-  background: var(--color-bg);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-
-.taskButton:hover:not(:disabled) {
-  border-color: var(--color-gold);
-}
-
-.taskButton:disabled {
-  cursor: default;
-  opacity: 0.7;
+.panelLink:hover {
+  color: var(--color-gold);
 }
 
 .emptyText {
@@ -247,46 +222,28 @@
   color: var(--color-text-muted);
 }
 
-.taskMeta {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.statusDot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 5px;
-}
-
-.taskTitle {
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--color-text);
-  line-height: 1.4;
-}
-
-.taskDue {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  margin-top: 3px;
-}
-
-/* ── Responsive ── (progress-bar styles live in components/ModuleProgressList) */
+/* ── Responsive ── */
 @media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-}
-
-@media (max-width: 700px) {
   .columns {
     grid-template-columns: 1fr;
   }
-  .statsGrid {
-    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 600px) {
+  .heroTitle {
+    font-size: 25px;
+  }
+  .heroCta {
+    width: 100%;
+    justify-content: center;
   }
 }
 

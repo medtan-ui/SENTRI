@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Icon from '../Icon/Icon'
 import { useAuth } from '../../context/AuthContext'
 import Card from '../Card/Card'
 import Button from '../Button/Button'
@@ -59,7 +60,7 @@ export default function ForcedPasswordChangeGate() {
       className={styles.toggleBtn}
       aria-label={showPwd ? 'Hide password' : 'Show password'}
     >
-      {showPwd ? '🙈' : '👁'}
+      {showPwd ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 
@@ -70,7 +71,7 @@ export default function ForcedPasswordChangeGate() {
       className={styles.toggleBtn}
       aria-label={showConfirmPwd ? 'Hide password' : 'Show password'}
     >
-      {showConfirmPwd ? '🙈' : '👁'}
+      {showConfirmPwd ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 

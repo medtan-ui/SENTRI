@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Icon from '../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/Card/Card'
 import Button from '../../components/Button/Button'
@@ -98,7 +99,7 @@ export default function RegisterAccountPage() {
       className={styles.toggleBtn}
       aria-label={showPwd ? 'Hide password' : 'Show password'}
     >
-      {showPwd ? '🙈' : '👁'}
+      {showPwd ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 
@@ -109,7 +110,7 @@ export default function RegisterAccountPage() {
       className={styles.toggleBtn}
       aria-label={showConfirmPwd ? 'Hide password' : 'Show password'}
     >
-      {showConfirmPwd ? '🙈' : '👁'}
+      {showConfirmPwd ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 

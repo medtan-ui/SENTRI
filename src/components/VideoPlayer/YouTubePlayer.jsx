@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../Icon/Icon'
 import styles from './YouTubePlayer.module.css'
 
 /**
@@ -48,7 +49,7 @@ export default function YouTubePlayer({ videoId, url, title = 'Video' }) {
   if (!id) {
     return (
       <div className={styles.placeholder} role="img" aria-label="Video coming soon">
-        <span className={styles.placeholderIcon} aria-hidden="true">🎬</span>
+        <span className={styles.placeholderIcon} aria-hidden="true"><Icon name="play" size={26} strokeWidth={1.6} /></span>
         <p className={styles.placeholderLabel}>Video coming soon</p>
       </div>
     )

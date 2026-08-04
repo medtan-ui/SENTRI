@@ -63,8 +63,15 @@
 }
 
 .slideIcon {
-  font-size: 36px;
-  margin-bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+  margin-bottom: var(--space-4);
 }
 
 .slideTitle {
@@ -126,8 +133,11 @@
 }
 
 .howIcon {
-  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  color: var(--color-gold-dark);
 }
 
 .howTitle {
@@ -156,6 +166,9 @@
 }
 
 .tipItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--color-text);
@@ -226,6 +239,9 @@
 }
 
 .practiceHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--color-success);

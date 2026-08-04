@@ -22,28 +22,19 @@
 
 .menuBtn {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 5px;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   background: transparent;
   border: none;
-  padding: 4px;
+  color: var(--color-text);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
 .menuBtn:hover {
   background: var(--color-bg);
-}
-
-.bar {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: var(--color-text);
-  border-radius: 2px;
 }
 
 .brand {
@@ -57,6 +48,26 @@
 .right {
   display: flex;
   align-items: center;
+  gap: var(--space-2);
+}
+
+/* The XP + streak pair. One button, not two, because both go to the same
+   place and two adjacent targets would just be a bigger hit area split
+   down the middle for no reason. */
+.rewards {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.rewards:hover {
+  background: var(--color-bg);
 }
 
 .userBadge {
@@ -107,6 +118,14 @@
   border-radius: var(--radius-full);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .userName { display: none; }
+  .roleTag { display: none; }
+}
+
+/* Below this the reward chips and a name would compete for the same
+   40px. The chips lose: they are reinforcement, and Progress is one tap
+   away through the sidebar. */
+@media (max-width: 480px) {
+  .rewards { display: none; }
 }

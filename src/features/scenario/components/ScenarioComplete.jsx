@@ -1,4 +1,5 @@
 import React from 'react'
+import Icon from '../../../components/Icon/Icon'
 import Card from '../../../components/Card/Card'
 import Button from '../../../components/Button/Button'
 import styles from './ScenarioComplete.module.css'
@@ -13,7 +14,7 @@ import styles from './ScenarioComplete.module.css'
 export default function ScenarioComplete({ moduleTitle, result, onContinueToQuiz }) {
   return (
     <Card className={styles.card}>
-      <span className={styles.icon} aria-hidden="true">🎉</span>
+      <span className={styles.icon} aria-hidden="true"><Icon name="shield" size={28} strokeWidth={1.6} /></span>
       <h2 className={styles.heading}>Congratulations</h2>
       <p className={styles.subheading}>Simulation Complete</p>
       <p className={styles.moduleTitle}>{moduleTitle}</p>

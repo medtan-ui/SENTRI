@@ -53,16 +53,38 @@
 }
 
 /* ── Nav list ── */
+.navScroll {
+  flex: 1;
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.navGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navGroupTitle {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(176,184,204,0.55);
+  padding: 0 12px var(--space-2);
+}
+
 .navList {
   list-style: none;
-  padding: var(--space-4) var(--space-3);
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
 .navLink {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -84,22 +106,36 @@
 .navLink.active {
   background: var(--color-sidebar-active-bg);
   color: var(--color-sidebar-active-text);
+  font-weight: 600;
 }
 
-.navLink.active .icon {
-  opacity: 1;
+/* A gold rail on the active item. The tinted background alone is a weak
+   signal at this contrast; the rail is what makes "where am I" readable
+   in peripheral vision without raising the tint into glare. */
+.navLink.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-gold-light);
 }
 
-.icon {
-  font-size: 15px;
+.iconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 20px;
-  text-align: center;
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0.75;
+  transition: opacity var(--transition-fast);
 }
 
-.navLink.active .icon,
-.navLink:hover .icon {
+.navLink.active .iconSlot,
+.navLink:hover .iconSlot,
+.logoutBtn:hover .iconSlot {
   opacity: 1;
 }
 
@@ -114,6 +150,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  font-family: inherit;
   width: 100%;
   padding: 10px 12px;
   background: transparent;

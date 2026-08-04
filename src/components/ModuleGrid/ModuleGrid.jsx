@@ -1,15 +1,22 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MODULE_STATUS } from '../../services/moduleProgressService'
+import Icon from '../Icon/Icon'
 import Tooltip from '../Tooltip/Tooltip'
 import styles from './ModuleGrid.module.css'
 
+/**
+ * The arrow is no longer baked into these strings. It used to be, which
+ * meant any caller that added its own arrow icon (the dashboard hero
+ * does) rendered "Continue → →". The label is text; the direction cue is
+ * an icon, added by whoever renders the button.
+ */
 export const MODULE_STATUS_META = {
   [MODULE_STATUS.LOCKED]: { label: 'Locked', cta: null },
-  [MODULE_STATUS.AVAILABLE]: { label: 'Available', cta: 'Start Module →' },
-  [MODULE_STATUS.IN_PROGRESS]: { label: 'In Progress', cta: 'Continue →' },
-  [MODULE_STATUS.QUIZ_AVAILABLE]: { label: 'Quiz Available', cta: 'Take Quiz →' },
-  [MODULE_STATUS.COMPLETED]: { label: 'Completed', cta: 'Review →' },
+  [MODULE_STATUS.AVAILABLE]: { label: 'Available', cta: 'Start module' },
+  [MODULE_STATUS.IN_PROGRESS]: { label: 'In Progress', cta: 'Continue' },
+  [MODULE_STATUS.QUIZ_AVAILABLE]: { label: 'Quiz Available', cta: 'Take quiz' },
+  [MODULE_STATUS.COMPLETED]: { label: 'Completed', cta: 'Review' },
 }
 
 /** Shared by ModuleGrid and ModuleProgressList so both pages agree on what "50% done" means. */
@@ -62,12 +69,18 @@ export default function ModuleGrid({ modules }) {
         return (
           <div key={m.moduleId} className={styles.moduleCard} data-locked={locked}>
             <div className={styles.moduleCardHeader}>
+              {/* The module's own icon is authored content (an admin
+                  picks it per module in Module Configuration) and stays
+                  as-is. A locked module shows the app's lock glyph
+                  instead, in muted grey, so "locked" reads as a state of
+                  the card rather than as the module's identity. */}
               <span
                 className={styles.moduleIconTile}
-                style={{ background: `${m.color}18`, color: m.color }}
+                style={locked ? undefined : { background: `${m.color}18`, color: m.color }}
+                data-locked={locked || undefined}
                 aria-hidden="true"
               >
-                {locked ? '🔒' : m.icon}
+                {locked ? <Icon name="lock" size={19} /> : m.icon}
               </span>
               <span className={styles.moduleStatusBadge} data-status={m.status.toLowerCase()}>
                 {meta.label}
@@ -92,7 +105,14 @@ export default function ModuleGrid({ modules }) {
                 disabled={locked}
                 onClick={() => destination && navigate(destination)}
               >
-                {locked ? 'Locked' : meta.cta}
+                {locked ? (
+                  'Locked'
+                ) : (
+                  <>
+                    {meta.cta}
+                    <Icon name="arrowRight" size={15} />
+                  </>
+                )}
               </button>
             </Tooltip>
           </div>

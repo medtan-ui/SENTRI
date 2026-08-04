@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Icon from '../../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
@@ -186,7 +187,7 @@ export default function AccountsPage() {
       className={styles.toggleBtn}
       aria-label={showResetPwd ? 'Hide password' : 'Show password'}
     >
-      {showResetPwd ? '🙈' : '👁'}
+      {showResetPwd ? <Icon name="eyeOff" size={17} /> : <Icon name="eye" size={17} />}
     </button>
   )
 

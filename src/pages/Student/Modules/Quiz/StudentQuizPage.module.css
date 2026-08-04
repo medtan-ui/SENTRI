@@ -15,9 +15,25 @@
 }
 
 .stateIcon {
-  font-size: 36px;
-  display: block;
-  margin-bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.stateIcon[data-tone='locked'] {
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.stateIcon[data-tone='done'] {
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .stateTitle {

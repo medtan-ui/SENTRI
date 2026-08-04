@@ -4,20 +4,21 @@ import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
 import Button from '../../../components/Button/Button'
 import InteractionDemo from '../../../features/scenario/engine/InteractionDemo'
+import Icon from '../../../components/Icon/Icon'
 import { useAuth } from '../../../context/AuthContext'
 import { markTutorialDone } from '../../../components/TutorialCard/TutorialCard'
 import styles from './StudentTutorialPage.module.css'
 
 const HOW_IT_WORKS = [
-  { icon: '📖', title: 'Read the Lesson', text: 'A short lesson opens every module. Read through it, it unlocks the scenario.' },
-  { icon: '🎬', title: 'Play the Scenario', text: 'A real-looking inbox, chat, or webpage appears. Click and type to make your choice.' },
-  { icon: '✎', title: 'Take the Quiz', text: 'A short quiz checks what stuck. One attempt, so take your time in the scenario.' },
+  { icon: 'book', title: 'Read the lesson', text: 'A short lesson opens every module. Read through it, it unlocks the scenario.' },
+  { icon: 'play', title: 'Play the scenario', text: 'A real-looking inbox, chat, or webpage appears. Click and type to make your choice.' },
+  { icon: 'quiz', title: 'Take the quiz', text: 'A short quiz checks what stuck. One attempt, so take your time in the scenario.' },
 ]
 
 const TIPS = [
-  { icon: '✅', text: 'Read each screen before you act. Nothing advances until you choose.' },
-  { icon: '🖱️', text: 'Buttons and fields with a gold glow are the ones you can click or type into.' },
-  { icon: '⚠️', text: 'Watch for urgency and pressure. That is usually the risky choice.' },
+  { icon: 'check', text: 'Read each screen before you act. Nothing advances until you choose.' },
+  { icon: 'cursor', text: 'Buttons and fields with a gold glow are the ones you can click or type into.' },
+  { icon: 'alert', text: 'Watch for urgency and pressure. That is usually the risky choice.' },
 ]
 
 /**
@@ -38,7 +39,7 @@ export default function StudentTutorialPage() {
   const SLIDES = [
     {
       eyebrow: 'Welcome',
-      icon: '🧭',
+      icon: 'sparkle',
       title: 'Welcome to SENTRI',
       body: (
         <p className={styles.slideText}>
@@ -49,14 +50,14 @@ export default function StudentTutorialPage() {
     },
     {
       eyebrow: 'How it works',
-      icon: '📚',
+      icon: 'book',
       title: 'Every module has 3 parts',
       body: (
         <div className={styles.howList}>
           {HOW_IT_WORKS.map((s, i) => (
             <div key={s.title} className={styles.howItem}>
               <span className={styles.howNumber}>{i + 1}</span>
-              <span className={styles.howIcon} aria-hidden="true">{s.icon}</span>
+              <span className={styles.howIcon} aria-hidden="true"><Icon name={s.icon} size={20} /></span>
               <div>
                 <h3 className={styles.howTitle}>{s.title}</h3>
                 <p className={styles.howText}>{s.text}</p>
@@ -68,7 +69,7 @@ export default function StudentTutorialPage() {
     },
     {
       eyebrow: 'Watch',
-      icon: '🎮',
+      icon: 'play',
       title: 'Buttons and forms respond to you',
       body: (
         <>
@@ -79,7 +80,8 @@ export default function StudentTutorialPage() {
           <ul className={styles.tipList}>
             {TIPS.map((t) => (
               <li key={t.text} className={styles.tipItem}>
-                <span aria-hidden="true">{t.icon}</span> {t.text}
+                <Icon name={t.icon} size={15} />
+                <span>{t.text}</span>
               </li>
             ))}
           </ul>
@@ -88,7 +90,7 @@ export default function StudentTutorialPage() {
     },
     {
       eyebrow: 'Your turn',
-      icon: '🖱️',
+      icon: 'cursor',
       title: 'Now you try it for real',
       body: (
         <div className={styles.practice}>
@@ -99,7 +101,7 @@ export default function StudentTutorialPage() {
             <button type="button" className={styles.practiceButton} onClick={() => setClicked(true)}>
               Try clicking me
             </button>
-            {clicked && <span className={styles.practiceHint}>✅ Nice. Just like that.</span>}
+            {clicked && <span className={styles.practiceHint}><Icon name="check" size={14} /> Nice. Just like that.</span>}
           </div>
           <div className={styles.practiceRow}>
             <label className={styles.practiceLabel} htmlFor="tutorial-practice-input">
@@ -114,7 +116,7 @@ export default function StudentTutorialPage() {
               placeholder="Type anything…"
             />
             {typedValue.trim().length >= 3 && (
-              <span className={styles.practiceHint}>✅ Typed. Forms work just like this too.</span>
+              <span className={styles.practiceHint}><Icon name="check" size={14} /> Typed. Forms work just like this too.</span>
             )}
           </div>
         </div>
@@ -122,7 +124,7 @@ export default function StudentTutorialPage() {
     },
     {
       eyebrow: 'Ready',
-      icon: '🎉',
+      icon: 'trophy',
       title: "You're ready to start",
       body: (
         <p className={styles.slideText}>
@@ -156,7 +158,7 @@ export default function StudentTutorialPage() {
 
         <Card className={styles.slideCard}>
           <span className={styles.stepCount}>Step {stepIndex + 1} of {totalSteps}</span>
-          <span className={styles.slideIcon} aria-hidden="true">{slide.icon}</span>
+          <span className={styles.slideIcon} aria-hidden="true"><Icon name={slide.icon} size={28} strokeWidth={1.6} /></span>
           <h2 className={styles.slideTitle}>{slide.title}</h2>
           <div className={styles.slideBody}>{slide.body}</div>
 
