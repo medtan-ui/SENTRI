@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Icon from '../../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
 import EditNicknameSection from '../../../components/EditNicknameSection/EditNicknameSection'
 import ChangePasswordSection from '../../../components/ChangePasswordSection/ChangePasswordSection'
+import BadgeCard, { ALL_BADGE_CATALOG } from '../../../components/Badges/BadgeCard'
 import { useAuth } from '../../../context/AuthContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
+import { getUserBadges } from '../../../services/badgeService'
 import styles from './StudentProfilePage.module.css'
 
 const QUICK_LINKS = [
@@ -17,7 +19,7 @@ const QUICK_LINKS = [
 
 /**
  * StudentProfilePage — /student/profile
- * Identity, a compact stats row, self-service profile/security controls
+ * Identity, a compact stats row, badges showcase, self-service profile/security controls
  * (nickname, password), and quick navigation — Settings no longer exists
  * as a separate page, so its useful bits live here instead.
  */
@@ -25,6 +27,13 @@ export default function StudentProfilePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { modules } = useStudentModules()
+  const [userBadges, setUserBadges] = useState([])
+
+  useEffect(() => {
+    if (user?.uid) {
+      getUserBadges(user.uid).then(setUserBadges).catch(console.error)
+    }
+  }, [user?.uid])
 
   const name = user?.nickname || user?.displayName || user?.email
   const initials = (name || '?')
@@ -37,6 +46,8 @@ export default function StudentProfilePage() {
   const completedCount = modules.filter((m) => m.status === MODULE_STATUS.COMPLETED).length
   const scores = modules.map((m) => m.progress?.score).filter((s) => typeof s === 'number')
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length) : null
+
+  const unlockedIds = new Set(userBadges.map((b) => b.id))
 
   return (
     <DashboardLayout role="student">
@@ -74,6 +85,24 @@ export default function StudentProfilePage() {
           </Card>
         </div>
 
+        {/* ── Badges Showcase ── */}
+        <Card>
+          <h2 className={styles.cardTitle}>🏆 Achievement Badges ({userBadges.length} / {ALL_BADGE_CATALOG.length})</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', marginTop: '16px' }}>
+            {ALL_BADGE_CATALOG.map((badge) => {
+              const unlockedBadge = userBadges.find((b) => b.id === badge.id)
+              return (
+                <BadgeCard
+                  key={badge.id}
+                  badge={badge}
+                  isUnlocked={unlockedIds.has(badge.id)}
+                  unlockedAt={unlockedBadge?.unlockedAt}
+                />
+              )
+            })}
+          </div>
+        </Card>
+
         <EditNicknameSection />
         <ChangePasswordSection />
 
@@ -97,3 +126,4 @@ export default function StudentProfilePage() {
     </DashboardLayout>
   )
 }
+

@@ -30,9 +30,14 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
   const guided = !isSafe && attemptCount >= 3
   const reflection = isSafe ? scenario?.postCompletionReflection : null
   const firstTry = isSafe && attemptCount === 0
+  const btnRef = React.useRef(null)
+
+  React.useEffect(() => {
+    btnRef.current?.focus()
+  }, [])
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} role="dialog" aria-modal="true" aria-live="polite">
       <div className={[styles.panel, isSafe ? styles.safe : styles.risky].join(' ')}>
         {firstTry && (
           <span className={styles.firstTry}>
@@ -57,11 +62,11 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
         )}
 
         {isSafe ? (
-          <button type="button" className={styles.primaryBtn} onClick={onContinue}>
+          <button ref={btnRef} type="button" className={styles.primaryBtn} onClick={onContinue}>
             Continue
           </button>
         ) : (
-          <button type="button" className={styles.primaryBtn} onClick={onRetry}>
+          <button ref={btnRef} type="button" className={styles.primaryBtn} onClick={onRetry}>
             Try Again
           </button>
         )}

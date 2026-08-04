@@ -40,6 +40,9 @@ export { submitQuiz } from './modules/quiz/controllers'
 
 export { submitAssessment } from './modules/assessment/controllers'
 
+export { getUserBadges } from './modules/badges/controllers'
+
+
 export {
   completeLesson,
   completeModule,
