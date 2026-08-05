@@ -98,6 +98,7 @@ export default function Sidebar({ role = 'student', isOpen, onClose }) {
                   <li key={item.path}>
                     <NavLink
                       to={item.path}
+                      data-tour={`nav-${item.path.split('/').pop()}`}
                       className={({ isActive }) =>
                         `${styles.navLink} ${isActive ? styles.active : ''}`
                       }

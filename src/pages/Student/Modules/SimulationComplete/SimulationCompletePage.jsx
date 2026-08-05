@@ -5,7 +5,6 @@ import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
 import Icon from '../../../../components/Icon/Icon'
 import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
-import BadgeMedal from '../../../../components/Gamification/BadgeMedal'
 import { useGamificationState } from '../../../../context/GamificationContext'
 import { loadModuleConfig } from '../../../../services/moduleLoader'
 import styles from './SimulationCompletePage.module.css'
@@ -31,12 +30,17 @@ import styles from './SimulationCompletePage.module.css'
  * If the refresh hasn't caught up, nothing is claimed. Showing "+0 XP"
  * because a trigger was slow would be worse than showing nothing, and the
  * real figure is one navigation away in the navbar either way.
+ *
+ * Only XP is reported here. Badges earned by this simulation are
+ * announced by the global BadgeToaster, which covers every other path
+ * that can award one too — showing them in both places would mean a
+ * student is told twice on this one screen and once everywhere else.
  */
 export default function SimulationCompletePage() {
   const { moduleId } = useParams()
   const navigate = useNavigate()
   const [config, setConfig] = useState(undefined)
-  const { gamification, catalog, refresh } = useGamificationState()
+  const { gamification, refresh } = useGamificationState()
 
   // Snapshot taken before the refresh lands, so the delta is "what this
   // simulation earned" rather than "what I have".
@@ -53,30 +57,38 @@ export default function SimulationCompletePage() {
     }
   }, [moduleId])
 
-  // One refresh on arrival. The trigger runs on the write the previous
-  // screen made, so a short delay covers the round trip without polling.
+  // Snapshot the totals as they were on arrival, once.
   useEffect(() => {
     if (beforeRef.current === null && gamification) {
       beforeRef.current = { points: gamification.points, badges: gamification.badges ?? [] }
-      const timer = setTimeout(refresh, 1200)
-      return () => clearTimeout(timer)
     }
-    return undefined
-  }, [gamification, refresh])
+  }, [gamification])
+
+  // One refresh on arrival, in its own mount-only effect. The award
+  // happens in a Firestore trigger fired by the write the previous
+  // screen made, so a short delay covers the round trip without polling.
+  //
+  // Deliberately NOT combined with the snapshot above. Doing both under
+  // one `beforeRef.current === null` guard looks tidier and is broken:
+  // StrictMode invokes an effect, cleans it up, then invokes it again,
+  // so the first pass sets the ref and schedules the timer, the cleanup
+  // cancels that timer, and the second pass finds the ref already set
+  // and schedules nothing. The refresh then never runs at all in
+  // development. A mount-only effect re-arms its own timer on the second
+  // pass, which is what makes it survive.
+  const refreshRef = useRef(refresh)
+  refreshRef.current = refresh
+  useEffect(() => {
+    const timer = setTimeout(() => refreshRef.current(), 1200)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     const before = beforeRef.current
     if (!before || !gamification) return
     const pointsGained = (gamification.points ?? 0) - before.points
-    const newBadges = (gamification.badges ?? []).filter((id) => !before.badges.includes(id))
-    if (pointsGained > 0 || newBadges.length > 0) {
-      setEarned({ pointsGained, newBadges })
-    }
+    if (pointsGained > 0) setEarned({ pointsGained })
   }, [gamification])
-
-  const newBadgeDetails = (earned?.newBadges ?? [])
-    .map((id) => catalog.find((badge) => badge.id === id))
-    .filter(Boolean)
 
   return (
     <DashboardLayout role="student">
@@ -98,17 +110,6 @@ export default function SimulationCompletePage() {
                 <Icon name="bolt" size={18} filled />
                 <span className={styles.xpValue}>+{earned.pointsGained} XP</span>
                 <span className={styles.xpTotal}>{gamification.points.toLocaleString()} total</span>
-              </div>
-            )}
-
-            {newBadgeDetails.length > 0 && (
-              <div className={styles.newBadges}>
-                <p className={styles.newBadgesTitle}>
-                  {newBadgeDetails.length === 1 ? 'New badge unlocked' : 'New badges unlocked'}
-                </p>
-                {newBadgeDetails.map((badge) => (
-                  <BadgeMedal key={badge.id} badge={badge} earned />
-                ))}
               </div>
             )}
 

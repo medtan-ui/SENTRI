@@ -54,6 +54,8 @@ const NO_TOTALS: GamificationTotals = {
   averageQuizScore: null,
   currentStreak: 0,
   longestStreak: 0,
+  flawlessSimulations: 0,
+  bestNormalizedGain: null,
 }
 
 describe('pointsForModule', () => {
@@ -152,6 +154,67 @@ describe('totalsFrom', () => {
     expect(totals.bestQuizScore).toBeNull()
     expect(totals.averageQuizScore).toBeNull()
   })
+
+  it('takes the best normalized gain across every module that has one', () => {
+    const rows = [
+      makeProgress({ normalizedGain: 0.4 }),
+      makeProgress({ moduleId: 'phishing-awareness', normalizedGain: 1 }),
+      makeProgress({ moduleId: 'safe-browsing' }),
+    ]
+    expect(totalsFrom(rows, 0, 0).bestNormalizedGain).toBe(1)
+  })
+})
+
+/**
+ * The clean-run count is the one total that cannot come from a progress
+ * document — a progress row records that a simulation finished, never
+ * how cleanly — so it is joined from the learningAnalytics counters.
+ *
+ * This replaces a predicate in the badge system that used to live beside
+ * this one, which read a field name (`is_safe`) that nothing writes; the
+ * real field is `is_safe_choice`. The comparison silently evaluated to
+ * `undefined === false`, so its "no risky choices" badge was awarded to
+ * anyone who finished any simulation at all. Hence the deliberately
+ * unkind cases below.
+ */
+describe('totalsFrom — flawless simulations', () => {
+  const clean = { moduleId: 'password-security', safeChoices: 4, riskyChoices: 0 }
+  const messy = { moduleId: 'phishing-awareness', safeChoices: 5, riskyChoices: 2 }
+
+  it('counts a finished simulation with no risky choice', () => {
+    const rows = [makeProgress({ simulationCompleted: true })]
+    expect(totalsFrom(rows, 0, 0, [clean]).flawlessSimulations).toBe(1)
+  })
+
+  it('does not count a simulation that had a risky choice', () => {
+    const rows = [makeProgress({ moduleId: 'phishing-awareness', simulationCompleted: true })]
+    expect(totalsFrom(rows, 0, 0, [messy]).flawlessSimulations).toBe(0)
+  })
+
+  it('does not count a module whose simulation was never finished', () => {
+    // Zero risky choices because zero choices. Vacuously clean is not clean.
+    const rows = [makeProgress({ simulationCompleted: false })]
+    expect(totalsFrom(rows, 0, 0, [{ ...clean, safeChoices: 0 }]).flawlessSimulations).toBe(0)
+  })
+
+  it('does not count a finished simulation with no behaviour row at all', () => {
+    // Decision recording fails soft by design (see
+    // scenarioDecisionService), so a missing row is an absence of
+    // evidence, not evidence of a clean run.
+    const rows = [makeProgress({ simulationCompleted: true })]
+    expect(totalsFrom(rows, 0, 0, []).flawlessSimulations).toBe(0)
+  })
+
+  it('scores each module independently rather than globally', () => {
+    // The predicate this replaced looked at every decision the student
+    // had ever made at once, so a single risky click in any module would
+    // have blocked the badge forever.
+    const rows = [
+      makeProgress({ simulationCompleted: true }),
+      makeProgress({ moduleId: 'phishing-awareness', simulationCompleted: true }),
+    ]
+    expect(totalsFrom(rows, 0, 0, [clean, messy]).flawlessSimulations).toBe(1)
+  })
 })
 
 describe('rankFor', () => {
@@ -220,6 +283,37 @@ describe('badges', () => {
   it('awards the full sweep only once every module is complete', () => {
     expect(earnedBadgeIds({ ...NO_TOTALS, modulesCompleted: 5 })).not.toContain('full-sweep')
     expect(earnedBadgeIds({ ...NO_TOTALS, modulesCompleted: 6 })).toContain('full-sweep')
+  })
+
+  it('awards First Defender for one clean run, not for finishing a run', () => {
+    expect(earnedBadgeIds({ ...NO_TOTALS, simulationsCompleted: 3 })).not.toContain('first-defender')
+    expect(earnedBadgeIds({ ...NO_TOTALS, flawlessSimulations: 1 })).toContain('first-defender')
+  })
+
+  it('awards Perfect Gain only at a full normalized gain', () => {
+    expect(earnedBadgeIds({ ...NO_TOTALS, bestNormalizedGain: 0.99 })).not.toContain('perfect-gain')
+    expect(earnedBadgeIds({ ...NO_TOTALS, bestNormalizedGain: 1 })).toContain('perfect-gain')
+  })
+
+  it('has no badge whose name implies a criterion it does not test', () => {
+    // The system this one absorbed shipped a flame-iconed badge called
+    // "Streak Hero" whose actual criterion was three completed modules.
+    // Every badge here that is named or iconed for streaks must key off
+    // a streak field, and no other badge may claim the flame.
+    const streakFields: Array<keyof GamificationTotals> = ['currentStreak', 'longestStreak']
+    for (const badge of BADGES.filter((b) => b.icon === 'flame' || /streak/i.test(b.id))) {
+      const earnedByStreakAlone = streakFields.some((field) =>
+        badge.earned({ ...NO_TOTALS, [field]: 999 }),
+      )
+      const earnedByEverythingElse = badge.earned({
+        ...NO_TOTALS,
+        lessonsCompleted: 9, simulationsCompleted: 9, quizzesCompleted: 9, modulesCompleted: 9,
+        pretestsCompleted: 9, posttestsCompleted: 9, perfectQuizzes: 9, flawlessSimulations: 9,
+        bestQuizScore: 100, averageQuizScore: 100, bestNormalizedGain: 1,
+      })
+      expect(earnedByStreakAlone).toBe(true)
+      expect(earnedByEverythingElse).toBe(false)
+    }
   })
 
   it('exposes a client catalog with no predicates and no missing badges', () => {

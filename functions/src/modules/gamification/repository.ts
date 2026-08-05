@@ -33,6 +33,34 @@ export async function listProgressForUser(userId: string): Promise<ModuleProgres
   return snap.docs.map((doc) => doc.data() as ModuleProgressDoc)
 }
 
+export interface BehaviourRow {
+  moduleId: string
+  safeChoices: number
+  riskyChoices: number
+}
+
+/**
+ * One student's per-module safe/risky decision counters, maintained by
+ * the updateLearningAnalytics trigger off scenario_decision_records.
+ *
+ * This is the only thing the reward layer needs that a moduleProgress
+ * row cannot tell it: progress records *that* a simulation finished,
+ * never *how cleanly*. Reading the already-aggregated counters rather
+ * than the raw decision records keeps the recompute at one small query
+ * instead of one per decision the student has ever made.
+ */
+export async function listBehaviourForUser(userId: string): Promise<BehaviourRow[]> {
+  const snap = await db.collection(COLLECTIONS.LEARNING_ANALYTICS).where('userId', '==', userId).get()
+  return snap.docs.map((doc) => {
+    const data = doc.data()
+    return {
+      moduleId: String(data.moduleId ?? ''),
+      safeChoices: Number(data.safeChoices ?? 0),
+      riskyChoices: Number(data.riskyChoices ?? 0),
+    }
+  })
+}
+
 export interface ProfileSummary {
   displayName: string
   section: string | null

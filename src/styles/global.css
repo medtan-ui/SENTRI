@@ -143,6 +143,38 @@ input, textarea, select {
   font-family: var(--font-body);
 }
 
+/* ══ Motion ════════════════════════════════════════════════════════════
+   This app has three entrance animations, used across the scenario
+   engine, its overlays and the reward callouts:
+
+     sentriFade — something appears in place (a backdrop, a panel body).
+     sentriRise — something arrives from below (a card, an overlay's
+                  contents). The 6px travel is small on purpose; more
+                  reads as a slide and draws attention to the motion
+                  rather than to what arrived.
+     sentriPop  — something is being celebrated (an earned reward). The
+                  only one that overshoots, and the only one that should.
+
+   The @keyframes blocks themselves are declared LOCALLY in each
+   `.module.css` that animates, not here, and that duplication is
+   deliberate. Vite rewrites `@keyframes` names inside CSS modules to
+   scoped ones, and it rewrites *references* too — so a module saying
+   `animation: sentriRise ...` compiles to a scoped name that matches no
+   rule, and the animation silently does nothing. It computes correctly,
+   it just never plays. `:global(sentriRise)` in the shorthand does not
+   rescue it either.
+
+   So only the easing lives here. A custom property is not a keyframe
+   name and does cascade into modules perfectly well, which at least
+   keeps the timing curve defined once.
+
+   Every use is decorative. The reduced-motion block below neutralises
+   all of them, and nothing in the app depends on an animation finishing.
+   ═════════════════════════════════════════════════════════════════════ */
+:root {
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* ── Focus ──────────────────────────────────────────────────────────
    One visible focus style for the whole app, on :focus-visible only, so
    keyboard users get a ring everywhere without mouse users seeing one

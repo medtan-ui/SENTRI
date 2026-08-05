@@ -1,6 +1,14 @@
 /**
  * Deliberately ordinary — plain corporate signup cards, not SENTRI's
  * gold theme. This is the cloned interface itself.
+ *
+ * Each card is themed by two custom properties set inline from the CARDS
+ * table (`--brand`, `--brand-soft`), so the three services differ the way
+ * three real services would: different mark, different accent, different
+ * button. That difference is load-bearing rather than decorative — a
+ * student who cannot see that these are three unrelated accounts has no
+ * reason to think reusing one password across them is a risk, which is
+ * the entire point of the scenario.
  */
 .scene {
   width: 100%;
@@ -16,22 +24,27 @@
   text-align: center;
   font-size: 13.5px;
   color: #5a5f68;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .cardRow {
   display: flex;
   gap: var(--space-4);
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
 }
 
 .card {
   flex: 1;
   min-width: 0;
-  max-width: 240px;
+  max-width: 250px;
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
   border: 1px solid #d9dbe0;
+  /* The brand colour as a top rule: the fastest way to read "these are
+     three different things" without looking at a single word. */
+  border-top: 3px solid var(--brand, #2e5fa3);
   border-radius: 10px;
   padding: var(--space-4);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -40,20 +53,75 @@
 .cardHeader {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: var(--space-4);
+  gap: 10px;
+  margin-bottom: var(--space-3);
   padding-bottom: var(--space-3);
   border-bottom: 1px solid #eceef1;
 }
 
-.cardIcon {
-  font-size: 18px;
+/* A letter tile, the way a real service logo looks at this size. The
+   three cards used to share one padlock emoji, which made them look like
+   three copies of the same form. */
+.cardMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: var(--brand, #2e5fa3);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cardHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .cardName {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #26282c;
+  line-height: 1.25;
+}
+
+.cardTagline {
+  font-size: 10.5px;
+  color: #8a8f98;
+  line-height: 1.3;
+}
+
+/* What this account is actually worth. The wallet saying "Real money"
+   next to the portal saying "Your academic record" is what makes reuse
+   across them feel different, which no amount of styling alone conveys. */
+/* Two lines' worth of height is reserved whether or not the copy needs
+   it. Without this the one card whose text wraps pushes its own
+   Username and Password fields lower than the other two, and three forms
+   that should read as a row read as a stagger. */
+.stakes {
+  font-size: 11px;
+  line-height: 1.4;
+  min-height: 54px;
+  color: var(--brand, #2e5fa3);
+  background: var(--brand-soft, #eef3f9);
+  border-radius: 6px;
+  padding: 7px 9px;
+}
+
+.stakesLabel {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 1px;
 }
 
 .fieldLabel {
@@ -66,12 +134,15 @@
 }
 
 .usernameDisplay {
-  font-size: 13px;
+  font-size: 12.5px;
   color: #3c3f44;
   background: #f3f4f6;
   border: 1px solid #e2e4e8;
   border-radius: 6px;
   padding: 8px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .passwordInput {
@@ -87,6 +158,7 @@
 
 .passwordInput:focus {
   outline: none;
+  border-color: var(--brand, #2e5fa3);
 }
 
 .emptyWarning {
@@ -99,19 +171,25 @@
 .saveBtnWrap {
   display: block;
   width: 100%;
-  margin-top: var(--space-4);
+  margin-top: auto;
+  padding-top: var(--space-4);
 }
 
 .saveBtn {
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
-  background: #2e5fa3;
-  padding: 9px 0;
+  background: var(--brand, #2e5fa3);
+  padding: 9px 6px;
   border-radius: 6px;
+  transition: background var(--transition-fast);
+}
+
+.saveBtn[data-saved] {
+  background: #1e7e34;
 }
 
 @media (max-width: 760px) {
@@ -121,5 +199,8 @@
   }
   .card {
     max-width: none;
+  }
+  .saveBtnWrap {
+    margin-top: var(--space-2);
   }
 }

@@ -40,7 +40,6 @@ export { submitQuiz } from './modules/quiz/controllers'
 
 export { submitAssessment } from './modules/assessment/controllers'
 
-export { getUserBadges } from './modules/badges/controllers'
 
 
 export {
@@ -57,8 +56,13 @@ export {
   getLeaderboard,
   getMyGamification,
   recordDailyVisit,
+  updateGamificationOnBehaviour,
   updateGamificationOnProgress,
 } from './modules/gamification/controllers'
+
+// TEMPORARY — remove this export and cleanupController.ts once the
+// one-off reward-orphan purge has been run against production.
+export { purgeRewardOrphans } from './modules/gamification/cleanupController'
 
 export {
   aggregateCohortAnalytics,

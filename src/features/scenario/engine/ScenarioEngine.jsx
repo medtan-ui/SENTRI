@@ -58,18 +58,27 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
           />
         </div>
 
-        <div className={styles.stage}>
+        {/* `data-phase` lets the stage fade its contents out while the
+            engine is advancing, so one scene leaves before the next
+            arrives instead of being replaced mid-frame. */}
+        <div className={styles.stage} data-phase={state}>
           {(state === 'loading' || state === 'playing') && (
-            <ScenarioPlayer
-              videoAvailable={currentScenario.videoAvailable}
-              materialUrl={currentScenario.material_url}
-              posterCaption={currentScenario.posterCaption}
-              scenarioTitle={currentScenario.scenario_title}
-            />
+            <div className={styles.layer} key={`player-${scenarioIndex}`}>
+              <ScenarioPlayer
+                videoAvailable={currentScenario.videoAvailable}
+                materialUrl={currentScenario.material_url}
+                posterCaption={currentScenario.posterCaption}
+                scenarioTitle={currentScenario.scenario_title}
+              />
+            </div>
           )}
 
           {showScene && SceneComponent && (
-            <>
+            /* Keyed on the scenario so React remounts this wrapper on
+               every scene change, which is what re-runs the entrance
+               animation. Without the key the element persists and the
+               new scene simply pops into the old box. */
+            <div className={styles.layer} key={`scene-${scenarioIndex}`}>
               <span className={styles.sceneLabel}>{sceneLabelFor(currentScenario.scene)}</span>
               <SceneComponent
                 scenario={currentScenario}
@@ -78,7 +87,7 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
                 guidedHintActive={guidedHintActive}
                 onResolve={actions.selectChoice}
               />
-            </>
+            </div>
           )}
 
           {state === 'consequence' && selectedChoice && (

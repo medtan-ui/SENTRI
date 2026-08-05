@@ -119,3 +119,57 @@ export const updateGamificationOnProgress = onDocumentWritten(
     }
   },
 )
+
+/**
+ * updateGamificationOnBehaviour — the second trigger, for the one badge
+ * whose evidence does not live on a progress document.
+ *
+ * "First Defender" needs to know a scenario was cleared with no risky
+ * choice, and only `learningAnalytics` records that. Those counters are
+ * written by their own trigger off scenario_decision_records, so the
+ * progress trigger above can fire before the last decision has been
+ * counted — the badge would then not appear until the student's next
+ * completed step, which on the final module could be never.
+ *
+ * The `riskyChoices === 0` guard is what keeps this cheap. A run that
+ * has already gone wrong can never earn the badge, so there is nothing
+ * to recompute for it; only a still-clean run is worth re-evaluating,
+ * and that is both the shorter path and the rarer one. Badges are
+ * union-only, so a later risky choice cannot revoke one already earned
+ * and therefore never needs a recompute of its own.
+ */
+export const updateGamificationOnBehaviour = onDocumentWritten(
+  `${COLLECTIONS.LEARNING_ANALYTICS}/{behaviourId}`,
+  async (event) => {
+    const after = event.data?.after?.data()
+    if (!after) return
+
+    const userId = typeof after.userId === 'string' ? after.userId : null
+    const riskyChoices = Number(after.riskyChoices ?? 0)
+    if (!userId || riskyChoices > 0) return
+
+    const startedAt = Date.now()
+    try {
+      // No streak touch here: a decision inside a scenario is already
+      // covered by the progress write that follows it, and counting the
+      // same session twice would be harmless but misleading in the logs.
+      const state = await service.recomputeFromProgress(userId, false)
+      logInfo('[updateGamificationOnBehaviour] succeeded', {
+        function: 'updateGamificationOnBehaviour',
+        uid: userId,
+        moduleId: typeof after.moduleId === 'string' ? after.moduleId : null,
+        durationMs: Date.now() - startedAt,
+        outcome: 'success',
+        badges: state.badges.length,
+      })
+    } catch (err) {
+      logError('[updateGamificationOnBehaviour] failed', {
+        function: 'updateGamificationOnBehaviour',
+        uid: userId,
+        durationMs: Date.now() - startedAt,
+        outcome: 'error',
+        error: err instanceof Error ? { message: err.message, stack: err.stack } : String(err),
+      })
+    }
+  },
+)

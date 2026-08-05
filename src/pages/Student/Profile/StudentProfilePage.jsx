@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Icon from '../../../components/Icon/Icon'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
 import EditNicknameSection from '../../../components/EditNicknameSection/EditNicknameSection'
 import ChangePasswordSection from '../../../components/ChangePasswordSection/ChangePasswordSection'
-import BadgeCard, { ALL_BADGE_CATALOG } from '../../../components/Badges/BadgeCard'
+import BadgeShelf from '../../../components/Gamification/BadgeShelf'
+import { resetFirstRunTour } from '../../../components/TourGuide/useFirstRunTour'
 import { useAuth } from '../../../context/AuthContext'
+import { useGamificationState } from '../../../context/GamificationContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
-import { getUserBadges } from '../../../services/badgeService'
 import styles from './StudentProfilePage.module.css'
 
 const QUICK_LINKS = [
@@ -22,18 +23,22 @@ const QUICK_LINKS = [
  * Identity, a compact stats row, badges showcase, self-service profile/security controls
  * (nickname, password), and quick navigation — Settings no longer exists
  * as a separate page, so its useful bits live here instead.
+ *
+ * The badge showcase reads from the same gamification context the
+ * dashboard and the Progress page use. It briefly did not: a second
+ * badge system existed alongside this one, with its own five-badge
+ * catalog, its own Firestore collection and its own Cloud Function, and
+ * this page was its only consumer. Two systems meant a student could see
+ * a badge here that the dashboard did not know about, and one named
+ * "Streak Hero" that had nothing to do with streaks. There is one
+ * catalog now (functions/src/modules/gamification/catalog.ts), and the
+ * two badges worth keeping from the other one were absorbed into it.
  */
 export default function StudentProfilePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { modules } = useStudentModules()
-  const [userBadges, setUserBadges] = useState([])
-
-  useEffect(() => {
-    if (user?.uid) {
-      getUserBadges(user.uid).then(setUserBadges).catch(console.error)
-    }
-  }, [user?.uid])
+  const { status: rewardStatus, gamification, catalog } = useGamificationState()
 
   const name = user?.nickname || user?.displayName || user?.email
   const initials = (name || '?')
@@ -47,7 +52,8 @@ export default function StudentProfilePage() {
   const scores = modules.map((m) => m.progress?.score).filter((s) => typeof s === 'number')
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length) : null
 
-  const unlockedIds = new Set(userBadges.map((b) => b.id))
+  const rewardsReady = rewardStatus === 'success' && gamification
+  const earnedBadges = gamification?.badges ?? []
 
   return (
     <DashboardLayout role="student">
@@ -85,22 +91,21 @@ export default function StudentProfilePage() {
           </Card>
         </div>
 
-        {/* ── Badges Showcase ── */}
-        <Card>
-          <h2 className={styles.cardTitle}>🏆 Achievement Badges ({userBadges.length} / {ALL_BADGE_CATALOG.length})</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', marginTop: '16px' }}>
-            {ALL_BADGE_CATALOG.map((badge) => {
-              const unlockedBadge = userBadges.find((b) => b.id === badge.id)
-              return (
-                <BadgeCard
-                  key={badge.id}
-                  badge={badge}
-                  isUnlocked={unlockedIds.has(badge.id)}
-                  unlockedAt={unlockedBadge?.unlockedAt}
-                />
-              )
-            })}
+        {/* ── Badges ── */}
+        <Card className={styles.badgesCard}>
+          <div className={styles.cardHeaderRow}>
+            <h2 className={styles.cardTitle}>Achievement badges</h2>
+            {rewardsReady && (
+              <span className={styles.countTag}>
+                {earnedBadges.length} of {catalog.length} earned
+              </span>
+            )}
           </div>
+          {rewardStatus === 'loading' && <p className={styles.emptyText}>Loading your badges…</p>}
+          {rewardStatus === 'error' && (
+            <p className={styles.emptyText}>Your badges could not be loaded right now.</p>
+          )}
+          {rewardsReady && <BadgeShelf catalog={catalog} earnedIds={earnedBadges} />}
         </Card>
 
         <EditNicknameSection />
@@ -120,6 +125,21 @@ export default function StudentProfilePage() {
                 {link.label}
               </button>
             ))}
+            {/* The first-run tour tells students they can come back to it
+                from here, so this is what makes that true. Clearing the
+                flag and landing on the dashboard is all it takes — the
+                tour offers itself whenever the flag is absent. */}
+            <button
+              type="button"
+              className={styles.quickLink}
+              onClick={() => {
+                resetFirstRunTour(user?.uid)
+                navigate('/student/dashboard')
+              }}
+            >
+              <Icon name="play" size={17} />
+              Replay the tour
+            </button>
           </div>
         </Card>
       </div>

@@ -7,6 +7,8 @@ import { useAuth } from '../../../context/AuthContext'
 import { useAdminOverview } from '../../../hooks/useAdminOverview'
 import { timeAgo } from '../../../utils/timeAgo'
 import Icon from '../../../components/Icon/Icon'
+import TourGuide from '../../../components/TourGuide/TourGuide'
+import { useFirstRunTour } from '../../../components/TourGuide/useFirstRunTour'
 import styles from './AdminDashboard.module.css'
 
 const QUICK_LINKS = [
@@ -17,10 +19,45 @@ const QUICK_LINKS = [
   { label: 'Accounts', path: '/admin/accounts', icon: 'users' },
 ]
 
+/**
+ * The admin walkthrough. Same machinery as the student one, aimed at a
+ * different job: an administrator's first question is not "where do I
+ * start training" but "where is the cohort, and where do I change what
+ * they see". So the steps follow the sidebar's own grouping — the
+ * numbers first, then Content, then People, then the full report.
+ */
+const TOUR_STEPS = [
+  {
+    title: "You're signed in as an administrator",
+    body: "A quick tour of what you can do from here. Skip it if you'd rather explore, it's always available again from your profile.",
+  },
+  {
+    target: 'admin-stats',
+    title: 'The cohort at a glance',
+    body: 'Accounts, enrolled students and the most recent quiz average. These update as students work through the curriculum.',
+  },
+  {
+    target: 'nav-modules',
+    title: 'Content lives under here',
+    body: 'Modules, Scenarios and Quiz Manager are where you author what students see: lesson text, branching scenarios and quiz questions.',
+  },
+  {
+    target: 'nav-accounts',
+    title: 'Accounts and class sections',
+    body: 'Create administrator accounts, assign students to sections, reset a password, or grant a quiz retry when someone appeals.',
+  },
+  {
+    target: 'nav-analytics',
+    title: 'The full analytics report',
+    body: 'Pre-test to post-test learning gains, item difficulty and per-section rollups, with CSV and PDF export for your documentation.',
+  },
+]
+
 export default function AdminDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules, users, recentAttempts, moduleSummaries } = useAdminOverview()
+  const { showTour, finishTour } = useFirstRunTour({ uid: user?.uid, ready: status === 'success' })
 
   const name = user?.nickname || user?.displayName || 'Administrator'
   const studentCount = users.filter((u) => u.role === 'student').length
@@ -64,7 +101,7 @@ export default function AdminDashboard() {
                 icon-in-a-tinted-square treatment these used to have put
                 four unrelated accent colours across the top of the page
                 and pushed the figures themselves to second billing. */}
-            <div className={styles.statsGrid}>
+            <div className={styles.statsGrid} data-tour="admin-stats">
               <div className={styles.statCard}>
                 <p className={styles.statValue}>{users.length}</p>
                 <p className={styles.statLabel}>Total accounts</p>
@@ -159,6 +196,8 @@ export default function AdminDashboard() {
           </>
         )}
       </div>
+
+      {showTour && <TourGuide steps={TOUR_STEPS} onFinish={finishTour} />}
     </DashboardLayout>
   )
 }

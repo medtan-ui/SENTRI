@@ -10,6 +10,8 @@ import RankMeter from '../../../components/Gamification/RankMeter'
 import StreakTrack from '../../../components/Gamification/StreakTrack'
 import BadgeShelf from '../../../components/Gamification/BadgeShelf'
 import Leaderboard from '../../../components/Gamification/Leaderboard'
+import TourGuide from '../../../components/TourGuide/TourGuide'
+import { useFirstRunTour } from '../../../components/TourGuide/useFirstRunTour'
 import { useAuth } from '../../../context/AuthContext'
 import { useGamificationState } from '../../../context/GamificationContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
@@ -45,11 +47,50 @@ import styles from './StudentDashboard.module.css'
  * scenario intro screen (ScenarioIntroTutorial), which is where a student
  * is about to need it rather than several clicks earlier.
  */
+/**
+ * The first-run walkthrough. Five steps, each anchored to something real
+ * on this page or in the chrome around it (see `data-tour` attributes).
+ *
+ * The order is the order a student actually moves through the app —
+ * where the training is, how to start it, what they earn, where the
+ * earnings live — rather than a tour of the navigation for its own sake.
+ * A step whose anchor is missing is dropped automatically, so a brand
+ * new account with no resumable module shows a four-step tour rather
+ * than pointing at a button that isn't there.
+ */
+const TOUR_STEPS = [
+  {
+    title: 'Welcome to SENTRI',
+    body: "Here's a 30 second tour of where everything is. You can skip it and come back to it from your profile any time.",
+  },
+  {
+    target: 'modules',
+    title: 'Your training lives here',
+    body: 'Six modules, each with a lesson, a hands-on scenario and a short quiz. They unlock in order as you finish them.',
+  },
+  {
+    target: 'continue',
+    title: 'One button to pick up where you left off',
+    body: 'This always points at the next thing you have to do, so you never have to work out where you got to.',
+  },
+  {
+    target: 'rewards',
+    title: 'XP and your daily streak',
+    body: 'You earn XP for every step you finish, and your streak grows on any day you train. Both follow you on every page.',
+  },
+  {
+    target: 'nav-progress',
+    title: 'Badges, ranks and the leaderboard',
+    body: 'Progress has the full picture: how far you have come, every badge and how you compare with your class.',
+  },
+]
+
 export default function StudentDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules } = useStudentModules()
   const { status: rewardStatus, gamification, catalog } = useGamificationState()
+  const { showTour, finishTour } = useFirstRunTour({ uid: user?.uid, ready: status === 'success' })
 
   const name = user?.nickname || user?.displayName || 'Student'
 
@@ -104,6 +145,7 @@ export default function StudentDashboard() {
                 <button
                   type="button"
                   className={styles.heroCta}
+                  data-tour="continue"
                   onClick={() => navigate(moduleDestination(inProgressOrNext))}
                 >
                   {MODULE_STATUS_META[inProgressOrNext.status].cta}
@@ -155,7 +197,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* ── 3. The curriculum ── */}
-        <section className={styles.moduleSection}>
+        <section className={styles.moduleSection} data-tour="modules">
           <h2 className={styles.sectionHeading}>Your modules</h2>
 
           <TutorialCard />
@@ -190,6 +232,8 @@ export default function StudentDashboard() {
           </section>
         </div>
       </div>
+
+      {showTour && <TourGuide steps={TOUR_STEPS} onFinish={finishTour} />}
     </DashboardLayout>
   )
 }

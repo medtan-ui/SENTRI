@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SENTRI">
+  <!--
+    index.html has always pointed at /favicon.svg, but the file was never
+    committed, so every browser tab fell back to its default icon.
+
+    This is a reduction of src/assets/images/logo.png rather than a copy of
+    it. The full logo is a gold disc carrying a gamepad, an officer's cap
+    and the SENTRI wordmark; at the 16px a tab actually renders, all three
+    collapse into noise. What survives the size is the disc's gold and the
+    cap's shield emblem, so that is what this keeps.
+  -->
+  <circle cx="32" cy="32" r="32" fill="#D9B268"/>
+  <path
+    d="M32 13.5 L47 19 v13.2 c0 10.4 -6.2 17.6 -15 20.8 c-8.8 -3.2 -15 -10.4 -15 -20.8 V19 z"
+    fill="#2E2008"/>
+  <path
+    d="M25.5 32.4 l4.6 4.6 l8.7 -9.2"
+    fill="none" stroke="#D9B268" stroke-width="4.4"
+    stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

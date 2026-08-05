@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Icon from '../../../components/Icon/Icon'
+import { resetFirstRunTour } from '../../../components/TourGuide/useFirstRunTour'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
 import Card from '../../../components/Card/Card'
@@ -109,6 +110,19 @@ export default function AdminProfilePage() {
                 {link.label}
               </button>
             ))}
+            {/* Matches the student profile. The admin tour's own copy
+                says it can be reopened from here, so it must be. */}
+            <button
+              type="button"
+              className={styles.quickLink}
+              onClick={() => {
+                resetFirstRunTour(user?.uid)
+                navigate('/admin/dashboard')
+              }}
+            >
+              <Icon name="play" size={17} />
+              Replay the tour
+            </button>
           </div>
         </Card>
       </div>

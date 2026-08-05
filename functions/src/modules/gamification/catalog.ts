@@ -102,6 +102,14 @@ export interface GamificationTotals {
   averageQuizScore: number | null
   currentStreak: number
   longestStreak: number
+  /** Modules whose simulation was finished with no risky choice at all.
+   * Sourced from learningAnalytics, not moduleProgress — a progress row
+   * records that a simulation was completed, never how cleanly. */
+  flawlessSimulations: number
+  /** Best normalized learning gain across every module with a post-test.
+   * 1.0 means the student closed the entire gap between their pre-test
+   * and a perfect score. */
+  bestNormalizedGain: number | null
 }
 
 /**
@@ -167,6 +175,32 @@ export const BADGES: BadgeDefinition[] = [
     icon: 'star',
     tier: 'silver',
     earned: (t) => t.modulesCompleted >= 3,
+  },
+  {
+    // Absorbed from the separate badge system this module replaced, where
+    // it was called First Defender. Its predicate there was broken (it
+    // compared a field name that is never written, so it fired for any
+    // completed simulation) and it was also evaluated across every
+    // module at once, meaning one risky click anywhere would have locked
+    // it forever. Here it is per-module: one clean run earns it.
+    id: 'first-defender',
+    name: 'First Defender',
+    description: 'Clear a whole scenario without a single risky choice.',
+    icon: 'shield',
+    tier: 'silver',
+    earned: (t) => t.flawlessSimulations >= 1,
+  },
+  {
+    // Also absorbed. Hake's normalized gain of 1.0 means the student
+    // closed the entire distance between their pre-test and full marks —
+    // the strongest single piece of evidence this curriculum produces
+    // that someone actually learned something, so it stays a gold tier.
+    id: 'perfect-gain',
+    name: 'Perfect Gain',
+    description: 'Close the whole gap between your pre-test and a perfect post-test.',
+    icon: 'bolt',
+    tier: 'gold',
+    earned: (t) => (t.bestNormalizedGain ?? 0) >= 1,
   },
   {
     id: 'sharp-eye',

@@ -44,6 +44,7 @@ export default function Navbar({ onToggleSidebar }) {
           <button
             type="button"
             className={styles.rewards}
+            data-tour="rewards"
             onClick={() => navigate('/student/progress')}
             aria-label={`${gamification.points} XP, ${gamification.currentStreak} day streak. View your progress.`}
           >

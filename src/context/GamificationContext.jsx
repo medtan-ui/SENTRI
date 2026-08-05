@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react'
 import { useAuth } from './AuthContext'
 import { useGamification } from '../hooks/useGamification'
+import BadgeToaster from '../components/Gamification/BadgeToaster'
 
 /**
  * GamificationContext
@@ -57,7 +58,14 @@ function StudentGamificationProvider({ children }) {
     [status, errorMessage, gamification, catalog, retry],
   )
 
-  return <GamificationContext.Provider value={value}>{children}</GamificationContext.Provider>
+  return (
+    <GamificationContext.Provider value={value}>
+      {children}
+      {/* Mounted here rather than per-page so a badge earned anywhere is
+          announced. It renders nothing until one actually lands. */}
+      <BadgeToaster />
+    </GamificationContext.Provider>
+  )
 }
 
 /**

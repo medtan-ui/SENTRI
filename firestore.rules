@@ -238,17 +238,14 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // ── Gamification badge records ────────────────────────────────────
-    // Written exclusively by the evaluateAndAwardBadges Cloud Function
-    // (Admin SDK, bypasses these rules). A student can read only their
-    // own badge document (the client-side fallback in badgeService.js
-    // reads it when the callable is unavailable). Admins can read any
-    // student's badges for analytics or support.
-    match /userBadges/{userId} {
-      allow read: if request.auth != null
-        && (request.auth.uid == userId || isAdmin());
-      allow write: if false;
-    }
+    // NOTE: `userBadges` used to be matched here, for a second badge
+    // system that briefly existed alongside the one above. It has been
+    // removed rather than left in place: an unmatched collection falls
+    // through to the default deny below, which is the correct end state
+    // for a collection nothing reads or writes any more. Its two badges
+    // worth keeping (First Defender, Perfect Gain) now live in the
+    // gamification catalog. Any documents left in Firestore from the
+    // old system are inert and can be deleted at leisure.
 
     // Default deny for anything not explicitly matched above.
     match /{document=**} {

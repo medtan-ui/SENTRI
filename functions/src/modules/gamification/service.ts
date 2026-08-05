@@ -44,6 +44,7 @@ import {
 } from './catalog'
 import { GamificationDoc, GetLeaderboardInput, LeaderboardEntry, LeaderboardResult } from './models'
 import * as repo from './repository'
+import { BehaviourRow } from './repository'
 
 const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000
 const DEFAULT_LEADERBOARD_LIMIT = 10
@@ -115,12 +116,31 @@ export function totalsFrom(
   progressRows: ModuleProgressDoc[],
   currentStreak: number,
   longestStreak: number,
+  behaviourRows: BehaviourRow[] = [],
 ): GamificationTotals {
   const scores = progressRows
     .map((row) => row.score)
     .filter((score): score is number => typeof score === 'number')
 
+  const gains = progressRows
+    .map((row) => row.normalizedGain)
+    .filter((gain): gain is number => typeof gain === 'number')
+
+  // A flawless run is a module whose simulation is finished AND whose
+  // decision record shows no risky choice. Both halves are required:
+  // zero risky choices on a simulation nobody has started is vacuous,
+  // and a finished simulation with no behaviour row at all (decision
+  // recording fails soft by design) is not evidence of a clean run.
+  const behaviourByModule = new Map(behaviourRows.map((row) => [row.moduleId, row]))
+  const flawlessSimulations = progressRows.filter((row) => {
+    if (!row.simulationCompleted) return false
+    const behaviour = behaviourByModule.get(row.moduleId)
+    return Boolean(behaviour) && behaviour!.riskyChoices === 0 && behaviour!.safeChoices > 0
+  }).length
+
   return {
+    flawlessSimulations,
+    bestNormalizedGain: gains.length > 0 ? Math.max(...gains) : null,
     lessonsCompleted: progressRows.filter((row) => row.lessonCompleted).length,
     simulationsCompleted: progressRows.filter((row) => row.simulationCompleted).length,
     quizzesCompleted: progressRows.filter((row) => row.quizCompleted || typeof row.score === 'number').length,
@@ -153,10 +173,11 @@ export async function recomputeFromProgress(
   userId: string,
   touchStreakToo = false,
 ): Promise<GamificationDoc> {
-  const [existing, progressRows, profile] = await Promise.all([
+  const [existing, progressRows, profile, behaviourRows] = await Promise.all([
     repo.getGamification(userId),
     repo.listProgressForUser(userId),
     repo.getProfileSummary(userId),
+    repo.listBehaviourForUser(userId),
   ])
 
   let currentStreak = existing?.currentStreak ?? 0
@@ -170,7 +191,7 @@ export async function recomputeFromProgress(
     lastActiveDate = advanced.lastActiveDate
   }
 
-  const totals = totalsFrom(progressRows, currentStreak, longestStreak)
+  const totals = totalsFrom(progressRows, currentStreak, longestStreak, behaviourRows)
   const points = pointsFrom(progressRows)
   const rank = rankFor(points)
 

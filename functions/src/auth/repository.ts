@@ -121,6 +121,15 @@ export async function deleteUserProfile(uid: string): Promise<void> {
  * discrimination. Orphaned rows there are worse than orphaned rows
  * elsewhere, because nothing on screen reveals them — the numbers simply
  * stay quietly wrong.
+ *
+ * `gamification` is the second such case, and it broke the rule more
+ * visibly than quiz_responses ever did: it was added with the reward
+ * layer and not listed here, so deleting a student left their points
+ * document behind. Because the leaderboard is a straight ordered read of
+ * that collection, the deleted student stayed on the board — and
+ * re-creating the same person produced a second row under the same name.
+ * A ghost in the analytics is quiet; a ghost on the leaderboard is the
+ * first thing anyone notices.
  */
 export async function deleteStudentData(uid: string): Promise<void> {
   const directDocDeletes = REAL_MODULE_IDS.flatMap((moduleId) => [
@@ -142,6 +151,13 @@ export async function deleteStudentData(uid: string): Promise<void> {
   await Promise.all([
     ...directDocDeletes,
     db.collection(COLLECTIONS.STUDENT_ANALYTICS).doc(uid).delete(),
+    db.collection(COLLECTIONS.GAMIFICATION).doc(uid).delete(),
+    // Retired collection: nothing reads or writes `userBadges` any more
+    // (its two surviving badges live in the gamification catalog), but a
+    // long-lived account may still have a document from when it did.
+    // Deleting it costs one no-op call and stops this cleanup depending
+    // on a separate purge having already run.
+    db.collection('userBadges').doc(uid).delete(),
     ...queriedDeletes,
   ])
 }

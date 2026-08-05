@@ -1,0 +1,82 @@
+/* Bottom-right, above everything except a modal scenario overlay
+   (z-index 30-35 inside the stage, which is scoped to the stage itself
+   rather than the viewport, so this clears it). */
+.stack {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 340px;
+  pointer-events: none;
+}
+
+.toast {
+  position: relative;
+  pointer-events: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-gold-muted);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lift);
+  padding: var(--space-4);
+  animation: toastIn 460ms var(--ease-out-soft) both;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  margin-bottom: var(--space-3);
+}
+
+/* The medal inside is the shared BadgeMedal, so a badge looks identical
+   here, on the dashboard shelf and on the profile page. Its own card
+   border would double up inside this one, so it is flattened. */
+.toast > div {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+}
+
+.dismiss {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-light);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.dismiss:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 600px) {
+  .stack {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+    max-width: none;
+  }
+}
