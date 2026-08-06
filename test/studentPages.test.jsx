@@ -134,6 +134,23 @@ vi.mock('../src/services/analyticsService', () => ({
   aggregateStudentAnalytics: vi.fn(async () => null),
 }))
 
+// The dashboard reads the end-of-curriculum final assessment to decide
+// whether to show its callout. Stubbed at the service boundary (rather
+// than the hook) so the hook's own unlock logic still runs against the
+// mocked module list above — the interesting part is that the callout
+// stays hidden while modules are outstanding.
+vi.mock('../src/services/finalAssessmentService', () => ({
+  getFinalAssessment: vi.fn(async () => ({
+    title: 'SENTRI Final Assessment',
+    settings: { passingScore: 75, timeLimitMinutes: 30, instructions: '', available: true, attemptsAllowed: 2 },
+    questions: [],
+  })),
+  getFinalAssessmentProgress: vi.fn(async () => null),
+  submitFinalAssessment: vi.fn(),
+  saveFinalAssessment: vi.fn(),
+  getDefaultFinalAssessmentConfig: vi.fn(() => ({})),
+}))
+
 const { default: StudentDashboard } = await import('../src/pages/Student/Dashboard/StudentDashboard')
 const { default: StudentProgressPage } = await import('../src/pages/Student/Progress/StudentProgressPage')
 

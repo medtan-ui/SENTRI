@@ -78,13 +78,6 @@ export default function StudentProgressPage() {
     }
   }
 
-  // Modules where the quiz is done but the post-test isn't — the students
-  // most worth nudging, since their learning gain can't be computed until
-  // they finish that last step.
-  const pendingPostTests = modules.filter(
-    (m) => m.progress?.quizCompleted && !m.progress?.postTestCompleted,
-  )
-
   const completedCount = modules.filter((m) => m.status === MODULE_STATUS.COMPLETED).length
   const scores = modules.map((m) => m.progress?.score).filter((s) => typeof s === 'number')
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length) : null
@@ -172,24 +165,20 @@ export default function StudentProgressPage() {
                   <ModuleProgressList modules={modules} />
                 </Card>
 
-                {pendingPostTests.length > 0 && (
+                {completedCount === modules.length && modules.length > 0 && (
                   <Card className={styles.panel}>
-                    <h2 className={styles.panelTitle}>Post-tests waiting</h2>
+                    <h2 className={styles.panelTitle}>Final assessment</h2>
                     <p className={styles.emptyText}>
-                      You've finished the quiz for {pendingPostTests.length} module
-                      {pendingPostTests.length === 1 ? '' : 's'} but haven't taken the post-test yet. It's the same
-                      short set of questions you answered at the start, and it's what shows you how much you picked
-                      up.
+                      Every module is done, which means the final assessment is open. It covers all six and it's
+                      what shows you how far you've come since your first pre-test.
                     </p>
                     <ul className={styles.pendingList}>
-                      {pendingPostTests.map((m) => (
-                        <li key={m.moduleId}>
-                          <Link className={styles.pendingLink} to={`/student/modules/${m.moduleId}/post-test`}>
-                            {m.title}: take the post-test
-                            <Icon name="arrowRight" size={14} />
-                          </Link>
-                        </li>
-                      ))}
+                      <li>
+                        <Link className={styles.pendingLink} to="/student/final-assessment">
+                          Take the final assessment
+                          <Icon name="arrowRight" size={14} />
+                        </Link>
+                      </li>
                     </ul>
                   </Card>
                 )}
@@ -204,7 +193,7 @@ export default function StudentProgressPage() {
                   )}
                   {analytics && !analytics.pairedCount && (
                     <p className={styles.emptyText}>
-                      Nothing to compare yet. Once you've taken both the pre-test and the post-test for a module,
+                      Nothing to compare yet. Once you've taken the module pre-tests and the final assessment,
                       your before-and-after shows up here.
                     </p>
                   )}

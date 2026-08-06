@@ -3,13 +3,17 @@
  * Authored seed content for each module's pre-test — 5 baseline
  * multiple-choice questions a student answers once, before their first
  * lesson, so their prior knowledge can be compared against the same
- * instrument re-administered after the module (the post-test).
+ * instrument re-administered at the end of the curriculum.
  *
- * No settings block (no passing score / attempts / time limit): neither
- * a pre-test nor a post-test has a pass/fail concept, only "completed or
- * not". The post-test deliberately reuses this exact question set — a
- * normalized learning gain is only meaningful when both measurements use
- * the same instrument.
+ * No settings block (no passing score / attempts / time limit): a
+ * pre-test has no pass/fail concept, only "completed or not".
+ *
+ * These items are also where the end-of-curriculum final assessment's
+ * question bank is seeded from (see src/data/finalAssessmentContent.js).
+ * That reuse is the point: a normalized learning gain is only meaningful
+ * when the before and after measurements use the same instrument. There
+ * used to be a per-module post-test doing the same job six times, minutes
+ * after each lesson; it was replaced by one test at the end.
  *
  * ── Topic tagging ────────────────────────────────────────────────────
  * Every item carries a `topic`. That is what makes per-topic mastery and
@@ -103,7 +107,11 @@ export const TOPIC_LABELS = {
   'harassment-response': 'Responding to harassment',
 }
 
-const MODULE_PRETESTS = {
+/** Exported so the final assessment can assemble its item bank from these
+ * same six banks — see src/data/finalAssessmentContent.js for why that
+ * matters to the normalized-gain claim. Treat as read-only; every consumer
+ * deep-copies before handing it out. */
+export const MODULE_PRETESTS = {
   'password-security': {
     moduleId: 'password-security',
     title: 'Password Security — Pre-Test',

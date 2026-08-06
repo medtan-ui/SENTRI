@@ -49,7 +49,7 @@ const TOUR_STEPS = [
   {
     target: 'nav-analytics',
     title: 'The full analytics report',
-    body: 'Pre-test to post-test learning gains, item difficulty and per-section rollups, with CSV and PDF export for your documentation.',
+    body: 'Pre-test to final assessment learning gains, item difficulty and per-section rollups, with CSV and PDF export for your documentation.',
   },
 ]
 

@@ -15,6 +15,7 @@ import { useFirstRunTour } from '../../../components/TourGuide/useFirstRunTour'
 import { useAuth } from '../../../context/AuthContext'
 import { useGamificationState } from '../../../context/GamificationContext'
 import { useStudentModules } from '../../../hooks/useStudentModules'
+import { useFinalAssessment } from '../../../hooks/useFinalAssessment'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
 import styles from './StudentDashboard.module.css'
 
@@ -90,6 +91,12 @@ export default function StudentDashboard() {
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules } = useStudentModules()
   const { status: rewardStatus, gamification, catalog } = useGamificationState()
+  const {
+    status: finalStatus,
+    unlocked: finalUnlocked,
+    completed: finalCompleted,
+    progress: finalProgress,
+  } = useFinalAssessment()
   const { showTour, finishTour } = useFirstRunTour({ uid: user?.uid, ready: status === 'success' })
 
   const name = user?.nickname || user?.displayName || 'Student'
@@ -205,6 +212,36 @@ export default function StudentDashboard() {
           {status === 'loading' && <LoadingSkeleton blocks={3} rows={2} />}
           {status === 'error' && <ErrorState message={errorMessage} onRetry={retry} />}
           {status === 'success' && <ModuleGrid modules={modules} />}
+
+          {/* The final assessment sits under the grid rather than in it —
+              it isn't a seventh module, it's the one thing left after all
+              six. Shown only once they're finished, so it never reads as
+              another locked card competing for attention. */}
+          {status === 'success' && finalStatus === 'success' && finalUnlocked && (
+            <div className={styles.finalCallout} data-done={finalCompleted}>
+              <span className={styles.finalCalloutIcon} aria-hidden="true">
+                <Icon name="trophy" size={22} strokeWidth={1.7} />
+              </span>
+              <div className={styles.finalCalloutText}>
+                <h3 className={styles.finalCalloutTitle}>
+                  {finalCompleted ? 'Final assessment complete' : 'Final assessment unlocked'}
+                </h3>
+                <p className={styles.finalCalloutBody}>
+                  {finalCompleted
+                    ? `You scored ${finalProgress?.score ?? 0}%. That's the whole curriculum finished.`
+                    : "Every module is done. One last test covering all six, and you're through."}
+                </p>
+              </div>
+              <button
+                type="button"
+                className={styles.finalCalloutCta}
+                onClick={() => navigate('/student/final-assessment')}
+              >
+                {finalCompleted ? 'View result' : 'Start'}
+                <Icon name="arrowRight" size={16} />
+              </button>
+            </div>
+          )}
         </section>
 
         {/* ── 4. Rewards ── */}

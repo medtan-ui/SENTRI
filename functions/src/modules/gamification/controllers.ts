@@ -57,7 +57,6 @@ const REWARDABLE_FIELDS: Array<keyof ModuleProgressDoc> = [
   'quizCompleted',
   'moduleCompleted',
   'preTestCompleted',
-  'postTestCompleted',
   'score',
 ]
 
@@ -112,6 +111,45 @@ export const updateGamificationOnProgress = onDocumentWritten(
         function: 'updateGamificationOnProgress',
         uid: userId,
         moduleId: after?.moduleId ?? null,
+        durationMs: Date.now() - startedAt,
+        outcome: 'error',
+        error: err instanceof Error ? { message: err.message, stack: err.stack } : String(err),
+      })
+    }
+  },
+)
+
+/**
+ * updateGamificationOnFinalAssessment — the final assessment lives in its
+ * own collection rather than on any module's progress row, so the trigger
+ * above never sees it. Without this, the points and the "Show Your Work"
+ * badge for finishing the whole curriculum would not appear until the
+ * student's next completed module step — which, after the final
+ * assessment, is never.
+ */
+export const updateGamificationOnFinalAssessment = onDocumentWritten(
+  `${COLLECTIONS.FINAL_ASSESSMENT_PROGRESS}/{userId}`,
+  async (event) => {
+    const userId = event.params.userId
+    const after = event.data?.after?.data() as { completed?: boolean } | undefined
+    if (!userId || !after?.completed) return
+
+    const startedAt = Date.now()
+    try {
+      const state = await service.recomputeFromProgress(userId, true)
+      logInfo('[updateGamificationOnFinalAssessment] succeeded', {
+        function: 'updateGamificationOnFinalAssessment',
+        uid: userId,
+        durationMs: Date.now() - startedAt,
+        outcome: 'success',
+        points: state.points,
+        level: state.level,
+        badges: state.badges.length,
+      })
+    } catch (err) {
+      logError('[updateGamificationOnFinalAssessment] failed', {
+        function: 'updateGamificationOnFinalAssessment',
+        uid: userId,
         durationMs: Date.now() - startedAt,
         outcome: 'error',
         error: err instanceof Error ? { message: err.message, stack: err.stack } : String(err),

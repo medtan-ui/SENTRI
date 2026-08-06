@@ -22,6 +22,7 @@ import {
   behaviourMetrics,
   cohortNormalizedGain,
   itemAnalysis,
+  postScoresByStudent,
   topicMastery,
   transferAnalysis,
 } from './metrics'
@@ -88,8 +89,11 @@ export async function aggregateModuleAnalytics(moduleId: string): Promise<Module
     choiceBreakdown[scenarioId][choiceId] = (choiceBreakdown[scenarioId][choiceId] || 0) + 1
   })
 
+  // This module's "after" score now comes from the final assessment's
+  // items that were seeded from this module's bank — see postScoresByStudent.
+  const postByStudent = postScoresByStudent(responses, moduleId)
   const gain = cohortNormalizedGain(
-    progressDocs.map((p) => ({ pre: p.preTestScore, post: p.postTestScore })),
+    progressDocs.map((p) => ({ pre: p.preTestScore, post: postByStudent.get(p.userId as string) ?? null })),
   )
 
   const doc: ModuleAnalyticsDoc = {
@@ -106,7 +110,7 @@ export async function aggregateModuleAnalytics(moduleId: string): Promise<Module
     avgPostTestScore: gain.avgPost,
     normalizedGain: gain.normalizedGain,
     pairedCount: gain.pairedCount,
-    postTestCompletedCount: progressDocs.filter((p) => p.postTestCompleted).length,
+    postTestCompletedCount: postByStudent.size,
     topicMastery: topicMastery(responses),
     itemAnalysis: itemAnalysis(responses),
     behaviour: behaviourMetrics(decisions),
@@ -151,23 +155,41 @@ export async function aggregateStudentAnalytics(userId: string): Promise<Student
     if (t && (!lastActivityAt || t.toMillis() > lastActivityAt.toMillis())) lastActivityAt = t
   }
 
+  // Per-module "after" scores, recovered from this student's final
+  // assessment responses grouped by the module each item came from.
+  const postByModule = new Map<string, number>()
+  Object.keys(moduleOrderById).forEach((moduleId) => {
+    const score = postScoresByStudent(responses, moduleId).get(userId)
+    if (typeof score === 'number') postByModule.set(moduleId, score)
+  })
+
   const gain = cohortNormalizedGain(
-    progressDocs.map((p) => ({ pre: p.preTestScore, post: p.postTestScore })),
+    progressDocs.map((p) => ({
+      pre: p.preTestScore,
+      post: postByModule.get(p.moduleId as string) ?? null,
+    })),
   )
   const transfer = transferAnalysis(decisions, responses, moduleOrderById)
   const safeRateByModule = new Map(transfer.byModule.map((p) => [p.moduleId, p.firstAttemptSafeRate]))
 
   const timeline: StudentTimelinePoint[] = progressDocs
-    .map((p) => ({
-      moduleId: p.moduleId as string,
-      moduleOrder: (p.moduleOrder as number) ?? moduleOrderById[p.moduleId as string] ?? 0,
-      preTestScore: typeof p.preTestScore === 'number' ? p.preTestScore : null,
-      quizScore: typeof p.score === 'number' ? p.score : null,
-      postTestScore: typeof p.postTestScore === 'number' ? p.postTestScore : null,
-      normalizedGain: typeof p.normalizedGain === 'number' ? p.normalizedGain : null,
-      firstAttemptSafeRate: safeRateByModule.get(p.moduleId as string) ?? null,
-      completedAt: (p.completionDate as FirebaseFirestore.Timestamp) ?? null,
-    }))
+    .map((p) => {
+      const post = postByModule.get(p.moduleId as string) ?? null
+      const pre = typeof p.preTestScore === 'number' ? p.preTestScore : null
+      return {
+        moduleId: p.moduleId as string,
+        moduleOrder: (p.moduleOrder as number) ?? moduleOrderById[p.moduleId as string] ?? 0,
+        preTestScore: pre,
+        quizScore: typeof p.score === 'number' ? p.score : null,
+        postTestScore: post,
+        normalizedGain:
+          pre === null || post === null || pre >= 100
+            ? null
+            : Math.round(Math.max(-1, Math.min(1, (post - pre) / (100 - pre))) * 100) / 100,
+        firstAttemptSafeRate: safeRateByModule.get(p.moduleId as string) ?? null,
+        completedAt: (p.completionDate as FirebaseFirestore.Timestamp) ?? null,
+      }
+    })
     .sort((a, b) => a.moduleOrder - b.moduleOrder)
 
   const doc: StudentAnalyticsDoc = {
@@ -283,17 +305,20 @@ export function buildCohortDoc(sources: CohortSources): CohortAnalyticsDoc {
   const totalCompleted = progressDocs.filter((p) => p.moduleCompleted).length
   const trackedStudents = byStudent.size
 
-  // One pre/post pair per student, averaged across the modules they've
-  // finished — so a student who did five modules doesn't outweigh one who
-  // did one when the cohort gain is computed.
-  const perStudentPairs = [...byStudent.values()].map((rows) => {
-    const paired = rows.filter(
-      (p) => typeof p.preTestScore === 'number' && typeof p.postTestScore === 'number',
-    )
-    if (paired.length === 0) return { pre: null, post: null }
+  // One pre/post pair per student: their average pre-test across the
+  // modules they've finished, against their single final assessment
+  // score. Averaging the pre side keeps a student who did five modules
+  // from outweighing one who did one, exactly as before — what changed is
+  // that the "after" side is now one measurement instead of six.
+  const finalScoreByStudent = postScoresByStudent(responses)
+  const perStudentPairs = [...byStudent.entries()].map(([userId, rows]) => {
+    const preScores = rows
+      .map((p) => p.preTestScore)
+      .filter((s): s is number => typeof s === 'number')
+    if (preScores.length === 0) return { pre: null, post: null }
     return {
-      pre: Math.round(paired.reduce((s, p) => s + (p.preTestScore as number), 0) / paired.length),
-      post: Math.round(paired.reduce((s, p) => s + (p.postTestScore as number), 0) / paired.length),
+      pre: Math.round(preScores.reduce((s, v) => s + v, 0) / preScores.length),
+      post: finalScoreByStudent.get(userId) ?? null,
     }
   })
   const gain = cohortNormalizedGain(perStudentPairs)
@@ -306,8 +331,12 @@ export function buildCohortDoc(sources: CohortSources): CohortAnalyticsDoc {
       const rows = progressDocs.filter((p) => p.moduleId === moduleId)
       const moduleAttempts = attempts.filter((a) => a.moduleId === moduleId)
       const completed = rows.filter((p) => p.moduleCompleted).length
+      const modulePostByStudent = postScoresByStudent(responses, moduleId)
       const moduleGain = cohortNormalizedGain(
-        rows.map((p) => ({ pre: p.preTestScore, post: p.postTestScore })),
+        rows.map((p) => ({
+          pre: p.preTestScore,
+          post: modulePostByStudent.get(p.userId as string) ?? null,
+        })),
       )
       return {
         moduleId,

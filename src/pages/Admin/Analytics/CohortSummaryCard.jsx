@@ -100,7 +100,7 @@ export default function CohortSummaryCard({ summary, refreshing, onRefresh }) {
               </div>
               <div className={styles.stat}>
                 <span className={styles.statValue}>{summary.avgPostTestScore}%</span>
-                <span className={styles.statLabel}>Avg. post-test</span>
+                <span className={styles.statLabel}>Avg. final assessment</span>
               </div>
               <div className={styles.stat}>
                 <span className={styles.statValue}>{formatGain(summary.normalizedGain)}</span>
@@ -109,7 +109,7 @@ export default function CohortSummaryCard({ summary, refreshing, onRefresh }) {
             </div>
             <p className={styles.sectionNote}>
               {gainBand(summary.normalizedGain)} · based on {summary.pairedCount} student
-              {summary.pairedCount === 1 ? '' : 's'} with both a pre-test and a post-test on record.
+              {summary.pairedCount === 1 ? '' : 's'} with both a pre-test and a final assessment on record.
             </p>
           </section>
 

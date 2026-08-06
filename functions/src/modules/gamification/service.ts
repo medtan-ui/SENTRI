@@ -43,7 +43,7 @@ import {
 } from './catalog'
 import { GamificationDoc, GetLeaderboardInput, LeaderboardEntry, LeaderboardResult } from './models'
 import * as repo from './repository'
-import { BehaviourRow } from './repository'
+import { BehaviourRow, FinalAssessmentSummary } from './repository'
 
 const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000
 const DEFAULT_LEADERBOARD_LIMIT = 10
@@ -98,8 +98,19 @@ export function pointsForModule(progress: ModuleProgressDoc): number {
     points += POINTS.QUIZ_BASE + Math.round(score * POINTS.QUIZ_SCORE_MULTIPLIER)
     if (score === 100) points += POINTS.QUIZ_PERFECT_BONUS
   }
-  if (progress.postTestCompleted) points += POINTS.POSTTEST
   if (progress.moduleCompleted) points += POINTS.MODULE
+  return points
+}
+
+/**
+ * The end-of-curriculum final assessment is worth points too, but it is a
+ * single event rather than part of any one module — so it's scored here,
+ * separately, from its own document.
+ */
+export function pointsForFinalAssessment(finalDoc: FinalAssessmentSummary | null): number {
+  if (!finalDoc?.completed) return 0
+  let points = POINTS.FINAL_ASSESSMENT
+  if (finalDoc.passed) points += POINTS.FINAL_ASSESSMENT_PASS_BONUS
   return points
 }
 
@@ -114,14 +125,11 @@ export function totalsFrom(
   currentStreak: number,
   longestStreak: number,
   behaviourRows: BehaviourRow[] = [],
+  finalDoc: FinalAssessmentSummary | null = null,
 ): GamificationTotals {
   const scores = progressRows
     .map((row) => row.score)
     .filter((score): score is number => typeof score === 'number')
-
-  const gains = progressRows
-    .map((row) => row.normalizedGain)
-    .filter((gain): gain is number => typeof gain === 'number')
 
   // A flawless run is a module whose simulation is finished AND whose
   // decision record shows no risky choice. Both halves are required:
@@ -137,13 +145,16 @@ export function totalsFrom(
 
   return {
     flawlessSimulations,
-    bestNormalizedGain: gains.length > 0 ? Math.max(...gains) : null,
+    // One gain now, not a best-of-six: the final assessment is the only
+    // post measurement, so there is exactly one gain per student.
+    bestNormalizedGain: typeof finalDoc?.normalizedGain === 'number' ? finalDoc.normalizedGain : null,
     lessonsCompleted: progressRows.filter((row) => row.lessonCompleted).length,
     simulationsCompleted: progressRows.filter((row) => row.simulationCompleted).length,
     quizzesCompleted: progressRows.filter((row) => row.quizCompleted || typeof row.score === 'number').length,
     modulesCompleted: progressRows.filter((row) => row.moduleCompleted).length,
     pretestsCompleted: progressRows.filter((row) => row.preTestCompleted).length,
-    posttestsCompleted: progressRows.filter((row) => row.postTestCompleted).length,
+    finalAssessmentCompleted: Boolean(finalDoc?.completed),
+    finalAssessmentPassed: Boolean(finalDoc?.passed),
     perfectQuizzes: scores.filter((score) => score === 100).length,
     bestQuizScore: scores.length > 0 ? Math.max(...scores) : null,
     averageQuizScore:
@@ -153,8 +164,13 @@ export function totalsFrom(
   }
 }
 
-export function pointsFrom(progressRows: ModuleProgressDoc[]): number {
-  return progressRows.reduce((sum, row) => sum + pointsForModule(row), 0)
+export function pointsFrom(
+  progressRows: ModuleProgressDoc[],
+  finalDoc: FinalAssessmentSummary | null = null,
+): number {
+  return (
+    progressRows.reduce((sum, row) => sum + pointsForModule(row), 0) + pointsForFinalAssessment(finalDoc)
+  )
 }
 
 /**
@@ -170,11 +186,12 @@ export async function recomputeFromProgress(
   userId: string,
   touchStreakToo = false,
 ): Promise<GamificationDoc> {
-  const [existing, progressRows, profile, behaviourRows] = await Promise.all([
+  const [existing, progressRows, profile, behaviourRows, finalDoc] = await Promise.all([
     repo.getGamification(userId),
     repo.listProgressForUser(userId),
     repo.getProfileSummary(userId),
     repo.listBehaviourForUser(userId),
+    repo.getFinalAssessmentSummary(userId),
   ])
 
   let currentStreak = existing?.currentStreak ?? 0
@@ -188,8 +205,8 @@ export async function recomputeFromProgress(
     lastActiveDate = advanced.lastActiveDate
   }
 
-  const totals = totalsFrom(progressRows, currentStreak, longestStreak, behaviourRows)
-  const points = pointsFrom(progressRows)
+  const totals = totalsFrom(progressRows, currentStreak, longestStreak, behaviourRows, finalDoc)
+  const points = pointsFrom(progressRows, finalDoc)
   const rank = rankFor(points)
 
   // Union, never replace — a badge already earned stays earned.

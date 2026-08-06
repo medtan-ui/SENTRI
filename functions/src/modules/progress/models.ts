@@ -14,19 +14,19 @@ export interface ModuleProgressDoc {
   completionDate: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp | null
   createdAt: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp
 
-  // ── Pre / post measurement ───────────────────────────────────────
-  // Both run on the same item bank; see modules/assessment. Optional
-  // because documents created before these fields existed simply don't
-  // have them, and every reader treats "absent" as "not taken yet".
+  // ── Baseline measurement ─────────────────────────────────────────
+  // The per-module pre-test; see modules/assessment. Optional because
+  // documents created before these fields existed simply don't have them,
+  // and every reader treats "absent" as "not taken yet".
+  //
+  // There is deliberately no matching per-module post-test. The "after"
+  // measurement is the single end-of-curriculum final assessment, whose
+  // score and normalized gain live in finalAssessmentProgress/{userId}
+  // (see modules/finalAssessment) — one document per student, not one per
+  // student per module.
   preTestCompleted?: boolean
   preTestScore?: number | null
   preTestCompletedAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp | null
-  postTestCompleted?: boolean
-  postTestScore?: number | null
-  postTestCompletedAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp | null
-  /** Hake's normalized gain, stored at post-test time so a later edit to
-   * the item bank can't retroactively change a reported gain. */
-  normalizedGain?: number | null
 
   // ── Quiz retry / appeal ──────────────────────────────────────────
   // A quiz is one attempt by default. An admin may grant exactly one

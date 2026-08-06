@@ -2,15 +2,17 @@ import { AssessmentType } from '../../shared/constants'
 
 /**
  * modules/assessment/models.ts
- * The pre-test / post-test pair. Both run on the same item bank
- * (modulePretests/{moduleId}) so a normalized gain is computed from
- * identical questions, which is the only way the "awareness improvement"
- * objective can be reported honestly.
+ * The per-module pre-test — the "before" half of the awareness
+ * measurement. The "after" half is no longer per-module: it is the single
+ * end-of-curriculum final assessment (modules/finalAssessment), whose item
+ * bank is seeded from these same six pre-test banks so a normalized gain
+ * is still computed from identical questions.
  */
 
-/** Only the two ungraded bookend assessments run through this module —
- * the graded quiz has its own callable (modules/quiz). */
-export type BookendAssessmentType = Extract<AssessmentType, 'pretest' | 'posttest'>
+/** Only the ungraded baseline runs through this module — the graded quiz
+ * has its own callable (modules/quiz), and so does the final assessment
+ * (modules/finalAssessment). */
+export type BookendAssessmentType = Extract<AssessmentType, 'pretest'>
 
 export interface SubmitAssessmentInput {
   moduleId: string
@@ -60,11 +62,6 @@ export interface SubmitAssessmentResult {
   correctCount: number
   total: number
   perQuestionResults: AssessmentItemResult[]
-  /** Present only on a post-test, and only once a pre-test score exists.
-   * Hake's normalized gain: (post - pre) / (100 - pre), clamped to
-   * [-1, 1]. Null when pre is 100 (no headroom, undefined gain). */
-  normalizedGain: number | null
-  preTestScore: number | null
 }
 
 /**

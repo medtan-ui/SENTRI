@@ -1,19 +1,19 @@
 /**
  * assessmentService.js
- * The pre-test and post-test pair — the two ungraded measurements that
- * bracket a module and make "did awareness actually improve?" answerable.
+ * The per-module pre-test — the ungraded baseline a student answers once,
+ * before that module's first lesson.
  *
- * Both run on the *same* item bank (`modulePretests/{moduleId}`, seeded
- * from src/data/modulePretestContent.js). That is deliberate: a
- * normalized learning gain only means something when the before and
- * after measurements use identical items.
+ * The matching "after" measurement is not here and is no longer
+ * per-module: it's the single end-of-curriculum final assessment (see
+ * finalAssessmentService.js), whose item bank is assembled from these same
+ * six pre-test banks so a normalized gain still compares identical items.
  *
  * Grading is server-side (the submitAssessment Cloud Function), not
  * client-side as the pre-test used to be. Two reasons: per-question
  * responses have to land in `quizResponses`, which no client may write,
- * or item analysis is impossible; and a post-test score is compared
- * against a stored pre-test score, so a client that computed either could
- * manufacture an improvement.
+ * or item analysis is impossible; and the final assessment's gain is
+ * compared against a stored pre-test score, so a client that computed
+ * either could manufacture an improvement.
  */
 import { httpsCallable } from 'firebase/functions'
 import { functions } from './firebase'
@@ -37,7 +37,7 @@ export async function getAssessment(moduleId) {
  * Submits one bookend assessment for server-side grading.
  *
  * @param {string} moduleId
- * @param {'pretest'|'posttest'} assessmentType
+ * @param {'pretest'} assessmentType  the only value the server accepts
  * @param {Record<string,string>} answers    questionId -> choiceId
  * @param {Record<string,number>} [durations] questionId -> milliseconds
  * @returns {Promise<{assessmentType:string, score:number, correctCount:number, total:number,

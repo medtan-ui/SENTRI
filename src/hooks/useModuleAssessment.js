@@ -6,11 +6,15 @@ import { getModuleProgress } from '../services/moduleProgressService'
 
 /**
  * useModuleAssessment
- * Drives one of the two ungraded bookend assessments for a module — the
- * pre-test before the first lesson, or the post-test after the quiz.
- * Both run on the same item bank, so one hook serves both; the only
- * difference is which progress flag it reads and which `assessmentType`
- * it submits.
+ * Drives a module's ungraded pre-test — the baseline a student answers
+ * once, before their first lesson.
+ *
+ * There is no matching per-module post-test any more. The "after" half of
+ * the measurement is the single end-of-curriculum final assessment (see
+ * useFinalAssessment), which reuses these same items so the comparison
+ * still holds. This hook keeps its `assessmentType` parameter only
+ * because the Cloud Function's payload has one; 'pretest' is now the
+ * only accepted value, server-side included.
  *
  * Grading is server-side (submitAssessment). This hook never computes a
  * score — it collects answers, measures how long each question took, and
@@ -22,7 +26,7 @@ import { getModuleProgress } from '../services/moduleProgressService'
  * next time, with no separate resume state to manage.
  *
  * @param {string} moduleId
- * @param {'pretest'|'posttest'} assessmentType
+ * @param {'pretest'} assessmentType
  */
 export function useModuleAssessment(moduleId, assessmentType = 'pretest') {
   const { user } = useAuth()
@@ -46,12 +50,9 @@ export function useModuleAssessment(moduleId, assessmentType = 'pretest') {
       .then(([assessmentDoc, progress]) => {
         if (cancelled) return
         setAssessment(assessmentDoc)
-        setCompleted(
-          Boolean(assessmentType === 'pretest' ? progress?.preTestCompleted : progress?.postTestCompleted),
-        )
-        // A post-test only exists once the quiz has been submitted; the
-        // pre-test has no precondition beyond the module being open.
-        setEligible(assessmentType === 'pretest' ? true : Boolean(progress?.quizCompleted))
+        setCompleted(Boolean(progress?.preTestCompleted))
+        // The pre-test has no precondition beyond the module being open.
+        setEligible(true)
         setStatus('success')
       })
       .catch((err) => {
@@ -84,7 +85,7 @@ export function useModuleAssessment(moduleId, assessmentType = 'pretest') {
         // measurements the form already collected — no second stopwatch,
         // and questions never touched simply contribute nothing.
         const totalMs = Object.values(durations || {}).reduce((sum, ms) => sum + (ms || 0), 0)
-        recordEvent(assessmentType === 'pretest' ? 'pretest_submitted' : 'posttest_submitted', {
+        recordEvent('pretest_submitted', {
           moduleId,
           durationMs: totalMs > 0 ? totalMs : undefined,
           payload: { score: outcome?.score ?? null },

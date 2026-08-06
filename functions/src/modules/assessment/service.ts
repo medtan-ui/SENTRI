@@ -1,16 +1,24 @@
 /**
  * modules/assessment/service.ts
- * Grades the ungraded bookends — the pre-test a student takes before
- * their first lesson, and the post-test they take after the module's
- * quiz. Neither has a passing score; the point is measurement, not a
- * gate.
+ * Grades the per-module pre-test — the ungraded baseline a student takes
+ * once, before their first lesson. There is no passing score; the point is
+ * measurement, not a gate.
  *
- * Grading moved server-side from the old client-side pre-test path for
- * two reasons. First, per-question responses have to be recorded
- * somewhere a student can't write (`quizResponses` is Cloud
- * Functions-only), or item analysis is worthless. Second, normalized gain
- * compares a post-test score against a stored pre-test score, and a
- * client that can compute either could manufacture an improvement.
+ * The matching "after" measurement is deliberately NOT here. It used to be
+ * a per-module post-test taken right after each module's quiz, which meant
+ * a student sat three separate tests per module (pre-test, quiz,
+ * post-test) — the same instrument twice, a few minutes apart, six times
+ * over. That was removed in favour of one end-of-curriculum final
+ * assessment (modules/finalAssessment) whose item bank is seeded from these
+ * same six pre-test banks, so normalized gain is still computed from
+ * identical questions — just once, against the average of the six
+ * baselines, instead of six times.
+ *
+ * Grading is server-side for two reasons. First, per-question responses
+ * have to be recorded somewhere a student can't write (`quizResponses` is
+ * Cloud Functions-only), or item analysis is worthless. Second, the final
+ * assessment's gain compares against a stored pre-test score, and a client
+ * that could compute either could manufacture an improvement.
  *
  * The transaction guards one-attempt-per-assessment: the check and the
  * write have to be atomic, or two tabs both pass a stale "not completed
@@ -28,18 +36,6 @@ import {
   BookendAssessmentType,
   SubmitAssessmentResult,
 } from './models'
-
-/**
- * Hake's normalized gain: how much of the headroom a student actually
- * closed, rather than a raw point difference (which flatters students who
- * started low). Null when the pre-test was already 100 — there is no
- * headroom to close, so the ratio is undefined rather than zero.
- */
-export function normalizedGain(preScore: number, postScore: number): number | null {
-  if (preScore >= 100) return null
-  const gain = (postScore - preScore) / (100 - preScore)
-  return Math.round(Math.max(-1, Math.min(1, gain)) * 100) / 100
-}
 
 export function gradeAssessment(
   config: AssessmentConfig,
@@ -100,8 +96,6 @@ export async function submitAssessment(
   const { perQuestionResults, correctCount, total, score } = gradeAssessment(config, answers, durations)
   const attemptId = repo.newAttemptId()
 
-  let preTestScore: number | null = null
-
   await db.runTransaction(async (txn) => {
     const ref = progressRef(userId, moduleId)
     const snap = await txn.get(ref)
@@ -110,47 +104,17 @@ export async function submitAssessment(
       ? (snap.data() as ModuleProgressDoc)
       : defaultProgress(userId, moduleId, moduleDoc.moduleOrder, moduleDoc.moduleOrder === 1)
 
-    if (assessmentType === 'pretest') {
-      if (current.preTestCompleted) {
-        throw new AppError('failed-precondition', 'The pre-test for this module has already been submitted.')
-      }
-      txn.set(
-        ref,
-        {
-          ...current,
-          preTestCompleted: true,
-          preTestScore: score,
-          preTestCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
-          lastAccessed: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      )
-      return
+    if (current.preTestCompleted) {
+      throw new AppError('failed-precondition', 'The pre-test for this module has already been submitted.')
     }
-
-    // ── post-test ──
-    if (!current.quizCompleted) {
-      throw new AppError(
-        'failed-precondition',
-        'The post-test unlocks after this module\'s quiz has been submitted.',
-      )
-    }
-    if (current.postTestCompleted) {
-      throw new AppError('failed-precondition', 'The post-test for this module has already been submitted.')
-    }
-
-    preTestScore = typeof current.preTestScore === 'number' ? current.preTestScore : null
 
     txn.set(
       ref,
       {
         ...current,
-        postTestCompleted: true,
-        postTestScore: score,
-        postTestCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
-        // Stored rather than recomputed on read, so a later edit to the
-        // item bank can't retroactively change a reported gain.
-        normalizedGain: preTestScore === null ? null : normalizedGain(preTestScore, score),
+        preTestCompleted: true,
+        preTestScore: score,
+        preTestCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
         lastAccessed: admin.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true },
@@ -184,8 +148,5 @@ export async function submitAssessment(
     correctCount,
     total,
     perQuestionResults,
-    normalizedGain:
-      assessmentType === 'posttest' && preTestScore !== null ? normalizedGain(preTestScore, score) : null,
-    preTestScore,
   }
 }

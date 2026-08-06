@@ -1,12 +1,16 @@
 /**
- * Unit tests for pre/post-test grading and normalized gain.
+ * Unit tests for pre-test grading.
  *
  * Grading moved server-side specifically so a client can't influence a
  * reported learning gain, so these tests care most about the boundaries
- * where a gain could be silently misreported: a perfect pre-test, a
- * regression, an unanswered item, and an unmeasured duration.
+ * where a score could be silently misreported: an unanswered item and an
+ * unmeasured duration.
+ *
+ * `normalizedGain` no longer lives here — the "after" measurement is the
+ * end-of-curriculum final assessment rather than a per-module post-test,
+ * so the gain arithmetic moved with it (see finalAssessment.grading.test.ts).
  */
-import { gradeAssessment, normalizedGain } from '../../src/modules/assessment/service'
+import { gradeAssessment } from '../../src/modules/assessment/service'
 import { AssessmentConfig } from '../../src/modules/assessment/models'
 
 const config: AssessmentConfig = {
@@ -37,25 +41,6 @@ const config: AssessmentConfig = {
     },
   ],
 }
-
-describe('normalizedGain', () => {
-  it('reports the share of available headroom that was closed', () => {
-    expect(normalizedGain(40, 70)).toBeCloseTo(0.5, 2)
-  })
-
-  it('returns null for a perfect pre-test, where the ratio is undefined', () => {
-    expect(normalizedGain(100, 100)).toBeNull()
-  })
-
-  it('reports a regression as a negative gain', () => {
-    expect(normalizedGain(80, 40)).toBeLessThan(0)
-  })
-
-  it('clamps to [-1, 1] so a single result cannot dominate a cohort average', () => {
-    expect(normalizedGain(0, 100)).toBe(1)
-    expect(normalizedGain(99, 0)).toBe(-1)
-  })
-})
 
 describe('gradeAssessment', () => {
   it('grades against the stored answer key and scores as a percentage', () => {

@@ -95,6 +95,43 @@ export function cohortNormalizedGain(
   }
 }
 
+/**
+ * Per-module post-test scores, derived from `quizResponses` rather than
+ * read off a progress row.
+ *
+ * There is no longer a per-module post-test — the six of them were
+ * replaced by one end-of-curriculum final assessment. But that assessment
+ * is seeded from the same six pre-test banks and every one of its answer
+ * rows is written with the module its item came from, so a per-module
+ * "after" score is still recoverable: take that student's posttest rows
+ * for that module and score them. This is what keeps per-module gain
+ * reportable after the change.
+ *
+ * @returns userId -> score (0-100), for one module
+ */
+export function postScoresByStudent(
+  responses: FirebaseFirestore.DocumentData[],
+  moduleId?: string,
+): Map<string, number> {
+  const tally = new Map<string, { correct: number; total: number }>()
+  responses.forEach((r) => {
+    if (r.assessmentType !== 'posttest') return
+    if (moduleId && r.moduleId !== moduleId) return
+    const userId = r.userId as string
+    if (!userId) return
+    const entry = tally.get(userId) ?? { correct: 0, total: 0 }
+    entry.total += 1
+    if (r.isCorrect === true) entry.correct += 1
+    tally.set(userId, entry)
+  })
+
+  const scores = new Map<string, number>()
+  tally.forEach((entry, userId) => {
+    if (entry.total > 0) scores.set(userId, Math.round((entry.correct / entry.total) * 100))
+  })
+  return scores
+}
+
 // ── Learning: per-topic mastery ──────────────────────────────────────
 
 export interface TopicMastery {

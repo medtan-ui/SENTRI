@@ -30,8 +30,11 @@ export const POINTS = {
   QUIZ_SCORE_MULTIPLIER: 0.5,
   /** One-off bonus on top for a flawless quiz. */
   QUIZ_PERFECT_BONUS: 25,
-  POSTTEST: 15,
   MODULE: 60,
+  /** The single end-of-curriculum assessment. Worth more than a module
+   * quiz because there is exactly one of it, at the end of everything. */
+  FINAL_ASSESSMENT: 80,
+  FINAL_ASSESSMENT_PASS_BONUS: 60,
 } as const
 
 /**
@@ -96,7 +99,9 @@ export interface GamificationTotals {
   quizzesCompleted: number
   modulesCompleted: number
   pretestsCompleted: number
-  posttestsCompleted: number
+  /** The single end-of-curriculum assessment, not one per module. */
+  finalAssessmentCompleted: boolean
+  finalAssessmentPassed: boolean
   perfectQuizzes: number
   bestQuizScore: number | null
   averageQuizScore: number | null
@@ -106,9 +111,10 @@ export interface GamificationTotals {
    * Sourced from learningAnalytics, not moduleProgress — a progress row
    * records that a simulation was completed, never how cleanly. */
   flawlessSimulations: number
-  /** Best normalized learning gain across every module with a post-test.
-   * 1.0 means the student closed the entire gap between their pre-test
-   * and a perfect score. */
+  /** Normalized learning gain from the final assessment, measured against
+   * the average of the six pre-tests. 1.0 means the student closed the
+   * entire gap between where they started and a perfect score. Null until
+   * the final assessment is taken. */
   bestNormalizedGain: number | null
 }
 
@@ -163,10 +169,10 @@ export const BADGES: BadgeDefinition[] = [
   {
     id: 'show-your-work',
     name: 'Show Your Work',
-    description: 'Finish a post-test and see how far you moved.',
+    description: 'Finish the final assessment and see how far you moved.',
     icon: 'bolt',
     tier: 'silver',
-    earned: (t) => t.posttestsCompleted >= 1,
+    earned: (t) => t.finalAssessmentCompleted,
   },
   {
     id: 'halfway-there',
@@ -197,7 +203,7 @@ export const BADGES: BadgeDefinition[] = [
     // that someone actually learned something, so it stays a gold tier.
     id: 'perfect-gain',
     name: 'Perfect Gain',
-    description: 'Close the whole gap between your pre-test and a perfect post-test.',
+    description: 'Close the whole gap between your pre-tests and a perfect final assessment.',
     icon: 'bolt',
     tier: 'gold',
     earned: (t) => (t.bestNormalizedGain ?? 0) >= 1,

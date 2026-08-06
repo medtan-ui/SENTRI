@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 export const submitAssessmentSchema = z.object({
   moduleId: z.string().min(1, 'moduleId is required.'),
-  assessmentType: z.enum(['pretest', 'posttest']),
+  // Pre-test only. The post measurement is no longer per-module — it is
+  // the single end-of-curriculum final assessment (modules/finalAssessment).
+  assessmentType: z.enum(['pretest']),
   answers: z.record(z.string(), z.string()),
   // Per-question milliseconds. Capped at an hour so a tab left open
   // overnight can't drag a cohort's average time-to-answer into

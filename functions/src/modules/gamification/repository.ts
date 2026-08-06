@@ -28,6 +28,29 @@ export async function saveGamification(userId: string, data: Partial<Gamificatio
 }
 
 /** Every module progress row belonging to one student. */
+/**
+ * The slice of a student's final assessment document that the reward
+ * layer needs. Kept narrow on purpose — gamification should not depend on
+ * the whole shape of another module's document.
+ */
+export interface FinalAssessmentSummary {
+  completed: boolean
+  passed: boolean
+  normalizedGain: number | null
+}
+
+/** Null when the student hasn't taken the final assessment yet. */
+export async function getFinalAssessmentSummary(userId: string): Promise<FinalAssessmentSummary | null> {
+  const snap = await db.collection(COLLECTIONS.FINAL_ASSESSMENT_PROGRESS).doc(userId).get()
+  if (!snap.exists) return null
+  const data = snap.data() as { completed?: boolean; passed?: boolean; normalizedGain?: number | null }
+  return {
+    completed: Boolean(data.completed),
+    passed: Boolean(data.passed),
+    normalizedGain: typeof data.normalizedGain === 'number' ? data.normalizedGain : null,
+  }
+}
+
 export async function listProgressForUser(userId: string): Promise<ModuleProgressDoc[]> {
   const snap = await db.collection(COLLECTIONS.MODULE_PROGRESS).where('userId', '==', userId).get()
   return snap.docs.map((doc) => doc.data() as ModuleProgressDoc)

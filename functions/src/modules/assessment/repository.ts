@@ -28,6 +28,12 @@ export interface ResponseInput {
   correctChoiceId: string
   isCorrect: boolean
   durationMs: number | null
+  /** Overrides the call's `moduleId` for this row. Only the final
+   * assessment uses it: that test isn't per-module, but each of its items
+   * was seeded from a specific module's pre-test bank, so attributing
+   * every row to its source module keeps per-module and per-topic
+   * analysis working across the pre/post pair. */
+  moduleId?: string
 }
 
 /**
@@ -50,7 +56,7 @@ export async function writeResponses(
     const ref = db.collection(COLLECTIONS.QUIZ_RESPONSES).doc()
     const doc: QuizResponseDoc = {
       userId,
-      moduleId,
+      moduleId: response.moduleId || moduleId,
       assessmentType,
       attemptId,
       questionId: response.questionId,

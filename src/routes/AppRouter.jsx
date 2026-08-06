@@ -19,6 +19,7 @@ const ModulesPage            = React.lazy(() => import('../pages/Admin/Modules/M
 const ModuleConfigurationPage= React.lazy(() => import('../pages/Admin/ModuleConfiguration/ModuleConfigurationPage'))
 const ScenarioManagerPage    = React.lazy(() => import('../pages/Admin/ScenarioManager/ScenarioManagerPage'))
 const QuizManagerPage        = React.lazy(() => import('../pages/Admin/QuizManager/QuizManagerPage'))
+const FinalAssessmentManagerPage = React.lazy(() => import('../pages/Admin/FinalAssessment/FinalAssessmentManagerPage'))
 const AdminAnalyticsPage     = React.lazy(() => import('../pages/Admin/Analytics/AdminAnalyticsPage'))
 const StudentModulesPage     = React.lazy(() => import('../pages/Student/Modules/StudentModulesPage'))
 const StudentTutorialPage    = React.lazy(() => import('../pages/Student/Tutorial/StudentTutorialPage'))
@@ -26,7 +27,7 @@ const StudentLessonViewerPage= React.lazy(() => import('../pages/Student/Modules
 const ScenarioRunnerPage     = React.lazy(() => import('../pages/Student/Modules/ScenarioRunner/ScenarioRunnerPage'))
 const SimulationCompletePage = React.lazy(() => import('../pages/Student/Modules/SimulationComplete/SimulationCompletePage'))
 const StudentQuizPage        = React.lazy(() => import('../pages/Student/Modules/Quiz/StudentQuizPage'))
-const StudentPostTestPage    = React.lazy(() => import('../pages/Student/Modules/PostTest/StudentPostTestPage'))
+const StudentFinalAssessmentPage = React.lazy(() => import('../pages/Student/FinalAssessment/StudentFinalAssessmentPage'))
 const StudentQuizOverviewPage= React.lazy(() => import('../pages/Student/Quiz/StudentQuizOverviewPage'))
 const StudentProgressPage    = React.lazy(() => import('../pages/Student/Progress/StudentProgressPage'))
 const StudentProfilePage     = React.lazy(() => import('../pages/Student/Profile/StudentProfilePage'))
@@ -164,11 +165,13 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+        {/* Not nested under a module: there is exactly one final
+            assessment for the whole curriculum, taken after all six. */}
         <Route
-          path="/student/modules/:moduleId/post-test"
+          path="/student/final-assessment"
           element={
             <ProtectedRoute requiredRole="student">
-              <StudentPostTestPage />
+              <StudentFinalAssessmentPage />
             </ProtectedRoute>
           }
         />
@@ -267,6 +270,16 @@ export default function AppRouter() {
           element={
             <ProtectedRoute requiredRole="admin">
               <QuizManagerPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* No module in the path: there is one final assessment for the
+            whole curriculum, so there is nothing to pick between. */}
+        <Route
+          path="/admin/final-assessment"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <FinalAssessmentManagerPage />
             </ProtectedRoute>
           }
         />

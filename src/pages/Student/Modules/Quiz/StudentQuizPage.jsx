@@ -161,7 +161,6 @@ export default function StudentQuizPage() {
     // a moment ago in this session. An admin-granted retry clears
     // quizCompleted, which is exactly what lets them back into the form.
     const alreadyCompleted = Boolean(progress?.quizCompleted) && !result
-    const postTestDone = Boolean(progress?.postTestCompleted)
 
     if (alreadyCompleted) {
       return (
@@ -172,15 +171,7 @@ export default function StudentQuizPage() {
             You've already taken this quiz — only one attempt is allowed. Your score was {progress?.score ?? '—'}%.
           </p>
           <div className={styles.actions}>
-            {!postTestDone && (
-              <Button
-                variant="primary"
-                onClick={() => navigate(`/student/modules/${moduleId}/post-test`)}
-              >
-                Take the Post-Test →
-              </Button>
-            )}
-            <Button variant="ghost" onClick={() => navigate('/student/dashboard')}>Return to Dashboard</Button>
+            <Button variant="primary" onClick={() => navigate('/student/dashboard')}>Return to Dashboard</Button>
           </div>
         </Card>
       )
@@ -203,31 +194,14 @@ export default function StudentQuizPage() {
             </p>
             <span className={styles.statusBadge}>Module Completed</span>
 
-            <p className={styles.postTestPrompt}>
-              One last step: answer the same questions you saw before the lesson, so you can see how much
-              you've learned.
-            </p>
-
             <div className={styles.actions}>
               <Button variant="ghost" onClick={() => setShowReview((v) => !v)}>
                 {showReview ? 'Hide Answer Review' : 'Review Your Answers'}
               </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => navigate(`/student/modules/${moduleId}/post-test`)}
-              >
-                Take the Post-Test →
+              <Button variant="primary" size="lg" onClick={() => navigate('/student/dashboard')}>
+                Return to Dashboard
               </Button>
             </div>
-
-            <button
-              type="button"
-              className={styles.skipLink}
-              onClick={() => navigate('/student/dashboard')}
-            >
-              Skip for now, return to Dashboard
-            </button>
           </Card>
 
           {showReview && (

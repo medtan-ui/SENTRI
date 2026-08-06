@@ -90,3 +90,40 @@
   padding: 5px 14px;
   white-space: nowrap;
 }
+
+/* ── Final assessment row ─────────────────────────────────────────────
+   Same shape as a module row, but gold-edged and slightly separated so
+   it doesn't read as a seventh module. It isn't one — it's the single
+   test that covers all six, and it only opens once they're finished. */
+.finalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-gold);
+}
+
+.finalRow[data-locked='true'] {
+  opacity: 0.7;
+  border-color: var(--color-border);
+}
+
+.finalIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.finalRow[data-locked='true'] .finalIcon {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+}

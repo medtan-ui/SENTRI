@@ -27,6 +27,14 @@ export const COLLECTIONS = {
   MODULE_PRETESTS: 'modulePretests',
   MODULE_ASSIGNMENTS: 'moduleAssignments',
   MODULE_PROGRESS: 'moduleProgress',
+  /** Singleton config document (id FINAL_ASSESSMENT_DOC_ID) holding the
+   * end-of-curriculum assessment's settings and questions. Not keyed by
+   * module — there is exactly one, taken after all six are complete. */
+  FINAL_ASSESSMENT: 'finalAssessment',
+  /** One document per student: their final assessment attempt, score, and
+   * the program-level normalized gain computed against the average of
+   * their six pre-test scores. */
+  FINAL_ASSESSMENT_PROGRESS: 'finalAssessmentProgress',
   SCENARIO_DECISION_RECORDS: 'scenarioDecisionRecords',
   QUIZ_ATTEMPTS: 'quizAttempts',
   /** One document per answered question, across pre-test, quiz, and
@@ -48,13 +56,21 @@ export const COLLECTIONS = {
 } as const
 
 /**
- * The three points a student is measured at. Pre-test and post-test use
- * the *same* instrument (modulePretests/{moduleId}) on purpose — a
- * normalized learning gain is only interpretable when both measurements
- * come from identical items.
+ * The three points a student is measured at. 'pretest' is per-module and
+ * runs once before that module's lesson; 'quiz' is per-module and graded;
+ * 'posttest' is now a single end-of-curriculum event (the final
+ * assessment), not one per module.
+ *
+ * The final assessment still writes its per-question rows under
+ * 'posttest' on purpose: its item bank is seeded from the same six
+ * pre-test banks, so pre/post item analysis compares identical items and
+ * keeps working unchanged.
  */
 export const ASSESSMENT_TYPES = ['pretest', 'quiz', 'posttest'] as const
 export type AssessmentType = (typeof ASSESSMENT_TYPES)[number]
+
+/** The one and only final assessment config document. */
+export const FINAL_ASSESSMENT_DOC_ID = 'config'
 
 export const ROLES = {
   STUDENT: 'student',

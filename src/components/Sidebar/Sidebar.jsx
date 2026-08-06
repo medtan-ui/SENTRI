@@ -42,6 +42,7 @@ const ADMIN_NAV = [
       { label: 'Modules', path: '/admin/modules', icon: 'book' },
       { label: 'Scenarios', path: '/admin/scenarios', icon: 'shield' },
       { label: 'Quiz Manager', path: '/admin/quizzes', icon: 'quiz' },
+      { label: 'Final Assessment', path: '/admin/final-assessment', icon: 'trophy' },
     ],
   },
   {

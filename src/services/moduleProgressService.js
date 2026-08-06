@@ -59,10 +59,9 @@ function defaultProgress(userId, moduleId, moduleOrder, isUnlocked) {
     preTestCompleted: false,
     preTestScore: null,
     preTestCompletedAt: null,
-    postTestCompleted: false,
-    postTestScore: null,
-    postTestCompletedAt: null,
-    normalizedGain: null,
+    // No post-test fields: the "after" measurement is the single
+    // end-of-curriculum final assessment, and its score and normalized
+    // gain live in finalAssessmentProgress/{userId}, not here.
     lessonStarted: false,
     lessonCompleted: false,
     simulationCompleted: false,

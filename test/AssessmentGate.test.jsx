@@ -5,13 +5,15 @@ import userEvent from '@testing-library/user-event'
 import AssessmentGate from '../src/components/AssessmentGate/AssessmentGate'
 
 /**
- * AssessmentGate is the single form behind both the pre-test and the
- * post-test, so a regression here breaks both ends of the pre/post
- * measurement at once. The behaviours worth pinning are the ones a
- * reviewer can't see by reading the JSX: that submit stays locked until
- * every item is answered, that per-question durations are actually
- * measured and sent, and that the post-test's before/after panel only
- * appears when there is a real pre-test score to compare against.
+ * AssessmentGate is the form behind every module's pre-test — the
+ * "before" half of the learning-gain measurement. (The "after" half is no
+ * longer a per-module post-test; it's the single end-of-curriculum final
+ * assessment, which is graded and so has its own page.)
+ *
+ * The behaviours worth pinning are the ones a reviewer can't see by
+ * reading the JSX: that submit stays locked until every item is answered,
+ * that per-question durations are actually measured and sent, and that
+ * nothing here ever reads as pass/fail.
  */
 const assessment = {
   title: 'Password Security — Pre-Test',
@@ -143,37 +145,22 @@ describe('AssessmentGate', () => {
     expect(screen.getByText(assessment.questions[0].text)).toBeInTheDocument()
   })
 
-  it('uses post-test wording in the post-test variant', () => {
-    renderGate({ variant: 'posttest' })
-    expect(screen.getByRole('button', { name: /submit post-test/i })).toBeInTheDocument()
-    expect(screen.getByText(/same 2 questions you answered before the lesson/i)).toBeInTheDocument()
-  })
-
-  it('shows the before/after comparison on a post-test result', async () => {
-    const onSubmit = vi
-      .fn()
-      .mockResolvedValue({ score: 80, correctCount: 4, total: 5, preTestScore: 40, normalizedGain: 0.67 })
-    renderGate({ variant: 'posttest', onSubmit })
+  it('never shows a pass/fail verdict — a pre-test is a baseline, not a gate', async () => {
+    // The one property that separates this form from the graded quiz and
+    // the graded final assessment. A student who scores badly on a
+    // baseline must not be told they failed anything. Deliberately not a
+    // blanket search for "passing": the reassurance copy says there is no
+    // passing score, which is the very thing being asserted.
+    const onSubmit = vi.fn().mockResolvedValue({ score: 20, correctCount: 1, total: 5 })
+    renderGate({ onSubmit })
     await userEvent.click(screen.getByLabelText('Being long and unique'))
     await userEvent.click(screen.getByLabelText('No'))
-    await userEvent.click(screen.getByRole('button', { name: /submit post-test/i }))
+    await userEvent.click(screen.getByRole('button', { name: /submit pre-test/i }))
 
-    expect(await screen.findByText('Post-Test Complete')).toBeInTheDocument()
-    expect(screen.getByText('40%')).toBeInTheDocument()
-    expect(screen.getByText('80%')).toBeInTheDocument()
-    expect(screen.getByText(/40 percentage points better/)).toBeInTheDocument()
-  })
-
-  it('omits the comparison when there is no pre-test score to compare against', async () => {
-    // A student who somehow reached the post-test without a pre-test must
-    // not be shown a fabricated "before" figure.
-    const onSubmit = vi.fn().mockResolvedValue({ score: 80, correctCount: 4, total: 5, preTestScore: null })
-    renderGate({ variant: 'posttest', onSubmit })
-    await userEvent.click(screen.getByLabelText('Being long and unique'))
-    await userEvent.click(screen.getByLabelText('No'))
-    await userEvent.click(screen.getByRole('button', { name: /submit post-test/i }))
-
-    expect(await screen.findByText('Post-Test Complete')).toBeInTheDocument()
-    expect(screen.queryByText('Before')).not.toBeInTheDocument()
+    expect(await screen.findByText('Pre-Test Complete')).toBeInTheDocument()
+    expect(screen.queryByText(/\b(you )?(passed|failed)\b/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/\bnot? pass\b/i)).not.toBeInTheDocument()
+    // The score is still reported — it's the verdict that's absent.
+    expect(screen.getByText(/1 of 5 correctly \(20%\)/i)).toBeInTheDocument()
   })
 })

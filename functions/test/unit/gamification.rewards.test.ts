@@ -48,7 +48,8 @@ const NO_TOTALS: GamificationTotals = {
   quizzesCompleted: 0,
   modulesCompleted: 0,
   pretestsCompleted: 0,
-  posttestsCompleted: 0,
+  finalAssessmentCompleted: false,
+  finalAssessmentPassed: false,
   perfectQuizzes: 0,
   bestQuizScore: null,
   averageQuizScore: null,
@@ -91,7 +92,6 @@ describe('pointsForModule', () => {
       simulationCompleted: true,
       quizCompleted: true,
       score: 90,
-      postTestCompleted: true,
       moduleCompleted: true,
     })
     const once = pointsForModule(progress)
@@ -106,11 +106,12 @@ describe('pointsForModule', () => {
       simulationCompleted: true,
       quizCompleted: true,
       score: 100,
-      postTestCompleted: true,
       moduleCompleted: true,
     })
-    // 10 + 20 + 40 + (25 + 50 + 25) + 15 + 60
-    expect(pointsForModule(perfect)).toBe(245)
+    // 10 + 20 + 40 + (25 + 50 + 25) + 60. The final assessment is no
+    // longer part of a module's worth — it's one event at the end of the
+    // curriculum, scored separately by pointsForFinalAssessment.
+    expect(pointsForModule(perfect)).toBe(230)
   })
 })
 
@@ -155,13 +156,19 @@ describe('totalsFrom', () => {
     expect(totals.averageQuizScore).toBeNull()
   })
 
-  it('takes the best normalized gain across every module that has one', () => {
-    const rows = [
-      makeProgress({ normalizedGain: 0.4 }),
-      makeProgress({ moduleId: 'phishing-awareness', normalizedGain: 1 }),
-      makeProgress({ moduleId: 'safe-browsing' }),
-    ]
-    expect(totalsFrom(rows, 0, 0).bestNormalizedGain).toBe(1)
+  it('takes the normalized gain from the final assessment, not from any module row', () => {
+    // There is exactly one gain per student now — the end-of-curriculum
+    // final assessment against the average of their six pre-tests — so
+    // this reads from that document rather than picking a best-of-six.
+    const rows = [makeProgress(), makeProgress({ moduleId: 'phishing-awareness' })]
+    const finalDoc = { completed: true, passed: true, normalizedGain: 0.72 }
+    expect(totalsFrom(rows, 0, 0, [], finalDoc).bestNormalizedGain).toBe(0.72)
+  })
+
+  it('reports no gain until the final assessment has actually been taken', () => {
+    const rows = [makeProgress({ moduleCompleted: true })]
+    expect(totalsFrom(rows, 0, 0).bestNormalizedGain).toBeNull()
+    expect(totalsFrom(rows, 0, 0).finalAssessmentCompleted).toBe(false)
   })
 })
 
@@ -308,7 +315,8 @@ describe('badges', () => {
       const earnedByEverythingElse = badge.earned({
         ...NO_TOTALS,
         lessonsCompleted: 9, simulationsCompleted: 9, quizzesCompleted: 9, modulesCompleted: 9,
-        pretestsCompleted: 9, posttestsCompleted: 9, perfectQuizzes: 9, flawlessSimulations: 9,
+        pretestsCompleted: 9, finalAssessmentCompleted: true, finalAssessmentPassed: true,
+        perfectQuizzes: 9, flawlessSimulations: 9,
         bestQuizScore: 100, averageQuizScore: 100, bestNormalizedGain: 1,
       })
       expect(earnedByStreakAlone).toBe(true)

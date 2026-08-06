@@ -40,10 +40,6 @@ export function defaultProgress(
     preTestCompleted: false,
     preTestScore: null,
     preTestCompletedAt: null,
-    postTestCompleted: false,
-    postTestScore: null,
-    postTestCompletedAt: null,
-    normalizedGain: null,
     // One attempt unless an admin explicitly grants another.
     attemptsAllowed: 1,
     retryGrantedBy: null,

@@ -7,20 +7,29 @@ import Button from '../../../components/Button/Button'
 import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../components/ErrorState/ErrorState'
 import { useStudentModules } from '../../../hooks/useStudentModules'
+import { useFinalAssessment } from '../../../hooks/useFinalAssessment'
 import { MODULE_STATUS } from '../../../services/moduleProgressService'
 import styles from './StudentQuizOverviewPage.module.css'
 
 /**
  * StudentQuizOverviewPage — /student/quiz
  * A directory of every module's quiz status — completed (with score),
- * available now, or locked (naming what to finish first). The actual
- * quiz-taking flow is unchanged, at /student/modules/:moduleId/quiz
- * (StudentQuizPage) — this page is purely a status overview, distinct
- * from that one.
+ * available now, or locked (naming what to finish first) — plus the one
+ * final assessment that unlocks after all six. The actual quiz-taking
+ * flow is unchanged, at /student/modules/:moduleId/quiz (StudentQuizPage)
+ * — this page is purely a status overview, distinct from that one.
  */
 export default function StudentQuizOverviewPage() {
   const navigate = useNavigate()
   const { status, errorMessage, retry, modules } = useStudentModules()
+  const {
+    unlocked: finalUnlocked,
+    completed: finalCompleted,
+    passed: finalPassed,
+    progress: finalProgress,
+    completedModules,
+    totalModules,
+  } = useFinalAssessment()
 
   return (
     <DashboardLayout role="student">
@@ -94,6 +103,37 @@ export default function StudentQuizOverviewPage() {
                 </Card>
               )
             })}
+
+            {/* ── The final assessment ──
+                Deliberately last and visually set apart: it isn't a
+                seventh module quiz, it's the one test that covers all
+                six and only opens once they're done. */}
+            <Card className={styles.finalRow} data-locked={!finalUnlocked}>
+              <div className={styles.rowInfo}>
+                <span className={styles.finalIcon}>
+                  <Icon name={finalUnlocked ? 'trophy' : 'lock'} size={18} />
+                </span>
+                <div>
+                  <h2 className={styles.rowTitle}>Final Assessment</h2>
+                  <p className={styles.rowMeta}>
+                    {finalCompleted
+                      ? `${finalPassed ? 'Passed' : 'Completed'} — scored ${finalProgress?.score ?? 0}%`
+                      : finalUnlocked
+                        ? 'Every module is complete. This covers all six.'
+                        : `Complete all ${totalModules || 6} modules to unlock — ${completedModules} done so far.`}
+                  </p>
+                </div>
+              </div>
+              {finalCompleted ? (
+                <span className={styles.badgeDone}><Icon name="check" size={13} /> Done</span>
+              ) : finalUnlocked ? (
+                <Button variant="primary" onClick={() => navigate('/student/final-assessment')}>
+                  Start →
+                </Button>
+              ) : (
+                <span className={styles.badgeLocked}>Locked</span>
+              )}
+            </Card>
           </div>
         )}
       </div>

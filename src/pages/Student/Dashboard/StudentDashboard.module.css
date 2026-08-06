@@ -252,3 +252,90 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Final assessment callout ─────────────────────────────────────────
+   Appears under the module grid only once all six are done. Gold-edged
+   so it reads as an event rather than a seventh card in the grid. */
+.finalCallout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.finalCallout[data-done='true'] {
+  border-color: var(--color-success);
+}
+
+.finalCalloutIcon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.finalCallout[data-done='true'] .finalCalloutIcon {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.finalCalloutText {
+  flex: 1;
+  min-width: 0;
+}
+
+.finalCalloutTitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.finalCalloutBody {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.finalCalloutCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-gold);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: var(--space-3) var(--space-5);
+  box-shadow: var(--shadow-button);
+  transition: background var(--transition-fast);
+}
+
+.finalCalloutCta:hover {
+  background: var(--color-gold-dark);
+}
+
+@media (max-width: 600px) {
+  .finalCallout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .finalCalloutCta {
+    width: 100%;
+    justify-content: center;
+  }
+}

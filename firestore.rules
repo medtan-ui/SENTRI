@@ -116,6 +116,32 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ── Final assessment ─────────────────────────────────────────────
+    // One config document for the whole curriculum (id 'config'), not one
+    // per module — the six per-module post-tests were replaced by this
+    // single end-of-curriculum test. Same lazy-seed shape as
+    // moduleQuizzes: any signed-in user may read it (that read IS the
+    // student assessment page), a student may create it if they are the
+    // first to open it, and only an admin may edit it afterward. It
+    // carries correctChoiceId for the same accepted tradeoff documented
+    // above — grading itself is server-side, in submitFinalAssessment.
+    match /finalAssessment/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && docId == 'config';
+      allow update, delete: if isAdmin();
+    }
+
+    // A student's own final assessment result. Written exclusively by the
+    // submitFinalAssessment Cloud Function (Admin SDK, bypasses these
+    // rules) — the score, the pass flag, the attempt count and the stored
+    // normalized gain are all things a student must not be able to set
+    // for themselves, so every client write is denied outright. Reads are
+    // own-document or admin, matching moduleProgress.
+    match /finalAssessmentProgress/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if false;
+    }
+
     // ── Student module progress ──────────────────────────────────────
     // Doc id is `${userId}_${moduleId}`; the userId field is the actual
     // ownership check (the id format is a convention, not something

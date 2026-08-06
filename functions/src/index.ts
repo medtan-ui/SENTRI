@@ -39,6 +39,8 @@ export { submitQuiz } from './modules/quiz/controllers'
 
 export { submitAssessment } from './modules/assessment/controllers'
 
+export { submitFinalAssessment, updateFinalAssessment } from './modules/finalAssessment/controllers'
+
 
 
 export {
@@ -56,6 +58,7 @@ export {
   getMyGamification,
   recordDailyVisit,
   updateGamificationOnBehaviour,
+  updateGamificationOnFinalAssessment,
   updateGamificationOnProgress,
 } from './modules/gamification/controllers'
 
