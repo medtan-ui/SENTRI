@@ -73,7 +73,6 @@ const modules = [
 const gamification = {
   userId: 'student-1',
   displayName: 'Ana',
-  section: 'BSIT 1-A',
   points: 400,
   level: 3,
   rankName: 'Analyst',
@@ -96,14 +95,12 @@ const catalog = [
 ]
 
 const leaderboard = {
-  scope: 'all',
-  section: null,
   totalRanked: 24,
   entries: [
-    { userId: 'a', displayName: 'Bea', section: null, points: 700, level: 4, rankName: 'Specialist', currentStreak: 6, badgeCount: 5, rank: 1, isYou: false },
-    { userId: 'student-1', displayName: 'Ana', section: null, points: 400, level: 3, rankName: 'Analyst', currentStreak: 4, badgeCount: 2, rank: 2, isYou: true },
+    { userId: 'a', displayName: 'Bea', points: 700, level: 4, rankName: 'Specialist', currentStreak: 6, badgeCount: 5, rank: 1, isYou: false },
+    { userId: 'student-1', displayName: 'Ana', points: 400, level: 3, rankName: 'Analyst', currentStreak: 4, badgeCount: 2, rank: 2, isYou: true },
   ],
-  you: { userId: 'student-1', displayName: 'Ana', section: null, points: 400, level: 3, rankName: 'Analyst', currentStreak: 4, badgeCount: 2, rank: 2, isYou: true },
+  you: { userId: 'student-1', displayName: 'Ana', points: 400, level: 3, rankName: 'Analyst', currentStreak: 4, badgeCount: 2, rank: 2, isYou: true },
 }
 
 let modulesState = { status: 'success', errorMessage: '', retry: vi.fn(), modules }
@@ -281,6 +278,8 @@ describe('StudentProgressPage', () => {
     await user.click(screen.getByRole('tab', { name: 'Leaderboard' }))
 
     await waitFor(() => expect(screen.getByText('Bea')).toBeInTheDocument())
-    expect(screen.getByRole('tab', { name: 'My class' })).toBeInTheDocument()
+    // The total is what makes a rank mean anything — "2nd" alone doesn't
+    // say whether that is out of three students or thirty.
+    expect(screen.getByText('24 students ranked')).toBeInTheDocument()
   })
 })

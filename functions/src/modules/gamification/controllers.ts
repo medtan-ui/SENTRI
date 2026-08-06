@@ -56,7 +56,7 @@ const REWARDABLE_FIELDS: Array<keyof ModuleProgressDoc> = [
   'simulationCompleted',
   'quizCompleted',
   'moduleCompleted',
-  'pretestCompleted',
+  'preTestCompleted',
   'postTestCompleted',
   'score',
 ]
@@ -126,7 +126,7 @@ export const updateGamificationOnProgress = onDocumentWritten(
  *
  * "First Defender" needs to know a scenario was cleared with no risky
  * choice, and only `learningAnalytics` records that. Those counters are
- * written by their own trigger off scenario_decision_records, so the
+ * written by their own trigger off scenarioDecisionRecords, so the
  * progress trigger above can fire before the last decision has been
  * counted — the badge would then not appear until the student's next
  * completed step, which on the final module could be never.

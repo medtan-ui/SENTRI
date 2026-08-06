@@ -1,12 +1,12 @@
 /**
  * scenarioDecisionService.js
- * Writes one scenario_decision_records document per decision (including
- * retries) — the exact field names match the project ERD. This is the
- * only Firestore-aware file the engine touches; useScenarioEngine calls
- * these functions, never Firestore directly.
+ * Writes one scenarioDecisionRecords document per decision (including
+ * retries), under the same field names the backend's own recordDecision
+ * writes. This is the only Firestore-aware file the engine touches;
+ * useScenarioEngine calls these functions, never Firestore directly.
  *
  * Analytics aggregates are NOT computed here or anywhere client-side —
- * aggregateStudentAnalytics (a Cloud Function) reads is_safe_choice back
+ * aggregateStudentAnalytics (a Cloud Function) reads isSafeChoice back
  * out of every doc this writes.
  *
  * A recording failure must never block learning: every function here
@@ -15,7 +15,7 @@
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../../../services/firebase'
 
-const COLLECTION = 'scenario_decision_records'
+const COLLECTION = 'scenarioDecisionRecords'
 
 /**
  * `attemptNumber` and `durationMs` are what the Kirkpatrick Level 3
@@ -45,15 +45,15 @@ export async function recordDecision({
 }) {
   try {
     const ref = await addDoc(collection(db, COLLECTION), {
-      user_id: userId,
-      module_id: moduleId,
-      scenario_id: scenarioId,
-      scenario_choice_id: choiceId,
-      is_safe_choice: isSafe,
-      attempt_number: attemptNumber,
-      duration_ms: typeof durationMs === 'number' && durationMs >= 0 ? Math.round(durationMs) : null,
-      selected_at: serverTimestamp(),
-      feedback_viewed: false,
+      userId,
+      moduleId,
+      scenarioId,
+      scenarioChoiceId: choiceId,
+      isSafeChoice: isSafe,
+      attemptNumber,
+      durationMs: typeof durationMs === 'number' && durationMs >= 0 ? Math.round(durationMs) : null,
+      selectedAt: serverTimestamp(),
+      feedbackViewed: false,
     })
     return ref.id
   } catch (err) {
@@ -70,7 +70,7 @@ export async function recordDecision({
 export async function markFeedbackViewed(decisionId) {
   if (!decisionId) return
   try {
-    await updateDoc(doc(db, COLLECTION, decisionId), { feedback_viewed: true })
+    await updateDoc(doc(db, COLLECTION, decisionId), { feedbackViewed: true })
   } catch (err) {
     console.error('[scenarioDecisionService] markFeedbackViewed failed:', err)
   }

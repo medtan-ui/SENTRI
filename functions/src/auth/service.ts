@@ -7,7 +7,7 @@
 import { AppError } from '../shared/errors'
 import { REAL_MODULE_IDS } from '../shared/constants'
 import { initializeAllProgressForUser } from '../modules/progress/service'
-import { aggregateAllCohortScopes, aggregateModuleAnalytics } from '../modules/analytics/service'
+import { aggregateCohortAnalytics, aggregateModuleAnalytics } from '../modules/analytics/service'
 import * as repo from './repository'
 import {
   ChangeOwnPasswordInput,
@@ -16,16 +16,8 @@ import {
   RegisterStudentAccountInput,
   ResetUserPasswordInput,
   SetUserAccountStatusInput,
-  SetUserSectionInput,
   UpdateOwnNicknameInput,
 } from './models'
-
-/** '' and '   ' both mean "no section" — collapse them before storing so
- * grouping never has to treat blank-ish values as a distinct group. */
-function cleanSection(section: string | null | undefined): string | null {
-  const trimmed = typeof section === 'string' ? section.trim() : ''
-  return trimmed.length > 0 ? trimmed : null
-}
 
 export async function createUserAccount(
   actor: { uid: string; email: string | null },
@@ -47,7 +39,6 @@ export async function createUserAccount(
       email: normalizedEmail,
       status: 'active',
       mustChangePassword: true,
-      section: cleanSection(input.section),
     })
   } catch (err) {
     // The Auth user was already created above — without this cleanup it
@@ -68,7 +59,7 @@ export async function createUserAccount(
     actorEmail: actor.email,
     targetUid: userRecord.uid,
     targetEmail: normalizedEmail,
-    details: { role: input.role, section: cleanSection(input.section) },
+    details: { role: input.role },
   })
 
   if (input.role === 'student') {
@@ -111,7 +102,6 @@ export async function registerStudentAccount(input: RegisterStudentAccountInput)
       email: normalizedEmail,
       status: 'active',
       mustChangePassword: false,
-      section: cleanSection(input.section),
     })
   } catch (err) {
     console.error(
@@ -194,17 +184,14 @@ export async function deleteUserAccount(
     }
   })
 
-  // The cohort rollups are cached singletons for the same reason the
-  // module ones are, so they need the same treatment: without this, the
+  // The cohort rollup is a cached singleton for the same reason the
+  // module ones are, so it needs the same treatment: without this, the
   // dashboard's headline student counts and learning gain would keep
   // including a deleted student until the nightly job caught up. Failures
   // are logged and swallowed — the account is already gone, and the next
   // scheduled run recomputes from the (now clean) raw data anyway.
   try {
-    const cohortResult = await aggregateAllCohortScopes()
-    if (cohortResult.failures.length > 0) {
-      console.error('[deleteUserAccount] cohort recompute partially failed — continuing:', input.uid, cohortResult.failures)
-    }
+    await aggregateCohortAnalytics()
   } catch (err) {
     console.error('[deleteUserAccount] cohort recompute failed — continuing:', input.uid, err)
   }
@@ -267,36 +254,6 @@ export async function setUserAccountStatus(
   })
 
   return { success: true }
-}
-
-/**
- * Assigns a student to a class group, or clears the assignment with null.
- * Audit-logged like every other admin action on someone else's account:
- * moving a student between sections moves which cohort report their
- * results land in, so it should be traceable to who did it.
- */
-export async function setUserSection(
-  actor: { uid: string; email: string | null },
-  input: SetUserSectionInput,
-) {
-  const section = cleanSection(input.section)
-  const target = await repo.getUserProfile(input.uid)
-  if (!target) {
-    throw new AppError('not-found', 'No account found for this user.')
-  }
-
-  await repo.setUserSection(input.uid, section)
-
-  await repo.writeAuditLog({
-    action: 'set_user_section',
-    actorUid: actor.uid,
-    actorEmail: actor.email,
-    targetUid: input.uid,
-    targetEmail: target.email ?? null,
-    details: { from: cleanSection(target.section), to: section },
-  })
-
-  return { success: true, section }
 }
 
 export async function changeOwnPassword(uid: string, input: ChangeOwnPasswordInput) {

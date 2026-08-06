@@ -57,8 +57,8 @@ export async function recordDailyVisit() {
 }
 
 /**
- * @param {{ scope?: 'all'|'section', limit?: number }} [options]
- * @returns {Promise<{ scope: string, section: string|null, entries: object[], you: object|null, totalRanked: number }>}
+ * @param {{ limit?: number }} [options]
+ * @returns {Promise<{ entries: object[], you: object|null, totalRanked: number }>}
  */
 export async function getLeaderboard(options = {}) {
   try {

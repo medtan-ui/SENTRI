@@ -98,13 +98,6 @@ export interface StudentTimelinePoint {
  * instructor reads instead of six separate module cards.
  */
 export interface CohortAnalyticsDoc {
-  /**
-   * Which class group this rollup covers, as typed, or null for the
-   * whole cohort. Stored on the document rather than inferred from its id
-   * so a report always carries its own scope — a segmented figure read
-   * without knowing it was segmented is worse than no figure.
-   */
-  section: string | null
   totalStudents: number
   activeStudents: number
   studentsCompletedAll: number

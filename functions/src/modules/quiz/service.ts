@@ -17,7 +17,7 @@
  * every read first, then write" shape used in modules/progress/service.ts.
  *
  * ── Per-question capture ─────────────────────────────────────────────
- * Every graded answer is also written to `quiz_responses` (one document
+ * Every graded answer is also written to `quizResponses` (one document
  * per question), which is the grain item difficulty and per-topic
  * analysis need. That write happens *after* the transaction commits: it
  * is analytics, and losing a student's graded attempt because an

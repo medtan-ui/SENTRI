@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Icon from '../Icon/Icon'
 import styles from './TourGuide.module.css'
 
@@ -32,11 +32,20 @@ const EDGE = 12
 export default function TourGuide({ steps, onFinish }) {
   const [index, setIndex] = useState(0)
   const [rect, setRect] = useState(null)
+  const openedMenuRef = useRef(false)
 
-  // Only steps whose anchor actually exists. Recomputed on mount rather
-  // than per render so the total can't change under the student.
+  // Only steps whose anchor actually exists AND is something a target
+  // could actually be shown for — a step whose element is CSS-hidden at
+  // this viewport (e.g. the navbar reward chips, hidden under 480px)
+  // would otherwise measure to a zero-size rect and spotlight nothing.
+  // An element that's merely off-canvas (the collapsed mobile sidebar)
+  // still passes this: that case is recovered below by opening it.
   const [liveSteps] = useState(() =>
-    steps.filter((step) => !step.target || document.querySelector(`[data-tour="${step.target}"]`)),
+    steps.filter((step) => {
+      if (!step.target) return true
+      const el = document.querySelector(`[data-tour="${step.target}"]`)
+      return Boolean(el) && window.getComputedStyle(el).display !== 'none'
+    }),
   )
 
   const step = liveSteps[index]
@@ -72,10 +81,36 @@ export default function TourGuide({ steps, onFinish }) {
   useEffect(() => {
     if (!step?.target) return undefined
     const el = document.querySelector(`[data-tour="${step.target}"]`)
-    el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    const timer = setTimeout(measure, 320)
+    if (!el) return undefined
+
+    // A target whose box sits entirely outside the horizontal viewport is
+    // the collapsed mobile sidebar (translateX(-100%), not display:none —
+    // see the liveSteps filter above) rather than something scrollIntoView
+    // can fix. Open it via the navbar's toggle so the real target is on
+    // screen for the spotlight to land on, and remember to close it again
+    // once the tour ends.
+    const box = el.getBoundingClientRect()
+    const offCanvas = box.right <= 0 || box.left >= window.innerWidth
+    if (offCanvas) {
+      document.querySelector('[data-tour-menu-toggle]')?.click()
+      openedMenuRef.current = true
+    } else {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+
+    const timer = setTimeout(measure, offCanvas ? 380 : 320)
     return () => clearTimeout(timer)
   }, [step, measure])
+
+  // Close the sidebar again on the way out, but only if this tour was the
+  // one that opened it.
+  useEffect(() => {
+    return () => {
+      if (openedMenuRef.current) {
+        document.querySelector('[data-tour-menu-toggle]')?.click()
+      }
+    }
+  }, [])
 
   useLayoutEffect(measure, [measure])
 

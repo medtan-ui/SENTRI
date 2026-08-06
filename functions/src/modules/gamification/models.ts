@@ -16,7 +16,6 @@ export interface GamificationDoc {
   userId: string
   /** Denormalized from users/{uid} so the leaderboard needs one read, not two. */
   displayName: string
-  section: string | null
 
   points: number
   level: number
@@ -49,7 +48,6 @@ export interface GamificationDoc {
 export interface LeaderboardEntry {
   userId: string
   displayName: string
-  section: string | null
   points: number
   level: number
   rankName: string
@@ -60,8 +58,6 @@ export interface LeaderboardEntry {
 }
 
 export interface LeaderboardResult {
-  scope: 'all' | 'section'
-  section: string | null
   entries: LeaderboardEntry[]
   /** The caller's own standing, even when they placed outside the returned rows. */
   you: LeaderboardEntry | null
@@ -69,6 +65,5 @@ export interface LeaderboardResult {
 }
 
 export interface GetLeaderboardInput {
-  scope?: 'all' | 'section'
   limit?: number
 }

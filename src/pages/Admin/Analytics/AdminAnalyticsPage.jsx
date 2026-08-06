@@ -10,7 +10,6 @@ import {
   aggregateModuleAnalytics,
   getCohortAnalytics,
   getModuleAnalytics,
-  listSections,
 } from '../../../services/analyticsService'
 import CohortSummaryCard from './CohortSummaryCard'
 import ExportToolbar from './ExportToolbar'
@@ -21,11 +20,10 @@ import styles from './AdminAnalyticsPage.module.css'
  * AdminAnalyticsPage — /admin/analytics
  * Two levels of reporting, both computed server-side and only read here:
  *
- *   Cohort  — aggregateCohortAnalytics → cohortAnalytics/{scope}.
+ *   Cohort  — aggregateCohortAnalytics → cohortAnalytics/current.
  *             Class-wide learning gain, behaviour, cross-module transfer,
  *             and the 30-day activity trend. This is the level the
- *             capstone's own objectives are reported at, and it can be
- *             scoped to a single section rather than the whole school.
+ *             capstone's own objectives are reported at.
  *   Module  — aggregateModuleAnalytics → moduleAnalytics/{moduleId}.
  *             Completion and pass rates as before, plus this module's
  *             pre/post gain, per-topic mastery, and item analysis.
@@ -35,14 +33,6 @@ import styles from './AdminAnalyticsPage.module.css'
  * derivation (functions/src/modules/analytics/metrics.ts). The same holds
  * for the CSV exports: they serialize these documents, they don't re-derive
  * them.
- *
- * A note on what the section picker does and doesn't scope: the cohort
- * rollup is per-section, but the per-module cards below are not. Module
- * analytics are keyed by module id alone, and inventing a per-section
- * variant of them would double the aggregate documents to answer a
- * question the cohort card's module breakdown already answers per section.
- * The heading below says so, rather than leaving an admin to assume the
- * filter reaches further than it does.
  */
 export default function AdminAnalyticsPage() {
   const { status, errorMessage, retry, modules } = useModuleList()
@@ -51,8 +41,6 @@ export default function AdminAnalyticsPage() {
   const [refreshingAll, setRefreshingAll] = useState(false)
   const [cohort, setCohort] = useState(undefined) // undefined = loading
   const [refreshingCohort, setRefreshingCohort] = useState(false)
-  const [sections, setSections] = useState([])
-  const [section, setSection] = useState(null) // null = whole cohort
 
   const loadSummaries = useCallback(async (moduleList) => {
     const entries = await Promise.all(
@@ -67,34 +55,15 @@ export default function AdminAnalyticsPage() {
     }
   }, [status, modules, loadSummaries])
 
-  // Re-reads whenever the scope changes, so switching sections can never
-  // leave the previous group's numbers on screen under a new label.
   useEffect(() => {
     let cancelled = false
     setCohort(undefined)
-    getCohortAnalytics(section)
+    getCohortAnalytics()
       .then((data) => {
         if (!cancelled) setCohort(data)
       })
       .catch(() => {
         if (!cancelled) setCohort(null)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [section])
-
-  // A section that no longer has students in it simply stops being
-  // offered — the picker is derived from the roster, never from the
-  // aggregate documents, which outlive the accounts that produced them.
-  useEffect(() => {
-    let cancelled = false
-    listSections()
-      .then((result) => {
-        if (!cancelled) setSections(result)
-      })
-      .catch((err) => {
-        console.error('[AdminAnalyticsPage] section list failed:', err)
       })
     return () => {
       cancelled = true
@@ -116,7 +85,7 @@ export default function AdminAnalyticsPage() {
   async function refreshCohort() {
     setRefreshingCohort(true)
     try {
-      setCohort(await aggregateCohortAnalytics(section))
+      setCohort(await aggregateCohortAnalytics())
     } catch (err) {
       console.error('[AdminAnalyticsPage] cohort refresh failed:', err)
     } finally {
@@ -132,10 +101,7 @@ export default function AdminAnalyticsPage() {
     }
     // The cohort rollup reads the same underlying collections, so it is
     // refreshed last rather than in parallel — no point recomputing it
-    // from data the per-module pass is still updating. Only the selected
-    // scope is recomputed, not every section: this is the "I want the
-    // current number now" path, and the nightly job is what keeps the
-    // sections nobody is looking at up to date.
+    // from data the per-module pass is still updating.
     await refreshCohort()
     setRefreshingAll(false)
   }
@@ -151,31 +117,16 @@ export default function AdminAnalyticsPage() {
             </p>
           </div>
           <div className={styles.headerActions} data-print-hide>
-            <select
-              className={styles.sectionSelect}
-              value={section ?? ''}
-              onChange={(e) => setSection(e.target.value || null)}
-              aria-label="Report on a section"
-              disabled={refreshingCohort || refreshingAll}
-            >
-              <option value="">All sections</option>
-              {sections.map((s) => (
-                <option key={s.key} value={s.label}>
-                  {s.label} ({s.studentCount})
-                </option>
-              ))}
-            </select>
             <Button variant="primary" onClick={refreshAll} loading={refreshingAll} disabled={refreshingAll}>
               Refresh All
             </Button>
           </div>
         </div>
 
-        <ExportToolbar cohort={cohort} modules={modules} summaries={summaries} section={section} />
+        <ExportToolbar cohort={cohort} modules={modules} summaries={summaries} />
 
         <CohortSummaryCard
           summary={cohort === undefined ? null : cohort}
-          section={section}
           refreshing={refreshingCohort || refreshingAll}
           onRefresh={refreshCohort}
         />
@@ -187,9 +138,7 @@ export default function AdminAnalyticsPage() {
           <>
             <h2 className={styles.gridHeading}>
               Per Module
-              <span className={styles.gridHeadingNote}>
-                Across every student. These cards are not filtered by the section picker.
-              </span>
+              <span className={styles.gridHeadingNote}>Across every student.</span>
             </h2>
             <div className={styles.grid}>
             {modules.map((m) => {

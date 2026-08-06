@@ -1,6 +1,6 @@
 import React from 'react'
 import Button from '../../../components/Button/Button'
-import { downloadCsv, filenameSlug, isoDateStamp } from '../../../utils/exportCsv'
+import { downloadCsv, isoDateStamp } from '../../../utils/exportCsv'
 import {
   activityTrendRows,
   cohortSummaryRows,
@@ -27,13 +27,12 @@ import styles from './AdminAnalyticsPage.module.css'
  * here would otherwise be a header row and nothing else — a blank export
  * that looks like a failed feature rather than like missing data.
  */
-export default function ExportToolbar({ cohort, modules, summaries, section }) {
+export default function ExportToolbar({ cohort, modules, summaries }) {
   const stamp = isoDateStamp()
-  const slug = filenameSlug(section)
   const ready = Boolean(cohort)
 
   function exportFile(name, rows) {
-    downloadCsv(`sentri-${name}-${slug}-${stamp}`, rows)
+    downloadCsv(`sentri-${name}-${stamp}`, rows)
   }
 
   return (

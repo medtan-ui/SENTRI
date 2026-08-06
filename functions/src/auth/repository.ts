@@ -82,15 +82,6 @@ export async function setUserNickname(uid: string, nickname: string): Promise<vo
   await db.collection(COLLECTIONS.USERS).doc(uid).set({ nickname }, { merge: true })
 }
 
-/**
- * Assigns (or clears, with null) the class group this account reports
- * under. Merged rather than set so it can be added to profiles written
- * before sections existed without disturbing anything else on them.
- */
-export async function setUserSection(uid: string, section: string | null): Promise<void> {
-  await db.collection(COLLECTIONS.USERS).doc(uid).set({ section }, { merge: true })
-}
-
 export async function setUserProfile(uid: string, profile: UserProfile): Promise<void> {
   await db.collection(COLLECTIONS.USERS).doc(uid).set(profile)
 }
@@ -114,7 +105,7 @@ export async function deleteUserProfile(uid: string): Promise<void> {
  * auditLogs (the record that this deletion happened should outlive the
  * deletion itself).
  *
- * Every collection that stores a uid must be listed here. `quiz_responses`
+ * Every collection that stores a uid must be listed here. `quizResponses`
  * is the cautionary example: it was added later, for item analysis, and
  * missing it meant a deleted student's per-question answers stayed in the
  * corpus forever, still feeding topic mastery, item difficulty, and
@@ -123,7 +114,7 @@ export async function deleteUserProfile(uid: string): Promise<void> {
  * stay quietly wrong.
  *
  * `gamification` is the second such case, and it broke the rule more
- * visibly than quiz_responses ever did: it was added with the reward
+ * visibly than quizResponses ever did: it was added with the reward
  * layer and not listed here, so deleting a student left their points
  * document behind. Because the leaderboard is a straight ordered read of
  * that collection, the deleted student stayed on the board — and
@@ -140,7 +131,7 @@ export async function deleteStudentData(uid: string): Promise<void> {
   const queriedCollections: Array<[string, string]> = [
     [COLLECTIONS.QUIZ_ATTEMPTS, 'userId'],
     [COLLECTIONS.QUIZ_RESPONSES, 'userId'],
-    [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'user_id'],
+    [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'userId'],
     [COLLECTIONS.ANALYTICS_EVENTS, 'userId'],
   ]
   const queriedDeletes = queriedCollections.map(async ([collectionName, field]) => {
@@ -173,7 +164,6 @@ export interface ListedUser {
   nickname: string
   email: string
   status: string
-  section: string | null
   createdAt: string | null
 }
 
@@ -190,9 +180,6 @@ export async function listUserProfiles(): Promise<ListedUser[]> {
       nickname: data.nickname || data.displayName,
       email: data.email,
       status: data.status || 'active',
-      // Normalized to null here so every caller has one "no section" value
-      // instead of having to handle undefined, '', and null separately.
-      section: typeof data.section === 'string' && data.section.trim() ? data.section.trim() : null,
       createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,
     }
   })

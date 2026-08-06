@@ -16,7 +16,7 @@ import styles from './VideoSection.module.css'
  * being a separate switch an admin can leave out of sync with reality.
  */
 export default function VideoSection({ scenario, errors, onUpdate }) {
-  const materialUrl = scenario.material_url || ''
+  const materialUrl = scenario.materialUrl || ''
   const captionError = errors.find((e) => e.field === 'posterCaption')?.message || ''
 
   return (
@@ -26,28 +26,28 @@ export default function VideoSection({ scenario, errors, onUpdate }) {
       <YouTubePlayer url={materialUrl} title="Scenario clip" />
 
       <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-4)' }}>
-        <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-material_url`}>
+        <label className={forms.fieldLabel} htmlFor={`${scenario.scenarioId}-materialUrl`}>
           Material URL (YouTube link or video file)
         </label>
         <input
-          id={`${scenario.scenario_id}-material_url`}
+          id={`${scenario.scenarioId}-materialUrl`}
           type="text"
           className={styles.urlInput}
           value={materialUrl}
           onChange={(e) => {
             const value = e.target.value
-            onUpdate({ material_url: value || null, videoAvailable: Boolean(value.trim()) })
+            onUpdate({ materialUrl: value || null, videoAvailable: Boolean(value.trim()) })
           }}
           placeholder="https://www.youtube.com/watch?v=…"
         />
       </div>
 
       <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-3)' }}>
-        <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-posterCaption`}>
+        <label className={forms.fieldLabel} htmlFor={`${scenario.scenarioId}-posterCaption`}>
           Poster Caption <span className={styles.hint}>(shown while the scene loads, and in place of a missing clip)</span>
         </label>
         <input
-          id={`${scenario.scenario_id}-posterCaption`}
+          id={`${scenario.scenarioId}-posterCaption`}
           type="text"
           className={`${styles.urlInput} ${captionError ? forms.textareaError : ''}`}
           value={scenario.posterCaption || ''}

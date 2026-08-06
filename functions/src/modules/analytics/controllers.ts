@@ -5,7 +5,6 @@ import { COLLECTIONS } from '../../shared/constants'
 import { logError, logInfo } from '../../shared/logger'
 import { parseOrThrow } from '../../shared/validation'
 import { defineCallable } from '../../shared/withCallable'
-import * as repo from './repository'
 import * as service from './service'
 import {
   aggregateCohortAnalyticsSchema,
@@ -35,24 +34,12 @@ export const aggregateStudentAnalytics = defineCallable('aggregateStudentAnalyti
 /**
  * aggregateCohortAnalytics — the class-level rollup. Admin-only: it reads
  * across every student's progress and responses, so it is not something a
- * student may trigger or see. With a `section`, the same rollup is scoped
- * to one class group and written to that section's own document.
+ * student may trigger or see.
  */
 export const aggregateCohortAnalytics = defineCallable('aggregateCohortAnalytics', async (request) => {
   await requireAdmin(request)
-  const input = parseOrThrow(aggregateCohortAnalyticsSchema, request.data ?? {})
-  return service.aggregateCohortAnalytics(input.section ?? null)
-})
-
-/**
- * listSections — the class groups currently in use, with student counts.
- * Admin-only, and read from the account roster rather than a separate
- * collection, so the picker can never offer a section nobody is in.
- */
-export const listSections = defineCallable('listSections', async (request) => {
-  await requireAdmin(request)
-  const sections = await repo.listSections()
-  return { sections }
+  parseOrThrow(aggregateCohortAnalyticsSchema, request.data ?? {})
+  return service.aggregateCohortAnalytics()
 })
 
 /**
@@ -61,9 +48,9 @@ export const listSections = defineCallable('listSections', async (request) => {
  * Every aggregate in this backend used to exist only after somebody
  * clicked Refresh, which meant the dashboard's honest state on any given
  * morning was "as of whenever an admin last visited". This runs the exact
- * same work `Refresh All` does — six modules, the whole-cohort rollup, and
- * one rollup per section in use — so opening the page shows numbers that
- * are at most a day old without anyone having to remember.
+ * same work `Refresh All` does — six modules and the cohort rollup — so
+ * opening the page shows numbers that are at most a day old without
+ * anyone having to remember.
  *
  * On-demand refresh is deliberately kept: a schedule is the floor, not a
  * replacement for wanting the current figure right now (during a defense,
@@ -94,7 +81,6 @@ export const scheduledAnalyticsAggregation = onSchedule(
         durationMs: Date.now() - startedAt,
         outcome: result.failures.length > 0 ? 'partial' : 'success',
         modulesAggregated: result.modules,
-        sectionsAggregated: result.sections,
         failures: result.failures,
       })
     } catch (err) {
@@ -113,7 +99,7 @@ export const scheduledAnalyticsAggregation = onSchedule(
  * exactly the "a Cloud Function is expected to trigger off writes to this
  * collection" TODO already left in
  * src/features/scenario/services/scenarioDecisionService.js: every new
- * scenario_decision_records doc increments the matching student+module's
+ * scenarioDecisionRecords doc increments the matching student+module's
  * safe/risky counters.
  */
 export const updateLearningAnalytics = onDocumentCreated(
@@ -122,9 +108,9 @@ export const updateLearningAnalytics = onDocumentCreated(
     const data = event.data?.data()
     if (!data) return
 
-    const userId = data.user_id as string | undefined
-    const moduleId = data.module_id as string | undefined
-    const isSafe = Boolean(data.is_safe_choice)
+    const userId = data.userId as string | undefined
+    const moduleId = data.moduleId as string | undefined
+    const isSafe = Boolean(data.isSafeChoice)
     if (!userId || !moduleId) return
 
     const startedAt = Date.now()

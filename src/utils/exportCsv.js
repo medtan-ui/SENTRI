@@ -16,8 +16,8 @@
 
 /**
  * RFC 4180 escaping. A field is quoted whenever it contains a comma,
- * quote, or newline — a section label like "BSIT-3A, evening" would
- * otherwise silently split into two columns.
+ * quote, or newline — a module title like "Phishing, and how to spot it"
+ * would otherwise silently split into two columns.
  */
 function escapeField(value) {
   if (value === null || value === undefined) return ''
@@ -76,19 +76,3 @@ export function isoDateStamp(date = new Date()) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
-/**
- * Strips a section label down to something safe in a filename, so
- * "BSIT-3A / evening" can't produce a path separator.
- * @param {string|null} section
- * @returns {string}
- */
-export function filenameSlug(section) {
-  if (!section) return 'all-sections'
-  return (
-    section
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'all-sections'
-  )
-}

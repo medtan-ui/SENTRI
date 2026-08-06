@@ -7,7 +7,7 @@
  *
  * Grading moved server-side from the old client-side pre-test path for
  * two reasons. First, per-question responses have to be recorded
- * somewhere a student can't write (`quiz_responses` is Cloud
+ * somewhere a student can't write (`quizResponses` is Cloud
  * Functions-only), or item analysis is worthless. Second, normalized gain
  * compares a post-test score against a stored pre-test score, and a
  * client that can compute either could manufacture an improvement.
@@ -111,16 +111,16 @@ export async function submitAssessment(
       : defaultProgress(userId, moduleId, moduleDoc.moduleOrder, moduleDoc.moduleOrder === 1)
 
     if (assessmentType === 'pretest') {
-      if (current.pretestCompleted) {
+      if (current.preTestCompleted) {
         throw new AppError('failed-precondition', 'The pre-test for this module has already been submitted.')
       }
       txn.set(
         ref,
         {
           ...current,
-          pretestCompleted: true,
-          pretestScore: score,
-          pretestCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
+          preTestCompleted: true,
+          preTestScore: score,
+          preTestCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
           lastAccessed: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true },
@@ -139,7 +139,7 @@ export async function submitAssessment(
       throw new AppError('failed-precondition', 'The post-test for this module has already been submitted.')
     }
 
-    preTestScore = typeof current.pretestScore === 'number' ? current.pretestScore : null
+    preTestScore = typeof current.preTestScore === 'number' ? current.preTestScore : null
 
     txn.set(
       ref,

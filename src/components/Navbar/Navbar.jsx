@@ -33,6 +33,7 @@ export default function Navbar({ onToggleSidebar }) {
           className={styles.menuBtn}
           onClick={onToggleSidebar}
           aria-label="Toggle sidebar"
+          data-tour-menu-toggle
         >
           <Icon name="menu" size={20} />
         </button>

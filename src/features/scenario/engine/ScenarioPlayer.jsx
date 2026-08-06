@@ -11,7 +11,7 @@ import styles from './ScenarioPlayer.module.css'
  * the paused_interactive state after a short beat, whether or not a real
  * clip exists.
  *
- * `material_url` accepts either a YouTube link/id — the same format the
+ * `materialUrl` accepts either a YouTube link/id — the same format the
  * lesson video slot takes, so recording a clip and pasting its link into
  * Scenario Configuration is all that's needed — or a direct video file
  * URL, which plays inline via <video>.

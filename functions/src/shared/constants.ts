@@ -27,12 +27,12 @@ export const COLLECTIONS = {
   MODULE_PRETESTS: 'modulePretests',
   MODULE_ASSIGNMENTS: 'moduleAssignments',
   MODULE_PROGRESS: 'moduleProgress',
-  SCENARIO_DECISION_RECORDS: 'scenario_decision_records',
+  SCENARIO_DECISION_RECORDS: 'scenarioDecisionRecords',
   QUIZ_ATTEMPTS: 'quizAttempts',
   /** One document per answered question, across pre-test, quiz, and
    * post-test. This is the grain item analysis needs — a quizAttempts
    * document only carries a whole-attempt score. */
-  QUIZ_RESPONSES: 'quiz_responses',
+  QUIZ_RESPONSES: 'quizResponses',
   ANALYTICS_EVENTS: 'analyticsEvents',
   MODULE_ANALYTICS: 'moduleAnalytics',
   STUDENT_ANALYTICS: 'studentAnalytics',

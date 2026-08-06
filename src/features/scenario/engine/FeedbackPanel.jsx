@@ -26,7 +26,7 @@ import styles from './FeedbackPanel.module.css'
  * rather than seeing a marker saying they missed it.
  */
 export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry, onContinue }) {
-  const isSafe = choice.is_safe_choice
+  const isSafe = choice.isSafeChoice
   const guided = !isSafe && attemptCount >= 3
   const reflection = isSafe ? scenario?.postCompletionReflection : null
   const firstTry = isSafe && attemptCount === 0
@@ -49,8 +49,8 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
         <span className={styles.icon} data-tone={isSafe ? 'safe' : 'risky'} aria-hidden="true">
           <Icon name={isSafe ? 'check' : 'alert'} size={26} strokeWidth={1.7} />
         </span>
-        <h3 className={styles.title}>{choice.outcome_title}</h3>
-        <p className={styles.text}>{choice.feedback_text}</p>
+        <h3 className={styles.title}>{choice.outcomeTitle}</h3>
+        <p className={styles.text}>{choice.feedbackText}</p>
 
         {reflection && <p className={styles.reflection}>{reflection}</p>}
 

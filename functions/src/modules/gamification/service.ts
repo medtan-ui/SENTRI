@@ -32,7 +32,6 @@
  * un-earn the moment they finished it the first time.
  */
 import { admin } from '../../shared/admin'
-import { AppError } from '../../shared/errors'
 import { ModuleProgressDoc } from '../progress/models'
 import {
   BADGES,
@@ -49,8 +48,6 @@ import { BehaviourRow } from './repository'
 const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000
 const DEFAULT_LEADERBOARD_LIMIT = 10
 const MAX_LEADERBOARD_LIMIT = 50
-/** How deep to read before filtering by section in memory (see repository.topByPoints). */
-const SECTION_SCAN_DEPTH = 200
 
 /**
  * `YYYY-MM-DD` for a moment, in Asia/Manila. The Philippines has not
@@ -93,7 +90,7 @@ export function nextStreak(
 /** What one module's progress row is worth, on its own. */
 export function pointsForModule(progress: ModuleProgressDoc): number {
   let points = 0
-  if (progress.pretestCompleted) points += POINTS.PRETEST
+  if (progress.preTestCompleted) points += POINTS.PRETEST
   if (progress.lessonCompleted) points += POINTS.LESSON
   if (progress.simulationCompleted) points += POINTS.SIMULATION
   if (progress.quizCompleted || typeof progress.score === 'number') {
@@ -145,7 +142,7 @@ export function totalsFrom(
     simulationsCompleted: progressRows.filter((row) => row.simulationCompleted).length,
     quizzesCompleted: progressRows.filter((row) => row.quizCompleted || typeof row.score === 'number').length,
     modulesCompleted: progressRows.filter((row) => row.moduleCompleted).length,
-    pretestsCompleted: progressRows.filter((row) => row.pretestCompleted).length,
+    pretestsCompleted: progressRows.filter((row) => row.preTestCompleted).length,
     posttestsCompleted: progressRows.filter((row) => row.postTestCompleted).length,
     perfectQuizzes: scores.filter((score) => score === 100).length,
     bestQuizScore: scores.length > 0 ? Math.max(...scores) : null,
@@ -211,7 +208,6 @@ export async function recomputeFromProgress(
   const doc: GamificationDoc = {
     userId,
     displayName: profile.displayName,
-    section: profile.section,
     points,
     level: rank.level,
     rankName: rank.rankName,
@@ -260,7 +256,6 @@ function toEntry(doc: GamificationDoc, rank: number, callerUid: string): Leaderb
   return {
     userId: doc.userId,
     displayName: doc.displayName || 'Student',
-    section: doc.section ?? null,
     points: doc.points ?? 0,
     level: doc.level ?? 1,
     rankName: doc.rankName ?? 'Trainee',
@@ -272,9 +267,7 @@ function toEntry(doc: GamificationDoc, rank: number, callerUid: string): Leaderb
 }
 
 /**
- * The board itself. Two scopes: the whole cohort, or just the caller's own
- * section, which is the comparison a student in a class of forty actually
- * cares about.
+ * The board itself, across every ranked student.
  *
  * A caller who placed outside the returned rows still gets their own
  * standing back as `you`, computed with a count aggregation rather than by
@@ -285,35 +278,9 @@ export async function getLeaderboard(
   callerUid: string,
   input: GetLeaderboardInput = {},
 ): Promise<LeaderboardResult> {
-  const scope = input.scope ?? 'all'
   const limit = Math.min(Math.max(input.limit ?? DEFAULT_LEADERBOARD_LIMIT, 1), MAX_LEADERBOARD_LIMIT)
 
   const me = await repo.getGamification(callerUid)
-  const mySection = me?.section ?? null
-
-  if (scope === 'section' && !mySection) {
-    throw new AppError(
-      'failed-precondition',
-      'You are not assigned to a class section yet, so there is no class board to show.',
-    )
-  }
-
-  if (scope === 'section') {
-    const scanned = await repo.topByPoints(SECTION_SCAN_DEPTH)
-    const inSection = scanned.filter((doc) => doc.section === mySection)
-    const entries = inSection.slice(0, limit).map((doc, i) => toEntry(doc, i + 1, callerUid))
-    const myIndex = inSection.findIndex((doc) => doc.userId === callerUid)
-    return {
-      scope,
-      section: mySection,
-      entries,
-      you:
-        myIndex >= 0
-          ? entries.find((entry) => entry.isYou) ?? toEntry(inSection[myIndex], myIndex + 1, callerUid)
-          : null,
-      totalRanked: inSection.length,
-    }
-  }
 
   const [top, ahead, totalRanked] = await Promise.all([
     repo.topByPoints(limit),
@@ -325,8 +292,6 @@ export async function getLeaderboard(
   const mine = entries.find((entry) => entry.isYou)
 
   return {
-    scope: 'all',
-    section: null,
     entries,
     you: mine ?? (me ? toEntry(me, ahead + 1, callerUid) : null),
     totalRanked,

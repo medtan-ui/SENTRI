@@ -119,27 +119,8 @@ export async function setUserAccountStatus(uid, status) {
 }
 
 /**
- * Assign a student to a class group (section), or clear the assignment by
- * passing null/''. This is what makes the Analytics page's per-section
- * cohort reporting possible — an unassigned student still counts in the
- * whole-cohort rollup, just not in any section's.
- * @param {string} uid
- * @param {string|null} section
- * @returns {Promise<{ success: boolean, section: string|null }>}
- */
-export async function setUserSection(uid, section) {
-  try {
-    const call = httpsCallable(functions, 'setUserSection')
-    const { data } = await call({ uid, section: section || null })
-    return data
-  } catch (err) {
-    throw new Error(_friendlyCallableError(err))
-  }
-}
-
-/**
  * List all student/admin account profiles for the account management screen.
- * @returns {Promise<Array<{ uid, role, displayName, nickname, email, status, section, createdAt }>>}
+ * @returns {Promise<Array<{ uid, role, displayName, nickname, email, status, createdAt }>>}
  */
 export async function listUsers() {
   try {

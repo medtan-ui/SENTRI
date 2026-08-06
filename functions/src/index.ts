@@ -21,7 +21,6 @@ export {
   registerStudentAccount,
   resetUserPassword,
   setUserAccountStatus,
-  setUserSection,
   updateOwnNickname,
 } from './auth/controllers'
 
@@ -60,15 +59,10 @@ export {
   updateGamificationOnProgress,
 } from './modules/gamification/controllers'
 
-// TEMPORARY — remove this export and cleanupController.ts once the
-// one-off reward-orphan purge has been run against production.
-export { purgeRewardOrphans } from './modules/gamification/cleanupController'
-
 export {
   aggregateCohortAnalytics,
   aggregateModuleAnalytics,
   aggregateStudentAnalytics,
-  listSections,
   recordAnalyticsEvent,
   scheduledAnalyticsAggregation,
   updateLearningAnalytics,

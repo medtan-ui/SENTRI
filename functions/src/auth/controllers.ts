@@ -17,7 +17,6 @@ import {
   registerStudentAccountSchema,
   resetUserPasswordSchema,
   setUserAccountStatusSchema,
-  setUserSectionSchema,
   updateOwnNicknameSchema,
 } from './validators'
 
@@ -54,15 +53,6 @@ export const setUserAccountStatus = defineCallable('setUserAccountStatus', async
   const actor = await requireAdmin(request)
   const input = parseOrThrow(setUserAccountStatusSchema, request.data)
   return service.setUserAccountStatus(actor, actor.uid, input)
-})
-
-// Admin-only, unlike updateOwnNickname below: a section decides which
-// cohort report a student's results are counted in, so it is not something
-// a student may set for themselves after registration.
-export const setUserSection = defineCallable('setUserSection', async (request) => {
-  const actor = await requireAdmin(request)
-  const input = parseOrThrow(setUserSectionSchema, request.data)
-  return service.setUserSection(actor, { uid: input.uid, section: input.section ?? null })
 })
 
 export const changeOwnPassword = defineCallable('changeOwnPassword', async (request) => {

@@ -25,12 +25,12 @@ export async function submitScenarioDecision(
     throw new AppError('not-found', `Module "${moduleId}" has no scenario configured yet.`)
   }
 
-  const scenario = config.scenarios.find((s) => s.scenario_id === scenarioId)
+  const scenario = config.scenarios.find((s) => s.scenarioId === scenarioId)
   if (!scenario) {
     throw new AppError('not-found', `Scenario "${scenarioId}" does not exist for this module.`)
   }
 
-  const choice = scenario.choices.find((c) => c.scenario_choice_id === choiceId)
+  const choice = scenario.choices.find((c) => c.scenarioChoiceId === choiceId)
   if (!choice) {
     throw new AppError('invalid-argument', `Choice "${choiceId}" does not exist for this scenario.`)
   }
@@ -40,21 +40,21 @@ export async function submitScenarioDecision(
     moduleId,
     scenarioId,
     choiceId,
-    isSafe: choice.is_safe_choice,
+    isSafe: choice.isSafeChoice,
     attemptNumber,
     durationMs,
   })
 
   return {
-    isSafe: choice.is_safe_choice,
+    isSafe: choice.isSafeChoice,
     decisionId,
-    feedback: { title: choice.outcome_title, text: choice.feedback_text },
-    consequence: choice.is_safe_choice
+    feedback: { title: choice.outcomeTitle, text: choice.feedbackText },
+    consequence: choice.isSafeChoice
       ? null
       : {
-          outcomeTitle: choice.outcome_title,
-          consequenceType: choice.consequence_type,
-          feedbackMediaUrl: choice.feedback_media_url ?? null,
+          outcomeTitle: choice.outcomeTitle,
+          consequenceType: choice.consequenceType,
+          feedbackMediaUrl: choice.feedbackMediaUrl ?? null,
         },
   }
 }

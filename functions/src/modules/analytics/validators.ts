@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { MAX_SECTION_LENGTH } from '../../shared/sections'
 import { ANALYTICS_EVENT_TYPES } from './models'
 
 export const recordAnalyticsEventSchema = z.object({
@@ -20,11 +19,8 @@ export const aggregateStudentAnalyticsSchema = z.object({
 })
 
 /**
- * Omitting `section` (or sending null) recomputes the whole cohort — the
- * report the dashboard opens on. Passing one scopes the same computation
- * to that class group. Length-bounded here so a section string can never
- * be long enough to produce an unusable Firestore document id.
+ * The cohort rollup covers every student and takes no arguments. Declared
+ * as an empty object rather than skipped so an unexpected payload is
+ * rejected at the edge like every other callable's.
  */
-export const aggregateCohortAnalyticsSchema = z.object({
-  section: z.string().trim().max(MAX_SECTION_LENGTH).nullable().optional(),
-})
+export const aggregateCohortAnalyticsSchema = z.object({})

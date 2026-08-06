@@ -14,7 +14,6 @@ import {
   setUserAccountStatus,
 } from '../../../services/adminService'
 import { validatePassword } from '../../../utils/passwordPolicy'
-import { normalizeSectionKey } from '../../../utils/sections'
 import styles from './AccountsPage.module.css'
 
 const AUDIT_ACTION_LABELS = {
@@ -23,11 +22,7 @@ const AUDIT_ACTION_LABELS = {
   reset_password: 'Reset password',
   deactivate_user: 'Deactivated account',
   activate_user: 'Reactivated account',
-  set_user_section: 'Changed section',
 }
-
-/** The filter value standing in for "student has no section yet". */
-const UNASSIGNED = '__unassigned__'
 
 /**
  * AccountsPage
@@ -52,7 +47,6 @@ export default function AccountsPage() {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [sectionFilter, setSectionFilter] = useState('all')
   const [notice, setNotice] = useState('')
 
   const [resetTargetUid, setResetTargetUid] = useState('')
@@ -191,36 +185,17 @@ export default function AccountsPage() {
     </button>
   )
 
-  // Distinct sections actually in use, keyed the same way the backend
-  // groups them — so "BSIT 3A" and "bsit-3a" collapse into one option
-  // here exactly as they do in the cohort rollup.
-  const sectionOptions = (() => {
-    const byKey = new Map()
-    users.forEach((u) => {
-      const key = normalizeSectionKey(u.section)
-      if (key && !byKey.has(key)) byKey.set(key, u.section.trim())
-    })
-    return [...byKey.entries()]
-      .map(([key, label]) => ({ key, label }))
-      .sort((a, b) => a.label.localeCompare(b.label))
-  })()
-
   const filteredUsers = users.filter((u) => {
     const matchesRole = roleFilter === 'all' || u.role === roleFilter
     const matchesStatus =
       statusFilter === 'all' || (statusFilter === 'disabled' ? u.status === 'disabled' : u.status !== 'disabled')
-    const sectionKey = normalizeSectionKey(u.section)
-    const matchesSection =
-      sectionFilter === 'all' ||
-      (sectionFilter === UNASSIGNED ? sectionKey === null : sectionKey === sectionFilter)
     const q = search.trim().toLowerCase()
     const matchesSearch =
       !q ||
       u.displayName?.toLowerCase().includes(q) ||
       u.nickname?.toLowerCase().includes(q) ||
-      u.email?.toLowerCase().includes(q) ||
-      u.section?.toLowerCase().includes(q)
-    return matchesRole && matchesStatus && matchesSection && matchesSearch
+      u.email?.toLowerCase().includes(q)
+    return matchesRole && matchesStatus && matchesSearch
   })
 
   return (
@@ -264,7 +239,7 @@ export default function AccountsPage() {
                 id="userSearch"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, nickname, email, or section"
+                placeholder="Search by name, nickname, or email"
                 className={styles.searchInput}
               />
               <select
@@ -286,20 +261,6 @@ export default function AccountsPage() {
                 <option value="all">All statuses</option>
                 <option value="active">Active</option>
                 <option value="disabled">Deactivated</option>
-              </select>
-              <select
-                className={styles.roleSelect}
-                value={sectionFilter}
-                onChange={(e) => setSectionFilter(e.target.value)}
-                aria-label="Filter by section"
-              >
-                <option value="all">All sections</option>
-                {sectionOptions.map((s) => (
-                  <option key={s.key} value={s.key}>
-                    {s.label}
-                  </option>
-                ))}
-                <option value={UNASSIGNED}>No section</option>
               </select>
               <Button variant="primary" onClick={() => navigate('/admin/accounts/create-admin')}>
                 + Create Admin Account
@@ -325,7 +286,6 @@ export default function AccountsPage() {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
-                        <th>Section</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th aria-label="Actions" />
@@ -347,9 +307,6 @@ export default function AccountsPage() {
                                 {u.role}
                               </span>
                             </td>
-                            <td className={u.section ? undefined : styles.mutedCell}>
-                              {u.role === 'admin' ? '—' : u.section || 'No section'}
-                            </td>
                             <td>
                               <span className={`${styles.statusBadge} ${u.status === 'disabled' ? styles.statusDisabled : styles.statusActive}`}>
                                 {u.status === 'disabled' ? 'Disabled' : 'Active'}
@@ -358,34 +315,36 @@ export default function AccountsPage() {
                             <td className={styles.mutedCell}>
                               {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}
                             </td>
-                            <td className={styles.actionsCell}>
-                              <button className={styles.linkBtn} onClick={() => navigate(`/admin/accounts/${u.uid}`)}>
-                                View
-                              </button>
-                              <button className={styles.linkBtn} onClick={() => openResetFor(u.uid)}>
-                                {resetTargetUid === u.uid ? 'Cancel' : 'Reset password'}
-                              </button>
-                              <button
-                                className={styles.linkBtn}
-                                onClick={() => handleStatusToggle(u)}
-                                disabled={u.uid === user?.uid || statusBusyUid === u.uid}
-                                title={u.uid === user?.uid ? "You can't deactivate your own account" : undefined}
-                              >
-                                {statusBusyUid === u.uid ? 'Updating…' : u.status === 'disabled' ? 'Activate' : 'Deactivate'}
-                              </button>
-                              <button
-                                className={`${styles.linkBtn} ${styles.linkDanger}`}
-                                onClick={() => handleDelete(u)}
-                                disabled={u.uid === user?.uid || busyUid === u.uid}
-                                title={u.uid === user?.uid ? "You can't delete your own account" : undefined}
-                              >
-                                {busyUid === u.uid ? 'Deleting…' : 'Delete'}
-                              </button>
+                            <td>
+                              <div className={styles.actionsCell}>
+                                <button className={styles.linkBtn} onClick={() => navigate(`/admin/accounts/${u.uid}`)}>
+                                  View
+                                </button>
+                                <button className={styles.linkBtn} onClick={() => openResetFor(u.uid)}>
+                                  {resetTargetUid === u.uid ? 'Cancel' : 'Reset password'}
+                                </button>
+                                <button
+                                  className={styles.linkBtn}
+                                  onClick={() => handleStatusToggle(u)}
+                                  disabled={u.uid === user?.uid || statusBusyUid === u.uid}
+                                  title={u.uid === user?.uid ? "You can't deactivate your own account" : undefined}
+                                >
+                                  {statusBusyUid === u.uid ? 'Updating…' : u.status === 'disabled' ? 'Activate' : 'Deactivate'}
+                                </button>
+                                <button
+                                  className={`${styles.linkBtn} ${styles.linkDanger}`}
+                                  onClick={() => handleDelete(u)}
+                                  disabled={u.uid === user?.uid || busyUid === u.uid}
+                                  title={u.uid === user?.uid ? "You can't delete your own account" : undefined}
+                                >
+                                  {busyUid === u.uid ? 'Deleting…' : 'Delete'}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                           {resetTargetUid === u.uid && (
                             <tr className={styles.resetRow}>
-                              <td colSpan={7}>
+                              <td colSpan={6}>
                                 <form onSubmit={(e) => handleResetSubmit(e, u.uid)} className={styles.resetForm}>
                                   {resetError && (
                                     <div className={styles.errorBanner} role="alert">

@@ -13,16 +13,16 @@
  *
  * ── What an admin may and may not change ─────────────────────────────
  * Editable (all student-visible copy and media):
- *   scenario: scenario_title, scenario_description, posterCaption,
- *             material_url, videoAvailable, postCompletionReflection
- *   choice:   choice_text, outcome_title, consequence_type,
- *             feedback_text, feedback_media_url
+ *   scenario: scenarioTitle, scenarioDescription, posterCaption,
+ *             materialUrl, videoAvailable, postCompletionReflection
+ *   choice:   choiceText, outcomeTitle, consequenceType,
+ *             feedbackText, feedbackMediaUrl
  *
  * Structural, shown read-only (wired to hand-authored React scene
  * components — a form cannot regenerate these, and changing them would
  * silently break the simulation):
- *   scenario: scenario_id, scenario_order, scene, coachTarget
- *   choice:   scenario_choice_id, target, is_safe_choice
+ *   scenario: scenarioId, scenarioOrder, scene, coachTarget
+ *   choice:   scenarioChoiceId, target, isSafeChoice
  *
  * That split is enforced in one place, not here: mergeScenarioConfig in
  * src/services/scenarioService.js always takes structural fields from the
@@ -53,26 +53,26 @@ export const CONSEQUENCE_TYPE_LABELS = {
 
 /**
  * @typedef {Object} ScenarioChoiceConfig
- * @property {string} scenario_choice_id  Structural — read-only.
+ * @property {string} scenarioChoiceId  Structural — read-only.
  * @property {string} target              Structural — read-only.
- * @property {boolean} is_safe_choice     Structural — read-only.
- * @property {string} choice_text
- * @property {string} outcome_title
- * @property {'credential_compromise'|'account_takeover'|'data_exposure'|'device_compromise'|'financial_loss'|'physical_risk'|'none'} consequence_type
- * @property {string} feedback_text
- * @property {string|null} feedback_media_url
+ * @property {boolean} isSafeChoice     Structural — read-only.
+ * @property {string} choiceText
+ * @property {string} outcomeTitle
+ * @property {'credential_compromise'|'account_takeover'|'data_exposure'|'device_compromise'|'financial_loss'|'physical_risk'|'none'} consequenceType
+ * @property {string} feedbackText
+ * @property {string|null} feedbackMediaUrl
  */
 
 /**
  * @typedef {Object} ScenarioConfig
- * @property {string} scenario_id         Structural — read-only.
- * @property {number} scenario_order      Structural — read-only.
+ * @property {string} scenarioId         Structural — read-only.
+ * @property {number} scenarioOrder      Structural — read-only.
  * @property {string} scene               Structural — read-only.
  * @property {string} [coachTarget]       Structural — read-only.
- * @property {string} scenario_title
- * @property {string} scenario_description
+ * @property {string} scenarioTitle
+ * @property {string} scenarioDescription
  * @property {boolean} videoAvailable
- * @property {string|null} material_url
+ * @property {string|null} materialUrl
  * @property {string} posterCaption
  * @property {string} [postCompletionReflection]
  * @property {ScenarioChoiceConfig[]} choices
@@ -80,8 +80,8 @@ export const CONSEQUENCE_TYPE_LABELS = {
 
 /**
  * @typedef {Object} ModuleScenarioConfig
- * @property {string} module_id
- * @property {string} module_title
+ * @property {string} moduleId
+ * @property {string} moduleTitle
  * @property {'full'|'idle'|'none'} coachLevel
  * @property {ScenarioConfig[]} scenarios
  */

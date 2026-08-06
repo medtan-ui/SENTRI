@@ -1,8 +1,6 @@
 import { z } from 'zod'
 
 export const getLeaderboardSchema = z.object({
-  /** 'section' compares a student only against their own class group. */
-  scope: z.enum(['all', 'section']).optional(),
   limit: z.number().int().min(1).max(50).optional(),
 })
 

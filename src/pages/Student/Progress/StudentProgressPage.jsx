@@ -34,8 +34,7 @@ const TABS = [
  *   Overview     — completion, scores, per-module bars, pre/post-test
  *                  movement and decision analytics. The page as it was.
  *   Achievements — the full badge catalog, earned and locked.
- *   Leaderboard  — the same board the dashboard previews, at full length
- *                  and with the class-versus-everyone toggle.
+ *   Leaderboard  — the same board the dashboard previews, at full length.
  *
  * Tabs rather than more stacked sections because these are three
  * different questions ("how am I doing", "what have I unlocked", "how do
@@ -341,7 +340,7 @@ export default function StudentProgressPage() {
           <div role="tabpanel" id="panel-leaderboard" aria-labelledby="tab-leaderboard">
             <Card className={styles.panel}>
               <h2 className={styles.panelTitle}>Standings</h2>
-              <Leaderboard scope="all" limit={20} showScopeToggle />
+              <Leaderboard limit={20} />
             </Card>
           </div>
         )}

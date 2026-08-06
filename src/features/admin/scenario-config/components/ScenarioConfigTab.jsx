@@ -99,12 +99,12 @@ export default function ScenarioConfigTab({ moduleId, moduleName, overview }) {
           <div className={styles.cardList}>
             {draft.scenarios.map((scenario) => (
               <ScenarioCard
-                key={scenario.scenario_id}
+                key={scenario.scenarioId}
                 scenario={scenario}
-                validation={validations.find((v) => v.scenarioId === scenario.scenario_id)}
-                onUpdateScenario={(patch) => actions.updateScenario(scenario.scenario_id, patch)}
+                validation={validations.find((v) => v.scenarioId === scenario.scenarioId)}
+                onUpdateScenario={(patch) => actions.updateScenario(scenario.scenarioId, patch)}
                 onUpdateChoice={(choiceId, patch) =>
-                  actions.updateChoice(scenario.scenario_id, choiceId, patch)
+                  actions.updateChoice(scenario.scenarioId, choiceId, patch)
                 }
               />
             ))}

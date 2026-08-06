@@ -12,7 +12,7 @@
  * recorded score without ever lowering it.
  *
  * This covers the claims the Learning Analytics framework rests on:
- * per-question responses actually land in `quiz_responses`, the
+ * per-question responses actually land in `quizResponses`, the
  * one-attempt rules on both bookend assessments really are enforced
  * server-side, and the appeal path is the only way past the single-attempt
  * quiz rule.
@@ -172,11 +172,11 @@ describe('assessment flow: pre-test -> module -> quiz -> post-test -> retry appe
     expect(result.total).toBe(2)
 
     const progress = (await progressRef().get()).data()!
-    expect(progress.pretestCompleted).toBe(true)
-    expect(progress.pretestScore).toBe(0)
+    expect(progress.preTestCompleted).toBe(true)
+    expect(progress.preTestScore).toBe(0)
   })
 
-  it('writes one quiz_responses row per pre-test item, carrying topic and duration', async () => {
+  it('writes one quizResponses row per pre-test item, carrying topic and duration', async () => {
     const responses = await responsesFor('pretest')
     expect(responses).toHaveLength(2)
 

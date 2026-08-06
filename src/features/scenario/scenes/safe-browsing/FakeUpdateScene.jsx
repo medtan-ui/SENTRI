@@ -4,7 +4,7 @@ import InteractiveTarget from '../../engine/InteractiveTarget'
 import styles from './FakeUpdateScene.module.css'
 
 function findChoiceId(scenario, targetName) {
-  return scenario.choices.find((c) => c.target === targetName)?.scenario_choice_id
+  return scenario.choices.find((c) => c.target === targetName)?.scenarioChoiceId
 }
 
 /**

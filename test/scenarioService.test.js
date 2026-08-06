@@ -21,10 +21,10 @@ describe('mergeScenarioConfig', () => {
 
   it('returns the authored config untouched when nothing is stored', () => {
     const result = mergeScenarioConfig(null, moduleId)
-    expect(result.scenarios.map((s) => s.scenario_id)).toEqual(
-      authored.scenarios.map((s) => s.scenario_id),
+    expect(result.scenarios.map((s) => s.scenarioId)).toEqual(
+      authored.scenarios.map((s) => s.scenarioId),
     )
-    expect(result.scenarios[0].scenario_title).toBe(authored.scenarios[0].scenario_title)
+    expect(result.scenarios[0].scenarioTitle).toBe(authored.scenarios[0].scenarioTitle)
   })
 
   it('returns null for a module that has no authored scenario', () => {
@@ -35,22 +35,22 @@ describe('mergeScenarioConfig', () => {
     const stored = {
       scenarios: [
         {
-          scenario_id: authored.scenarios[0].scenario_id,
-          scenario_title: 'A Rewritten Title',
-          scenario_description: 'Rewritten description.',
+          scenarioId: authored.scenarios[0].scenarioId,
+          scenarioTitle: 'A Rewritten Title',
+          scenarioDescription: 'Rewritten description.',
           posterCaption: 'Rewritten caption.',
         },
       ],
     }
     const result = mergeScenarioConfig(stored, moduleId)
-    expect(result.scenarios[0].scenario_title).toBe('A Rewritten Title')
-    expect(result.scenarios[0].scenario_description).toBe('Rewritten description.')
+    expect(result.scenarios[0].scenarioTitle).toBe('A Rewritten Title')
+    expect(result.scenarios[0].scenarioDescription).toBe('Rewritten description.')
     expect(result.scenarios[0].posterCaption).toBe('Rewritten caption.')
   })
 
   it('ignores a stored attempt to change which scene renders a scenario', () => {
     const stored = {
-      scenarios: [{ scenario_id: authored.scenarios[0].scenario_id, scene: 'SomeOtherScene' }],
+      scenarios: [{ scenarioId: authored.scenarios[0].scenarioId, scene: 'SomeOtherScene' }],
     }
     const result = mergeScenarioConfig(stored, moduleId)
     expect(result.scenarios[0].scene).toBe(authored.scenarios[0].scene)
@@ -61,11 +61,11 @@ describe('mergeScenarioConfig', () => {
     const stored = {
       scenarios: [
         {
-          scenario_id: authored.scenarios[0].scenario_id,
+          scenarioId: authored.scenarios[0].scenarioId,
           choices: [
             {
-              scenario_choice_id: authoredChoice.scenario_choice_id,
-              is_safe_choice: !authoredChoice.is_safe_choice,
+              scenarioChoiceId: authoredChoice.scenarioChoiceId,
+              isSafeChoice: !authoredChoice.isSafeChoice,
               target: 'a-target-that-does-not-exist',
             },
           ],
@@ -74,7 +74,7 @@ describe('mergeScenarioConfig', () => {
     }
     const result = mergeScenarioConfig(stored, moduleId)
     const merged = result.scenarios[0].choices[0]
-    expect(merged.is_safe_choice).toBe(authoredChoice.is_safe_choice)
+    expect(merged.isSafeChoice).toBe(authoredChoice.isSafeChoice)
     expect(merged.target).toBe(authoredChoice.target)
   })
 
@@ -83,29 +83,29 @@ describe('mergeScenarioConfig', () => {
     const stored = {
       scenarios: [
         {
-          scenario_id: authored.scenarios[0].scenario_id,
+          scenarioId: authored.scenarios[0].scenarioId,
           choices: [
             {
-              scenario_choice_id: authoredChoice.scenario_choice_id,
-              feedback_text: 'Rewritten feedback.',
-              outcome_title: 'Rewritten outcome.',
+              scenarioChoiceId: authoredChoice.scenarioChoiceId,
+              feedbackText: 'Rewritten feedback.',
+              outcomeTitle: 'Rewritten outcome.',
             },
           ],
         },
       ],
     }
     const merged = mergeScenarioConfig(stored, moduleId).scenarios[0].choices[0]
-    expect(merged.feedback_text).toBe('Rewritten feedback.')
-    expect(merged.outcome_title).toBe('Rewritten outcome.')
+    expect(merged.feedbackText).toBe('Rewritten feedback.')
+    expect(merged.outcomeTitle).toBe('Rewritten outcome.')
     expect(merged.target).toBe(authoredChoice.target)
   })
 
   it('keeps the authored value for a field the stored document omits', () => {
     const stored = {
-      scenarios: [{ scenario_id: authored.scenarios[0].scenario_id, scenario_title: 'Only a title' }],
+      scenarios: [{ scenarioId: authored.scenarios[0].scenarioId, scenarioTitle: 'Only a title' }],
     }
     const merged = mergeScenarioConfig(stored, moduleId).scenarios[0]
-    expect(merged.scenario_description).toBe(authored.scenarios[0].scenario_description)
+    expect(merged.scenarioDescription).toBe(authored.scenarios[0].scenarioDescription)
     expect(merged.posterCaption).toBe(authored.scenarios[0].posterCaption)
   })
 
@@ -113,16 +113,16 @@ describe('mergeScenarioConfig', () => {
     // The case that matters after a code change renames or removes a
     // scenario: stale stored entries must not resurrect it.
     const stored = {
-      scenarios: [{ scenario_id: 'removed-in-a-later-refactor', scenario_title: 'Ghost' }],
+      scenarios: [{ scenarioId: 'removed-in-a-later-refactor', scenarioTitle: 'Ghost' }],
     }
     const result = mergeScenarioConfig(stored, moduleId)
     expect(result.scenarios).toHaveLength(authored.scenarios.length)
-    expect(result.scenarios.every((s) => s.scenario_title !== 'Ghost')).toBe(true)
+    expect(result.scenarios.every((s) => s.scenarioTitle !== 'Ghost')).toBe(true)
   })
 
   it('never loses a choice the scene still expects, even if storage omits it', () => {
     const stored = {
-      scenarios: [{ scenario_id: authored.scenarios[0].scenario_id, choices: [] }],
+      scenarios: [{ scenarioId: authored.scenarios[0].scenarioId, choices: [] }],
     }
     const result = mergeScenarioConfig(stored, moduleId)
     expect(result.scenarios[0].choices).toHaveLength(authored.scenarios[0].choices.length)
@@ -143,10 +143,10 @@ describe('authored scenario configs', () => {
     // advances on a safe choice, so the student would be trapped.
     Object.entries(SCENARIO_CONFIG_REGISTRY).forEach(([moduleId, config]) => {
       config.scenarios.forEach((scenario) => {
-        const safeCount = scenario.choices.filter((c) => c.is_safe_choice).length
+        const safeCount = scenario.choices.filter((c) => c.isSafeChoice).length
         expect(
           safeCount,
-          `${moduleId}/${scenario.scenario_id} is unwinnable — no safe choice`,
+          `${moduleId}/${scenario.scenarioId} is unwinnable — no safe choice`,
         ).toBeGreaterThan(0)
       })
     })
@@ -159,7 +159,7 @@ describe('authored scenario configs', () => {
       config.scenarios.forEach((scenario) => {
         expect(
           SCENE_REGISTRY[scenario.scene],
-          `${moduleId}/${scenario.scenario_id} names unknown scene "${scenario.scene}"`,
+          `${moduleId}/${scenario.scenarioId} names unknown scene "${scenario.scene}"`,
         ).toBeTruthy()
       })
     })
@@ -171,7 +171,7 @@ describe('authored scenario configs', () => {
         const targets = scenario.choices.map((c) => c.target)
         expect(
           new Set(targets).size,
-          `${moduleId}/${scenario.scenario_id} has duplicate targets`,
+          `${moduleId}/${scenario.scenarioId} has duplicate targets`,
         ).toBe(targets.length)
       })
     })

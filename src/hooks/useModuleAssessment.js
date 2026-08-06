@@ -47,7 +47,7 @@ export function useModuleAssessment(moduleId, assessmentType = 'pretest') {
         if (cancelled) return
         setAssessment(assessmentDoc)
         setCompleted(
-          Boolean(assessmentType === 'pretest' ? progress?.pretestCompleted : progress?.postTestCompleted),
+          Boolean(assessmentType === 'pretest' ? progress?.preTestCompleted : progress?.postTestCompleted),
         )
         // A post-test only exists once the quiz has been submitted; the
         // pre-test has no precondition beyond the module being open.

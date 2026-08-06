@@ -25,11 +25,11 @@ export default function ScenarioCard({
   const [expanded, setExpanded] = useState(defaultExpanded)
 
   const scenarioLevelIssues = validation.issues.filter((issue) =>
-    ['safeChoice', 'scenario_title', 'scenario_description', 'posterCaption'].includes(issue.field),
+    ['safeChoice', 'scenarioTitle', 'scenarioDescription', 'posterCaption'].includes(issue.field),
   )
-  const titleError = validation.issues.find((i) => i.field === 'scenario_title')?.message || ''
+  const titleError = validation.issues.find((i) => i.field === 'scenarioTitle')?.message || ''
   const descriptionError =
-    validation.issues.find((i) => i.field === 'scenario_description')?.message || ''
+    validation.issues.find((i) => i.field === 'scenarioDescription')?.message || ''
 
   return (
     <Card className={styles.card}>
@@ -40,8 +40,8 @@ export default function ScenarioCard({
         aria-expanded={expanded}
       >
         <div className={styles.headerLeft}>
-          <span className={styles.orderBadge}>Scenario {scenario.scenario_order}</span>
-          <span className={styles.titlePreview}>{scenario.scenario_title || '(untitled)'}</span>
+          <span className={styles.orderBadge}>Scenario {scenario.scenarioOrder}</span>
+          <span className={styles.titlePreview}>{scenario.scenarioTitle || '(untitled)'}</span>
         </div>
         <div className={styles.headerRight}>
           <span className={`${badges.pill} ${validation.isValid ? badges.valid : badges.invalid}`}>
@@ -65,19 +65,19 @@ export default function ScenarioCard({
 
           <div className={styles.titleRow}>
             <div className={forms.fieldGroup} style={{ flex: 1 }}>
-              <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-title`}>
+              <label className={forms.fieldLabel} htmlFor={`${scenario.scenarioId}-title`}>
                 Scenario Title
               </label>
               <input
-                id={`${scenario.scenario_id}-title`}
+                id={`${scenario.scenarioId}-title`}
                 className={`${styles.titleInput} ${titleError ? forms.textareaError : ''}`}
-                value={scenario.scenario_title}
-                onChange={(e) => onUpdateScenario({ scenario_title: e.target.value })}
+                value={scenario.scenarioTitle}
+                onChange={(e) => onUpdateScenario({ scenarioTitle: e.target.value })}
               />
             </div>
             <div className={styles.orderDisplay}>
               <span className={forms.fieldLabel}>Order</span>
-              <span className={styles.orderValue}>{scenario.scenario_order}</span>
+              <span className={styles.orderValue}>{scenario.scenarioOrder}</span>
             </div>
           </div>
 
@@ -89,24 +89,24 @@ export default function ScenarioCard({
           </div>
 
           <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-4)' }}>
-            <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-description`}>
+            <label className={forms.fieldLabel} htmlFor={`${scenario.scenarioId}-description`}>
               Scenario Description
             </label>
             <textarea
-              id={`${scenario.scenario_id}-description`}
+              id={`${scenario.scenarioId}-description`}
               className={`${forms.textarea} ${descriptionError ? forms.textareaError : ''}`}
               rows={2}
-              value={scenario.scenario_description}
-              onChange={(e) => onUpdateScenario({ scenario_description: e.target.value })}
+              value={scenario.scenarioDescription}
+              onChange={(e) => onUpdateScenario({ scenarioDescription: e.target.value })}
             />
           </div>
 
           <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-4)' }}>
-            <label className={forms.fieldLabel} htmlFor={`${scenario.scenario_id}-reflection`}>
+            <label className={forms.fieldLabel} htmlFor={`${scenario.scenarioId}-reflection`}>
               Closing Reflection <span className={styles.labelHint}>(optional — shown once this scenario is resolved safely)</span>
             </label>
             <textarea
-              id={`${scenario.scenario_id}-reflection`}
+              id={`${scenario.scenarioId}-reflection`}
               className={forms.textarea}
               rows={2}
               value={scenario.postCompletionReflection || ''}

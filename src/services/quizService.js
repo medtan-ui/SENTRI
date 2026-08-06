@@ -61,7 +61,7 @@ export function getDefaultQuiz(moduleId) {
  * Submits one quiz attempt for grading. The server re-reads this same
  * quiz document itself to grade — `answers` is the only input trusted
  * from the client, never a score. Also records the attempt, completes the
- * module, unlocks the next one, and writes one `quiz_responses` row per
+ * module, unlocks the next one, and writes one `quizResponses` row per
  * question for item analysis.
  *
  * `durations` (questionId -> milliseconds) is purely for analytics and

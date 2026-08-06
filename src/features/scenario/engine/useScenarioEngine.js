@@ -34,7 +34,7 @@ export function useScenarioEngine(config, userId) {
   // How many scenarios were resolved safely without a single risky
   // attempt. Purely for the run's own feedback — a student who needed
   // three goes still finishes, and the engine still records every
-  // attempt to scenario_decision_records exactly as before. This is the
+  // attempt to scenarioDecisionRecords exactly as before. This is the
   // number that makes a second playthrough worth doing.
   const [cleanCalls, setCleanCalls] = useState(0)
 
@@ -120,7 +120,7 @@ export function useScenarioEngine(config, userId) {
 
   /**
    * selectChoice
-   * Called by a scene once it has resolved a scenario_choice_id — either
+   * Called by a scene once it has resolved a scenarioChoiceId — either
    * directly from a single target click, or from compound logic (e.g.
    * comparing three password fields) that only a bespoke scene can do.
    * @param {string} choiceId
@@ -128,7 +128,7 @@ export function useScenarioEngine(config, userId) {
   const selectChoice = useCallback(
     (choiceId) => {
       if (state !== 'paused_interactive') return
-      const choice = currentScenario.choices.find((c) => c.scenario_choice_id === choiceId)
+      const choice = currentScenario.choices.find((c) => c.scenarioChoiceId === choiceId)
       if (!choice) return
 
       const startedAt = decisionStartedAtRef.current
@@ -139,10 +139,10 @@ export function useScenarioEngine(config, userId) {
 
       recordDecision({
         userId,
-        moduleId: config.module_id,
-        scenarioId: currentScenario.scenario_id,
-        choiceId: choice.scenario_choice_id,
-        isSafe: choice.is_safe_choice,
+        moduleId: config.moduleId,
+        scenarioId: currentScenario.scenarioId,
+        choiceId: choice.scenarioChoiceId,
+        isSafe: choice.isSafeChoice,
         // attemptCount counts *risky* attempts already made on this
         // scenario, so the attempt now being recorded is the next one.
         attemptNumber: attemptCount + 1,
@@ -151,14 +151,14 @@ export function useScenarioEngine(config, userId) {
         currentDecisionIdRef.current = decisionId
       })
     },
-    [state, currentScenario, userId, config.module_id, attemptCount],
+    [state, currentScenario, userId, config.moduleId, attemptCount],
   )
 
   // ── resolving -> consequence (risky) | feedback (safe) ──
   useEffect(() => {
     if (state !== 'resolving' || !selectedChoice) return undefined
     const t = setTimeout(() => {
-      if (!selectedChoice.is_safe_choice) {
+      if (!selectedChoice.isSafeChoice) {
         setAttemptCount((n) => n + 1)
         setState('consequence')
       } else {
@@ -187,7 +187,7 @@ export function useScenarioEngine(config, userId) {
     // attemptCount === 0 here means the student got it right first go.
     if (attemptCount === 0) setCleanCalls((n) => n + 1)
     setCompletedScenarioIds((prev) =>
-      prev.includes(currentScenario.scenario_id) ? prev : [...prev, currentScenario.scenario_id],
+      prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
     )
     setState('advancing')
   }, [currentScenario, attemptCount])

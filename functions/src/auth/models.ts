@@ -7,13 +7,6 @@ export interface UserProfile {
   email: string
   status: 'active' | 'disabled'
   mustChangePassword: boolean
-  /**
-   * The class group this account belongs to, as typed (e.g. "BSIT-3A").
-   * Null for admins and for students who haven't been assigned one — the
-   * analytics rollup treats that as "unassigned" rather than dropping
-   * them. See shared/sections.ts for how the label becomes a group key.
-   */
-  section?: string | null
   createdAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp
 }
 
@@ -23,7 +16,6 @@ export interface CreateUserAccountInput {
   displayName: string
   nickname?: string
   role: UserRole
-  section?: string | null
 }
 
 export interface RegisterStudentAccountInput {
@@ -31,13 +23,6 @@ export interface RegisterStudentAccountInput {
   password: string
   displayName: string
   nickname: string
-  section?: string | null
-}
-
-export interface SetUserSectionInput {
-  uid: string
-  /** Null or blank clears the assignment. */
-  section: string | null
 }
 
 export interface SetUserAccountStatusInput {

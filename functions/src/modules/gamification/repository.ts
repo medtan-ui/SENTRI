@@ -41,7 +41,7 @@ export interface BehaviourRow {
 
 /**
  * One student's per-module safe/risky decision counters, maintained by
- * the updateLearningAnalytics trigger off scenario_decision_records.
+ * the updateLearningAnalytics trigger off scenarioDecisionRecords.
  *
  * This is the only thing the reward layer needs that a moduleProgress
  * row cannot tell it: progress records *that* a simulation finished,
@@ -63,7 +63,6 @@ export async function listBehaviourForUser(userId: string): Promise<BehaviourRow
 
 export interface ProfileSummary {
   displayName: string
-  section: string | null
   role: string
 }
 
@@ -75,10 +74,9 @@ export interface ProfileSummary {
 export async function getProfileSummary(userId: string): Promise<ProfileSummary> {
   const snap = await db.collection(COLLECTIONS.USERS).doc(userId).get()
   const data = snap.data()
-  if (!data) return { displayName: 'Student', section: null, role: ROLES.STUDENT }
+  if (!data) return { displayName: 'Student', role: ROLES.STUDENT }
   return {
     displayName: data.nickname || data.displayName || 'Student',
-    section: typeof data.section === 'string' && data.section.trim() ? data.section.trim() : null,
     role: data.role ?? ROLES.STUDENT,
   }
 }
@@ -86,13 +84,9 @@ export async function getProfileSummary(userId: string): Promise<ProfileSummary>
 /**
  * The top `limit` scorers, highest first.
  *
- * Deliberately a single-field `orderBy('points')` with no `where` clause,
- * even when the caller asked for one section: adding an equality filter
- * would need a composite index deployed alongside the functions, and a
- * section is then filtered out of this result in memory instead (see
- * service.getLeaderboard). At a capstone cohort's scale reading a couple
- * of hundred small documents is cheaper than the operational cost of an
- * index that has to exist before the feature works at all.
+ * A single-field `orderBy('points')` with no `where` clause, so it needs
+ * no composite index — nothing has to be deployed and built before the
+ * board works at all.
  */
 export async function topByPoints(limit: number): Promise<GamificationDoc[]> {
   const snap = await db

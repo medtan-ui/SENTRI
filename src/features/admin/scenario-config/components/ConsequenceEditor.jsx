@@ -10,15 +10,15 @@ import styles from './ConsequenceEditor.module.css'
  * src/features/scenario/engine/ConsequenceOverlay.jsx, which is what
  * actually renders this.
  *
- * `consequence_type` picks the illustrative icon the overlay falls back
- * to; `feedback_media_url` replaces that icon with a real image once one
+ * `consequenceType` picks the illustrative icon the overlay falls back
+ * to; `feedbackMediaUrl` replaces that icon with a real image once one
  * exists. There is no separate title or body field here: those ARE the
- * choice's outcome_title/feedback_text, edited once in ChoiceEditor and
+ * choice's outcomeTitle/feedbackText, edited once in ChoiceEditor and
  * reused by both the overlay and the feedback panel.
  */
 export default function ConsequenceEditor({ choice, error, onUpdate }) {
-  const id = choice.scenario_choice_id
-  const mediaUrl = choice.feedback_media_url || ''
+  const id = choice.scenarioChoiceId
+  const mediaUrl = choice.feedbackMediaUrl || ''
 
   return (
     <div className={styles.wrap}>
@@ -27,12 +27,12 @@ export default function ConsequenceEditor({ choice, error, onUpdate }) {
       </div>
 
       <div className={forms.fieldGroup}>
-        <label className={forms.fieldLabel} htmlFor={`${id}-consequence_type`}>Consequence Type</label>
+        <label className={forms.fieldLabel} htmlFor={`${id}-consequenceType`}>Consequence Type</label>
         <select
-          id={`${id}-consequence_type`}
+          id={`${id}-consequenceType`}
           className={`${styles.select} ${error ? forms.textareaError : ''}`}
-          value={choice.consequence_type}
-          onChange={(e) => onUpdate({ consequence_type: e.target.value })}
+          value={choice.consequenceType}
+          onChange={(e) => onUpdate({ consequenceType: e.target.value })}
         >
           {CONSEQUENCE_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -44,15 +44,15 @@ export default function ConsequenceEditor({ choice, error, onUpdate }) {
       </div>
 
       <div className={forms.fieldGroup} style={{ marginTop: 'var(--space-3)' }}>
-        <label className={forms.fieldLabel} htmlFor={`${id}-feedback_media_url`}>
+        <label className={forms.fieldLabel} htmlFor={`${id}-feedbackMediaUrl`}>
           Consequence Image URL <span className={styles.optional}>(optional)</span>
         </label>
         <input
-          id={`${id}-feedback_media_url`}
+          id={`${id}-feedbackMediaUrl`}
           type="text"
           className={styles.urlInput}
           value={mediaUrl}
-          onChange={(e) => onUpdate({ feedback_media_url: e.target.value || null })}
+          onChange={(e) => onUpdate({ feedbackMediaUrl: e.target.value || null })}
           placeholder="Leave empty to use the illustrative icon"
         />
       </div>
@@ -62,7 +62,7 @@ export default function ConsequenceEditor({ choice, error, onUpdate }) {
       ) : (
         <p className={styles.note}>
           No image set, so the consequence beat shows the icon for “
-          {CONSEQUENCE_TYPE_LABELS[choice.consequence_type] || choice.consequence_type}”.
+          {CONSEQUENCE_TYPE_LABELS[choice.consequenceType] || choice.consequenceType}”.
         </p>
       )}
     </div>

@@ -15,7 +15,7 @@
  *                        it reappears in a later one
  */
 
-/** A `quiz_responses` row, loosely typed at this boundary. */
+/** A `quizResponses` row, loosely typed at this boundary. */
 export interface ResponseRow {
   userId?: string
   moduleId?: string
@@ -29,15 +29,15 @@ export interface ResponseRow {
 }
 
 
-/** A `scenario_decision_records` row. */
+/** A `scenarioDecisionRecords` row. */
 export interface DecisionRow {
-  user_id?: string
-  module_id?: string
-  scenario_id?: string
-  scenario_choice_id?: string
-  is_safe_choice?: boolean
-  attempt_number?: number
-  duration_ms?: number | null
+  userId?: string
+  moduleId?: string
+  scenarioId?: string
+  scenarioChoiceId?: string
+  isSafeChoice?: boolean
+  attemptNumber?: number
+  durationMs?: number | null
 }
 
 function round(value: number, places = 2): number {
@@ -318,11 +318,11 @@ export interface BehaviourMetrics {
 
 export function behaviourMetrics(decisions: DecisionRow[]): BehaviourMetrics {
   const total = decisions.length
-  const firstAttempts = decisions.filter((d) => (d.attempt_number ?? 1) === 1)
-  const riskyCount = decisions.filter((d) => d.is_safe_choice === false).length
+  const firstAttempts = decisions.filter((d) => (d.attemptNumber ?? 1) === 1)
+  const riskyCount = decisions.filter((d) => d.isSafeChoice === false).length
 
   const durations = decisions
-    .map((d) => d.duration_ms)
+    .map((d) => d.durationMs)
     .filter((d): d is number => typeof d === 'number' && d >= 0)
 
   const medianDuration = median(durations)
@@ -333,8 +333,8 @@ export function behaviourMetrics(decisions: DecisionRow[]): BehaviourMetrics {
   let slowWrongCount = 0
   if (medianDuration !== null) {
     decisions.forEach((d) => {
-      if (d.is_safe_choice !== false) return
-      const duration = d.duration_ms
+      if (d.isSafeChoice !== false) return
+      const duration = d.durationMs
       if (typeof duration !== 'number') return
       if (duration < medianDuration) fastWrongCount += 1
       else slowWrongCount += 1
@@ -344,7 +344,7 @@ export function behaviourMetrics(decisions: DecisionRow[]): BehaviourMetrics {
   return {
     totalDecisions: total,
     firstAttemptSafeRate: percent(
-      firstAttempts.filter((d) => d.is_safe_choice === true).length,
+      firstAttempts.filter((d) => d.isSafeChoice === true).length,
       firstAttempts.length,
     ),
     firstAttemptCount: firstAttempts.length,
@@ -397,19 +397,19 @@ export function transferAnalysis(
 ): TransferAnalysis {
   const byModule = new Map<string, DecisionRow[]>()
   decisions.forEach((d) => {
-    if (!d.module_id) return
-    if (!byModule.has(d.module_id)) byModule.set(d.module_id, [])
-    byModule.get(d.module_id)!.push(d)
+    if (!d.moduleId) return
+    if (!byModule.has(d.moduleId)) byModule.set(d.moduleId, [])
+    byModule.get(d.moduleId)!.push(d)
   })
 
   const points: TransferPoint[] = [...byModule.entries()]
     .map(([moduleId, rows]) => {
-      const firstAttempts = rows.filter((d) => (d.attempt_number ?? 1) === 1)
+      const firstAttempts = rows.filter((d) => (d.attemptNumber ?? 1) === 1)
       return {
         moduleId,
         moduleOrder: moduleOrderById[moduleId] ?? 0,
         firstAttemptSafeRate: percent(
-          firstAttempts.filter((d) => d.is_safe_choice === true).length,
+          firstAttempts.filter((d) => d.isSafeChoice === true).length,
           firstAttempts.length,
         ),
         firstAttemptCount: firstAttempts.length,

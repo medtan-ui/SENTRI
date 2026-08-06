@@ -20,10 +20,10 @@ export default function ScenarioFlowView({ scenarios }) {
   return (
     <div className={styles.wrap}>
       {scenarios.map((scenario) => (
-        <Card key={scenario.scenario_id} className={styles.column}>
+        <Card key={scenario.scenarioId} className={styles.column}>
           <div className={styles.columnHeader}>
-            <span className={styles.orderBadge}>Scenario {scenario.scenario_order}</span>
-            <h3 className={styles.columnTitle}>{scenario.scenario_title || '(untitled)'}</h3>
+            <span className={styles.orderBadge}>Scenario {scenario.scenarioOrder}</span>
+            <h3 className={styles.columnTitle}>{scenario.scenarioTitle || '(untitled)'}</h3>
             <span className={styles.sceneTag}>{sceneLabelFor(scenario.scene)}</span>
           </div>
 
@@ -31,19 +31,19 @@ export default function ScenarioFlowView({ scenarios }) {
 
           <div className={styles.choices}>
             {scenario.choices.map((choice) => (
-              <div key={choice.scenario_choice_id} className={styles.choiceNode}>
+              <div key={choice.scenarioChoiceId} className={styles.choiceNode}>
                 <div className={styles.choiceHeader}>
-                  <span className={`${badges.pill} ${choice.is_safe_choice ? badges.safe : badges.risky}`}>
-                    {choice.is_safe_choice ? 'Safe' : 'Risky'}
+                  <span className={`${badges.pill} ${choice.isSafeChoice ? badges.safe : badges.risky}`}>
+                    {choice.isSafeChoice ? 'Safe' : 'Risky'}
                   </span>
                 </div>
-                <p className={styles.choiceText}>{choice.choice_text || '(no choice description yet)'}</p>
+                <p className={styles.choiceText}>{choice.choiceText || '(no choice description yet)'}</p>
                 <div className={styles.arrowDown} aria-hidden="true">↓</div>
-                <div className={styles.outcomeNode} data-safe={choice.is_safe_choice}>
-                  <p className={styles.outcomeTitle}>{choice.outcome_title || '(no outcome title yet)'}</p>
-                  {!choice.is_safe_choice && (
+                <div className={styles.outcomeNode} data-safe={choice.isSafeChoice}>
+                  <p className={styles.outcomeTitle}>{choice.outcomeTitle || '(no outcome title yet)'}</p>
+                  {!choice.isSafeChoice && (
                     <span className={styles.outcomeMeta}>
-                      ⚠ {CONSEQUENCE_TYPE_LABELS[choice.consequence_type] || choice.consequence_type}
+                      ⚠ {CONSEQUENCE_TYPE_LABELS[choice.consequenceType] || choice.consequenceType}
                     </span>
                   )}
                 </div>

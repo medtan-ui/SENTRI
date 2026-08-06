@@ -4,8 +4,8 @@
  * written server-side by the recordAnalyticsEvent Cloud Function.
  *
  * This is the time-on-task layer, distinct from the two finer-grained
- * ones: `quiz_responses` measures a single question, and
- * `scenario_decision_records` measures a single decision. Here an event
+ * ones: `quizResponses` measures a single question, and
+ * `scenarioDecisionRecords` measures a single decision. Here an event
  * covers a whole activity — how long a student spent reading a lesson,
  * running a simulation, or taking a quiz.
  *

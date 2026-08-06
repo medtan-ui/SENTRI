@@ -1,7 +1,7 @@
 
 ## Cyber-Simulation Training Platform
 
-SENTRI is a comprehensive web-based training platform designed to educate K-12 students on critical cybersecurity concepts through interactive modules and realistic scenarios. The platform features adaptive learning paths, progress tracking, and role-based access control to create an engaging and effective learning experience.
+SENTRI is a comprehensive web-based training platform designed to educate non-IT college students of TIP Manila on critical cybersecurity concepts through interactive modules and realistic scenarios. The platform features adaptive learning paths, progress tracking, and role-based access control to create an engaging and effective learning experience.
 
 ### Key Features
 
@@ -63,9 +63,9 @@ SENTRI is a comprehensive web-based training platform designed to educate K-12 s
 #### Scheduled analytics
 
 `scheduledAnalyticsAggregation` recomputes every analytics aggregate
-(six modules, the whole-cohort rollup, and one rollup per section in use)
-nightly at 02:00 Asia/Manila, so the admin dashboard is never staler than
-a day without anyone clicking Refresh.
+(six modules plus the cohort rollup) nightly at 02:00 Asia/Manila, so the
+admin dashboard is never staler than a day without anyone clicking
+Refresh.
 
 It is deployed by `firebase deploy --only functions` like any other
 function, but the first deploy also needs the **Cloud Scheduler API**

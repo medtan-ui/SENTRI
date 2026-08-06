@@ -9,7 +9,7 @@
  * pulling in React.
  *
  * Scope note: only *editable* fields are validated. Structural fields
- * (scene, target, is_safe_choice, ids) come straight from the authored
+ * (scene, target, isSafeChoice, ids) come straight from the authored
  * config via mergeScenarioConfig and cannot be wrong here — the one
  * exception is the safe-choice count, checked as a cheap tripwire in case
  * a future authored config is hand-edited and gets it wrong.
@@ -23,11 +23,11 @@ import { CONSEQUENCE_TYPES } from '../../../../services/scenarioService'
 export function validateScenario(scenario) {
   const issues = []
 
-  if (!scenario.scenario_title || !scenario.scenario_title.trim()) {
-    issues.push({ field: 'scenario_title', message: 'Scenario title is empty.' })
+  if (!scenario.scenarioTitle || !scenario.scenarioTitle.trim()) {
+    issues.push({ field: 'scenarioTitle', message: 'Scenario title is empty.' })
   }
-  if (!scenario.scenario_description || !scenario.scenario_description.trim()) {
-    issues.push({ field: 'scenario_description', message: 'Scenario description is empty.' })
+  if (!scenario.scenarioDescription || !scenario.scenarioDescription.trim()) {
+    issues.push({ field: 'scenarioDescription', message: 'Scenario description is empty.' })
   }
   if (!scenario.posterCaption || !scenario.posterCaption.trim()) {
     issues.push({
@@ -43,7 +43,7 @@ export function validateScenario(scenario) {
   // two distinct safe endings. What is never acceptable is *zero*: that
   // leaves the scenario unwinnable, since the engine only advances on a
   // safe choice.
-  const safeCount = scenario.choices.filter((c) => c.is_safe_choice).length
+  const safeCount = scenario.choices.filter((c) => c.isSafeChoice).length
   if (safeCount === 0) {
     issues.push({
       field: 'safeChoice',
@@ -53,25 +53,25 @@ export function validateScenario(scenario) {
 
   scenario.choices.forEach((choice, index) => {
     const label = `Choice ${index + 1}`
-    const id = choice.scenario_choice_id
-    if (!choice.choice_text || !choice.choice_text.trim()) {
-      issues.push({ field: `choice-${id}-choice_text`, message: `${label}: choice description is empty.` })
+    const id = choice.scenarioChoiceId
+    if (!choice.choiceText || !choice.choiceText.trim()) {
+      issues.push({ field: `choice-${id}-choiceText`, message: `${label}: choice description is empty.` })
     }
-    if (!choice.outcome_title || !choice.outcome_title.trim()) {
-      issues.push({ field: `choice-${id}-outcome_title`, message: `${label}: outcome title is empty.` })
+    if (!choice.outcomeTitle || !choice.outcomeTitle.trim()) {
+      issues.push({ field: `choice-${id}-outcomeTitle`, message: `${label}: outcome title is empty.` })
     }
-    if (!choice.feedback_text || !choice.feedback_text.trim()) {
-      issues.push({ field: `choice-${id}-feedback_text`, message: `${label}: feedback text is empty.` })
+    if (!choice.feedbackText || !choice.feedbackText.trim()) {
+      issues.push({ field: `choice-${id}-feedbackText`, message: `${label}: feedback text is empty.` })
     }
-    if (!CONSEQUENCE_TYPES.includes(choice.consequence_type)) {
+    if (!CONSEQUENCE_TYPES.includes(choice.consequenceType)) {
       issues.push({
-        field: `choice-${id}-consequence_type`,
-        message: `${label}: "${choice.consequence_type}" is not a consequence type the engine can illustrate.`,
+        field: `choice-${id}-consequenceType`,
+        message: `${label}: "${choice.consequenceType}" is not a consequence type the engine can illustrate.`,
       })
     }
   })
 
-  return { scenarioId: scenario.scenario_id, isValid: issues.length === 0, issues }
+  return { scenarioId: scenario.scenarioId, isValid: issues.length === 0, issues }
 }
 
 /**

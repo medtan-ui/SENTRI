@@ -18,9 +18,9 @@ export interface ModuleProgressDoc {
   // Both run on the same item bank; see modules/assessment. Optional
   // because documents created before these fields existed simply don't
   // have them, and every reader treats "absent" as "not taken yet".
-  pretestCompleted?: boolean
-  pretestScore?: number | null
-  pretestCompletedAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp | null
+  preTestCompleted?: boolean
+  preTestScore?: number | null
+  preTestCompletedAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp | null
   postTestCompleted?: boolean
   postTestScore?: number | null
   postTestCompletedAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp | null

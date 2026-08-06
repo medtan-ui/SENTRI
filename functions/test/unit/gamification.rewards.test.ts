@@ -86,7 +86,7 @@ describe('pointsForModule', () => {
 
   it('is a pure function of state — running it repeatedly never inflates the total', () => {
     const progress = makeProgress({
-      pretestCompleted: true,
+      preTestCompleted: true,
       lessonCompleted: true,
       simulationCompleted: true,
       quizCompleted: true,
@@ -101,7 +101,7 @@ describe('pointsForModule', () => {
 
   it('values a flawlessly finished module at the documented maximum', () => {
     const perfect = makeProgress({
-      pretestCompleted: true,
+      preTestCompleted: true,
       lessonCompleted: true,
       simulationCompleted: true,
       quizCompleted: true,
@@ -172,7 +172,7 @@ describe('totalsFrom', () => {
  *
  * This replaces a predicate in the badge system that used to live beside
  * this one, which read a field name (`is_safe`) that nothing writes; the
- * real field is `is_safe_choice`. The comparison silently evaluated to
+ * real field is `isSafeChoice`. The comparison silently evaluated to
  * `undefined === false`, so its "no risky choices" badge was awarded to
  * anyone who finished any simulation at all. Hence the deliberately
  * unkind cases below.

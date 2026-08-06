@@ -77,7 +77,7 @@ function commonPrefixLength(strings) {
  * Three real signup cards. The student types a password into each and
  * saves it; once all three are saved, this scene — not the engine —
  * decides which choice applies by comparing the three strings, then
- * calls onResolve with that choice's scenario_choice_id. No "what
+ * calls onResolve with that choice's scenarioChoiceId. No "what
  * should you do" menu: the choices ARE the password fields and Save
  * buttons.
  *
@@ -93,7 +93,7 @@ export default function SignupTrioScene({ scenario, interactive, onResolve }) {
   const [emptyWarningKey, setEmptyWarningKey] = useState(null)
 
   function findChoiceId(targetName) {
-    return scenario.choices.find((c) => c.target === targetName)?.scenario_choice_id
+    return scenario.choices.find((c) => c.target === targetName)?.scenarioChoiceId
   }
 
   function evaluate(pw) {

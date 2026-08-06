@@ -5,7 +5,7 @@
  * This session changed who can read what: `moduleLessons` and
  * `moduleScenarios` went from admin-only to student-readable (because the
  * Lesson Viewer and Scenario Engine now genuinely read them), and a new
- * `quiz_responses` collection was added that no client may ever write.
+ * `quizResponses` collection was added that no client may ever write.
  * Those are exactly the changes where a mistake is silent — the app keeps
  * working while the data is either unreachable or wide open — so they get
  * asserted directly rather than assumed.
@@ -48,8 +48,8 @@ beforeAll(async () => {
     await db.doc(`users/${ADMIN_UID}`).set({ role: 'admin', email: 'admin@test.local' })
     await db.doc(`users/${STUDENT_UID}`).set({ role: 'student', email: 'student@test.local' })
     await db.doc(`moduleLessons/${MODULE_ID}`).set({ moduleId: MODULE_ID, sections: [] })
-    await db.doc(`moduleScenarios/${MODULE_ID}`).set({ module_id: MODULE_ID, scenarios: [] })
-    await db.doc('quiz_responses/response-1').set({ userId: STUDENT_UID, moduleId: MODULE_ID })
+    await db.doc(`moduleScenarios/${MODULE_ID}`).set({ moduleId: MODULE_ID, scenarios: [] })
+    await db.doc('quizResponses/response-1').set({ userId: STUDENT_UID, moduleId: MODULE_ID })
     await db.doc('cohortAnalytics/current').set({ totalStudents: 1 })
     await db.doc(`moduleProgress/${STUDENT_UID}_${MODULE_ID}`).set({
       userId: STUDENT_UID,
@@ -86,37 +86,37 @@ describe('firestore.rules — published content', () => {
 
   it('refuses a student writing lesson or scenario content', async () => {
     await assertFails(asStudent().doc(`moduleLessons/${MODULE_ID}`).set({ sections: [] }))
-    await assertFails(asStudent().doc(`moduleScenarios/${MODULE_ID}`).update({ module_title: 'Hacked' }))
+    await assertFails(asStudent().doc(`moduleScenarios/${MODULE_ID}`).update({ moduleTitle: 'Hacked' }))
   })
 
   it('lets an admin write lesson and scenario content', async () => {
     await assertSucceeds(
       asAdmin().doc(`moduleLessons/${MODULE_ID}`).set({ moduleId: MODULE_ID, sections: [] }),
     )
-    await assertSucceeds(asAdmin().doc(`moduleScenarios/${MODULE_ID}`).update({ module_title: 'Edited' }))
+    await assertSucceeds(asAdmin().doc(`moduleScenarios/${MODULE_ID}`).update({ moduleTitle: 'Edited' }))
   })
 })
 
 describe('firestore.rules — item-analysis responses', () => {
   it('refuses a student reading response rows', async () => {
     // Reading these would expose the answer key across every assessment.
-    await assertFails(asStudent().doc('quiz_responses/response-1').get())
+    await assertFails(asStudent().doc('quizResponses/response-1').get())
   })
 
   it('refuses a student writing a response row, even their own', async () => {
     // The measurement that a learning gain is computed from must not be
     // forgeable by the person being measured.
     await assertFails(
-      asStudent().doc('quiz_responses/forged').set({ userId: STUDENT_UID, isCorrect: true }),
+      asStudent().doc('quizResponses/forged').set({ userId: STUDENT_UID, isCorrect: true }),
     )
   })
 
   it('refuses even an admin writing a response row', async () => {
-    await assertFails(asAdmin().doc('quiz_responses/forged').set({ userId: STUDENT_UID }))
+    await assertFails(asAdmin().doc('quizResponses/forged').set({ userId: STUDENT_UID }))
   })
 
   it('lets an admin read response rows for analytics', async () => {
-    await assertSucceeds(asAdmin().doc('quiz_responses/response-1').get())
+    await assertSucceeds(asAdmin().doc('quizResponses/response-1').get())
   })
 })
 

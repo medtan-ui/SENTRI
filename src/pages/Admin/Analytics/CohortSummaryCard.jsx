@@ -56,24 +56,14 @@ function TrendChart({ points }) {
  * because these are the figures the capstone's own objectives are
  * reported against, and they should have exactly one derivation.
  */
-export default function CohortSummaryCard({ summary, section, refreshing, onRefresh }) {
-  // The card's own scope, not the picker's: a stored document knows which
-  // group it was computed over, and that is the honest label for the
-  // numbers actually on screen. The picker only agrees once a refresh has
-  // caught up with it.
-  const scope = summary?.section ?? null
-
+export default function CohortSummaryCard({ summary, refreshing, onRefresh }) {
   return (
     <Card className={styles.cohortCard}>
       <div className={styles.cohortHeader}>
         <div>
-          <h2 className={styles.cohortTitle}>
-            {scope ? `Cohort Overview: ${scope}` : 'Cohort Overview'}
-          </h2>
+          <h2 className={styles.cohortTitle}>Cohort Overview</h2>
           <p className={styles.cohortSubtitle}>
-            {scope
-              ? `Learning gain, behaviour, and cross-module transfer for section ${scope}.`
-              : 'Class-wide learning gain, behaviour, and cross-module transfer.'}
+            Class-wide learning gain, behaviour, and cross-module transfer.
           </p>
         </div>
         <Button variant="ghost" data-print-hide onClick={onRefresh} loading={refreshing} disabled={refreshing}>
@@ -82,11 +72,7 @@ export default function CohortSummaryCard({ summary, section, refreshing, onRefr
       </div>
 
       {!summary ? (
-        <p className={styles.emptyText}>
-          {section
-            ? `Section ${section} has not been aggregated yet. Click Refresh Cohort to compute it.`
-            : 'Not yet aggregated. Click Refresh Cohort to compute.'}
-        </p>
+        <p className={styles.emptyText}>Not yet aggregated. Click Refresh Cohort to compute.</p>
       ) : (
         <>
           <div className={styles.statGrid}>

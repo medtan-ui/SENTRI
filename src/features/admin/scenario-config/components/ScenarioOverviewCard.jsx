@@ -17,12 +17,12 @@ export default function ScenarioOverviewCard({ moduleName, overviewDescription, 
 
       <div className={styles.summaryRow}>
         {scenarios.map((scenario) => {
-          const validation = validations.find((v) => v.scenarioId === scenario.scenario_id)
+          const validation = validations.find((v) => v.scenarioId === scenario.scenarioId)
           const isValid = validation?.isValid ?? true
           return (
-            <div key={scenario.scenario_id} className={styles.summaryItem}>
-              <span className={styles.summaryOrder}>Scenario {scenario.scenario_order}</span>
-              <span className={styles.summaryTitle}>{scenario.scenario_title || '(untitled)'}</span>
+            <div key={scenario.scenarioId} className={styles.summaryItem}>
+              <span className={styles.summaryOrder}>Scenario {scenario.scenarioOrder}</span>
+              <span className={styles.summaryTitle}>{scenario.scenarioTitle || '(untitled)'}</span>
               <span className={`${badges.pill} ${isValid ? badges.valid : badges.invalid}`}>
                 {isValid
                   ? '✓ Valid'

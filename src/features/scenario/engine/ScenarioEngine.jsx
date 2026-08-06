@@ -49,7 +49,7 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
     <ScenarioInteractionProvider value={interaction}>
       <div className={styles.wrap}>
         <div className={styles.header}>
-          <h2 className={styles.moduleTitle}>{config.module_title}</h2>
+          <h2 className={styles.moduleTitle}>{config.moduleTitle}</h2>
           <ScenarioProgress
             total={totalScenarios}
             currentIndex={scenarioIndex}
@@ -66,9 +66,9 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
             <div className={styles.layer} key={`player-${scenarioIndex}`}>
               <ScenarioPlayer
                 videoAvailable={currentScenario.videoAvailable}
-                materialUrl={currentScenario.material_url}
+                materialUrl={currentScenario.materialUrl}
                 posterCaption={currentScenario.posterCaption}
-                scenarioTitle={currentScenario.scenario_title}
+                scenarioTitle={currentScenario.scenarioTitle}
               />
             </div>
           )}

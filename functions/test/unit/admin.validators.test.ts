@@ -8,38 +8,38 @@ import { QuizConfig, QuizQuestion, ScenarioConfig, ScenarioItem } from '../../sr
 
 function makeChoice(overrides: Partial<ScenarioItem['choices'][number]> = {}) {
   return {
-    scenario_choice_id: 'c1',
+    scenarioChoiceId: 'c1',
     target: 'link-btn',
-    choice_text: 'Click the link',
-    is_safe_choice: false,
-    outcome_title: 'Credentials Captured',
-    consequence_type: 'credential_compromise',
-    feedback_text: 'That was risky.',
-    feedback_media_url: null,
+    choiceText: 'Click the link',
+    isSafeChoice: false,
+    outcomeTitle: 'Credentials Captured',
+    consequenceType: 'credential_compromise',
+    feedbackText: 'That was risky.',
+    feedbackMediaUrl: null,
     ...overrides,
   }
 }
 
 function makeScenario(overrides: Partial<ScenarioItem> = {}): ScenarioItem {
   return {
-    scenario_id: 'scenario-1',
-    scenario_order: 1,
-    scenario_title: 'A Suspicious Email',
-    scenario_description: 'An unexpected email lands in your inbox.',
+    scenarioId: 'scenario-1',
+    scenarioOrder: 1,
+    scenarioTitle: 'A Suspicious Email',
+    scenarioDescription: 'An unexpected email lands in your inbox.',
     videoAvailable: false,
-    material_url: null,
+    materialUrl: null,
     posterCaption: 'One email, one decision.',
     scene: 'InboxScene',
     choices: [
       makeChoice(),
       makeChoice({
-        scenario_choice_id: 'c2',
+        scenarioChoiceId: 'c2',
         target: 'report-btn',
-        choice_text: 'Report it',
-        is_safe_choice: true,
-        outcome_title: 'Well Handled',
-        consequence_type: 'none',
-        feedback_text: 'Well done.',
+        choiceText: 'Report it',
+        isSafeChoice: true,
+        outcomeTitle: 'Well Handled',
+        consequenceType: 'none',
+        feedbackText: 'Well done.',
       }),
     ],
     ...overrides,
@@ -53,7 +53,7 @@ describe('modules/admin/validators — scenario business rules', () => {
 
   it('flags zero safe choices, which would leave the scenario unwinnable', () => {
     const scenario = makeScenario({
-      choices: [makeChoice(), makeChoice({ scenario_choice_id: 'c2', target: 'report-btn' })],
+      choices: [makeChoice(), makeChoice({ scenarioChoiceId: 'c2', target: 'report-btn' })],
     })
     const issues = validateScenarioItem(scenario)
     expect(issues.some((i) => i.field === 'safeChoice')).toBe(true)
@@ -65,12 +65,12 @@ describe('modules/admin/validators — scenario business rules', () => {
     // distinguishing unique-and-strong from unique-but-weak passwords.
     const scenario = makeScenario({
       choices: [
-        makeChoice({ is_safe_choice: true, consequence_type: 'none' }),
+        makeChoice({ isSafeChoice: true, consequenceType: 'none' }),
         makeChoice({
-          scenario_choice_id: 'c2',
+          scenarioChoiceId: 'c2',
           target: 'report-btn',
-          is_safe_choice: true,
-          consequence_type: 'none',
+          isSafeChoice: true,
+          consequenceType: 'none',
         }),
       ],
     })
@@ -83,7 +83,7 @@ describe('modules/admin/validators — scenario business rules', () => {
     const scenario = makeScenario({
       choices: [
         makeChoice(),
-        makeChoice({ scenario_choice_id: 'c2', is_safe_choice: true, consequence_type: 'none' }),
+        makeChoice({ scenarioChoiceId: 'c2', isSafeChoice: true, consequenceType: 'none' }),
       ],
     })
     const issues = validateScenarioItem(scenario)
@@ -91,35 +91,35 @@ describe('modules/admin/validators — scenario business rules', () => {
   })
 
   it('flags empty student-visible scenario copy', () => {
-    const issues = validateScenarioItem(makeScenario({ scenario_title: '  ', posterCaption: '' }))
-    expect(issues.some((i) => i.field === 'scenario_title')).toBe(true)
+    const issues = validateScenarioItem(makeScenario({ scenarioTitle: '  ', posterCaption: '' }))
+    expect(issues.some((i) => i.field === 'scenarioTitle')).toBe(true)
     expect(issues.some((i) => i.field === 'posterCaption')).toBe(true)
   })
 
   it('flags empty choice copy per field', () => {
     const scenario = makeScenario({
       choices: [
-        makeChoice({ choice_text: '', outcome_title: '', feedback_text: '' }),
+        makeChoice({ choiceText: '', outcomeTitle: '', feedbackText: '' }),
         makeChoice({
-          scenario_choice_id: 'c2',
+          scenarioChoiceId: 'c2',
           target: 'report-btn',
-          is_safe_choice: true,
-          consequence_type: 'none',
+          isSafeChoice: true,
+          consequenceType: 'none',
         }),
       ],
     })
     const issues = validateScenarioItem(scenario)
-    expect(issues.some((i) => i.field === 'choice-c1-choice_text')).toBe(true)
-    expect(issues.some((i) => i.field === 'choice-c1-outcome_title')).toBe(true)
-    expect(issues.some((i) => i.field === 'choice-c1-feedback_text')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c1-choiceText')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c1-outcomeTitle')).toBe(true)
+    expect(issues.some((i) => i.field === 'choice-c1-feedbackText')).toBe(true)
   })
 
   it('validateScenarioConfig aggregates issues across all scenarios', () => {
     const config: ScenarioConfig = {
-      module_id: 'phishing-awareness',
-      module_title: 'Phishing Awareness',
+      moduleId: 'phishing-awareness',
+      moduleTitle: 'Phishing Awareness',
       coachLevel: 'full',
-      scenarios: [makeScenario(), makeScenario({ scenario_id: 'scenario-2', choices: [] as any })],
+      scenarios: [makeScenario(), makeScenario({ scenarioId: 'scenario-2', choices: [] as any })],
     }
     const result = validateScenarioConfig(config)
     expect(result.valid).toBe(false)

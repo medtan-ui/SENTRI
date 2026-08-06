@@ -15,7 +15,7 @@
  * ── The structural / editable split ──────────────────────────────────
  * A scenario is half content and half *wiring*. `scene` names a bespoke
  * React component; `target` names a clickable element inside that
- * component; `is_safe_choice` is what that component's own logic was
+ * component; `isSafeChoice` is what that component's own logic was
  * written against. None of those can be regenerated from a form, and an
  * admin editing them would silently break the simulation — so they are
  * always taken from the authored config in
@@ -39,21 +39,21 @@ export const SCENARIO_CONTENT_VERSION = 2
 
 /** Scenario-level fields an admin may edit. Everything else is structural. */
 export const EDITABLE_SCENARIO_FIELDS = [
-  'scenario_title',
-  'scenario_description',
+  'scenarioTitle',
+  'scenarioDescription',
   'posterCaption',
-  'material_url',
+  'materialUrl',
   'videoAvailable',
   'postCompletionReflection',
 ]
 
 /** Choice-level fields an admin may edit. Everything else is structural. */
 export const EDITABLE_CHOICE_FIELDS = [
-  'choice_text',
-  'outcome_title',
-  'consequence_type',
-  'feedback_text',
-  'feedback_media_url',
+  'choiceText',
+  'outcomeTitle',
+  'consequenceType',
+  'feedbackText',
+  'feedbackMediaUrl',
 ]
 
 /** The consequence types ConsequenceOverlay knows how to illustrate. */
@@ -114,27 +114,27 @@ export function mergeScenarioConfig(stored, moduleId) {
   if (!stored || !Array.isArray(stored.scenarios)) return authored
 
   const storedScenarios = new Map(
-    stored.scenarios.filter((s) => s && s.scenario_id).map((s) => [s.scenario_id, s]),
+    stored.scenarios.filter((s) => s && s.scenarioId).map((s) => [s.scenarioId, s]),
   )
 
   return {
     ...authored,
-    module_title: stored.module_title || authored.module_title,
+    moduleTitle: stored.moduleTitle || authored.moduleTitle,
     coachLevel: stored.coachLevel || authored.coachLevel,
     scenarios: authored.scenarios.map((scenario) => {
-      const storedScenario = storedScenarios.get(scenario.scenario_id)
+      const storedScenario = storedScenarios.get(scenario.scenarioId)
       const merged = overlay(scenario, storedScenario, EDITABLE_SCENARIO_FIELDS)
 
       const storedChoices = new Map(
         (storedScenario?.choices || [])
-          .filter((c) => c && c.scenario_choice_id)
-          .map((c) => [c.scenario_choice_id, c]),
+          .filter((c) => c && c.scenarioChoiceId)
+          .map((c) => [c.scenarioChoiceId, c]),
       )
 
       return {
         ...merged,
         choices: scenario.choices.map((choice) =>
-          overlay(choice, storedChoices.get(choice.scenario_choice_id), EDITABLE_CHOICE_FIELDS),
+          overlay(choice, storedChoices.get(choice.scenarioChoiceId), EDITABLE_CHOICE_FIELDS),
         ),
       }
     }),

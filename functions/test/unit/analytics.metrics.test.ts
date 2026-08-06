@@ -168,10 +168,10 @@ describe('itemAnalysis', () => {
 
 describe('behaviourMetrics', () => {
   const decisions: DecisionRow[] = [
-    { is_safe_choice: false, attempt_number: 1, duration_ms: 1000 },
-    { is_safe_choice: true, attempt_number: 2, duration_ms: 9000 },
-    { is_safe_choice: true, attempt_number: 1, duration_ms: 5000 },
-    { is_safe_choice: false, attempt_number: 1, duration_ms: 8000 },
+    { isSafeChoice: false, attemptNumber: 1, durationMs: 1000 },
+    { isSafeChoice: true, attemptNumber: 2, durationMs: 9000 },
+    { isSafeChoice: true, attemptNumber: 1, durationMs: 5000 },
+    { isSafeChoice: false, attemptNumber: 1, durationMs: 8000 },
   ]
 
   it('measures first-attempt safety only over first attempts', () => {
@@ -185,8 +185,8 @@ describe('behaviourMetrics', () => {
     // Every scenario ends safely in the engine, so an eventual-success
     // rate would always read 100%. First-attempt rate must not.
     const result = behaviourMetrics([
-      { is_safe_choice: false, attempt_number: 1 },
-      { is_safe_choice: true, attempt_number: 2 },
+      { isSafeChoice: false, attemptNumber: 1 },
+      { isSafeChoice: true, attemptNumber: 2 },
     ])
     expect(result.firstAttemptSafeRate).toBe(0)
   })
@@ -203,7 +203,7 @@ describe('behaviourMetrics', () => {
   })
 
   it('returns null timings rather than zero when nothing was measured', () => {
-    const result = behaviourMetrics([{ is_safe_choice: true, attempt_number: 1 }])
+    const result = behaviourMetrics([{ isSafeChoice: true, attemptNumber: 1 }])
     expect(result.medianTimeToDecideMs).toBeNull()
     expect(result.avgTimeToDecideMs).toBeNull()
     expect(result.fastWrongCount).toBe(0)
@@ -221,8 +221,8 @@ describe('transferAnalysis', () => {
 
   it('orders per-module behaviour by curriculum position, not insertion order', () => {
     const decisions: DecisionRow[] = [
-      { module_id: 'online-safety', is_safe_choice: true, attempt_number: 1 },
-      { module_id: 'password-security', is_safe_choice: false, attempt_number: 1 },
+      { moduleId: 'online-safety', isSafeChoice: true, attemptNumber: 1 },
+      { moduleId: 'password-security', isSafeChoice: false, attemptNumber: 1 },
     ]
     const result = transferAnalysis(decisions, [], moduleOrder)
     expect(result.byModule.map((p) => p.moduleId)).toEqual(['password-security', 'online-safety'])
@@ -230,10 +230,10 @@ describe('transferAnalysis', () => {
 
   it('reports positive behavioural transfer when later modules start safer', () => {
     const decisions: DecisionRow[] = [
-      { module_id: 'password-security', is_safe_choice: false, attempt_number: 1 },
-      { module_id: 'password-security', is_safe_choice: false, attempt_number: 1 },
-      { module_id: 'online-safety', is_safe_choice: true, attempt_number: 1 },
-      { module_id: 'online-safety', is_safe_choice: true, attempt_number: 1 },
+      { moduleId: 'password-security', isSafeChoice: false, attemptNumber: 1 },
+      { moduleId: 'password-security', isSafeChoice: false, attemptNumber: 1 },
+      { moduleId: 'online-safety', isSafeChoice: true, attemptNumber: 1 },
+      { moduleId: 'online-safety', isSafeChoice: true, attemptNumber: 1 },
     ]
     const result = transferAnalysis(decisions, [], moduleOrder)
     expect(result.behaviouralTransfer).toBe(100)
@@ -262,7 +262,7 @@ describe('transferAnalysis', () => {
 
   it('leaves behavioural transfer null with only one module of data', () => {
     const result = transferAnalysis(
-      [{ module_id: 'password-security', is_safe_choice: true, attempt_number: 1 }],
+      [{ moduleId: 'password-security', isSafeChoice: true, attemptNumber: 1 }],
       [],
       moduleOrder,
     )

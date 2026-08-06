@@ -1,4 +1,4 @@
-# SENTRI Analytics: How It Actually Works
+﻿# SENTRI Analytics: How It Actually Works
 
 *A guide to reading the admin Analytics page, and to defending the numbers on it.*
 
@@ -28,16 +28,16 @@ That file is pure mathematics with no database access, which is also why every m
 
 | When a student... | This gets written | Collection |
 |---|---|---|
-| Answers any single question (pre-test, quiz, or post-test) | One row per question: topic, right/wrong, time spent | `quiz_responses` |
+| Answers any single question (pre-test, quiz, or post-test) | One row per question: topic, right/wrong, time spent | `quizResponses` |
 | Submits a whole quiz | One row: score, passed, attempt number | `quizAttempts` |
-| Makes a choice in a simulation | One row per decision, **including retries** | `scenario_decision_records` |
+| Makes a choice in a simulation | One row per decision, **including retries** | `scenarioDecisionRecords` |
 | Finishes a lesson, module, or assessment | One row: what happened, how long it took | `analyticsEvents` |
 | Progresses through a module at all | One running record per student per module | `moduleProgress` |
 
 Two details in here carry a lot of weight later:
 
-- **`quiz_responses` is per *question*, not per test.** A quiz attempt only knows "you scored 72%". Item analysis needs to know *which* questions you got wrong, which is why this collection exists at all.
-- **Every decision is recorded, including the retries.** The simulation always eventually lets a student through to the safe outcome. If we only stored the final decision, the safe rate would read 100% forever and mean nothing. Storing `attempt_number` is what makes "did they get it right *first* time" answerable.
+- **`quizResponses` is per *question*, not per test.** A quiz attempt only knows "you scored 72%". Item analysis needs to know *which* questions you got wrong, which is why this collection exists at all.
+- **Every decision is recorded, including the retries.** The simulation always eventually lets a student through to the safe outcome. If we only stored the final decision, the safe rate would read 100% forever and mean nothing. Storing `attemptNumber` is what makes "did they get it right *first* time" answerable.
 
 Nothing here is writable by a student's browser except their own progress and their own decisions. Grading happens server-side specifically so a post-test score cannot be manufactured.
 
@@ -50,13 +50,12 @@ Three summary documents get computed from those raw collections:
 | `moduleAnalytics/{moduleId}` | One module, all students | "How is the class doing on Phishing Awareness?" |
 | `studentAnalytics/{userId}` | One student, all modules | "How is Juan doing?" |
 | `cohortAnalytics/current` | All students, all modules | "Did the training work?" |
-| `cohortAnalytics/section__bsit-3a` | One class group | "Did it work for *this* class?" |
 
 ### Step 3: Aggregation runs at three moments
 
-1. **Nightly at 02:00 Manila time.** Recomputes all six modules, the whole cohort, and every section in use. This is why the dashboard is never more than a day stale even if nobody touches it.
-2. **When you click Refresh.** Either one module, one cohort scope, or "Refresh All".
-3. **When an account is deleted.** All six module summaries *and* every cohort rollup recompute immediately, so a deleted student's numbers stop being baked into the totals right away rather than lingering until 2am.
+1. **Nightly at 02:00 Manila time.** Recomputes all six modules and the cohort rollup. This is why the dashboard is never more than a day stale even if nobody touches it.
+2. **When you click Refresh.** Either one module, the cohort rollup, or "Refresh All".
+3. **When an account is deleted.** All six module summaries *and* the cohort rollup recompute immediately, so a deleted student's numbers stop being baked into the totals right away rather than lingering until 2am.
 
 The nightly job and the Refresh All button run the *same* code, so they cannot drift apart in what they cover.
 
@@ -181,23 +180,7 @@ D = (correct rate in top group) - (correct rate in bottom group)
 
 ---
 
-## 5. Sections (class groups)
-
-A section is a class group like `BSIT-3A`. It lets you report on one class instead of every student at once.
-
-**Assigning one:** a student can type it when registering, or an admin sets it on Accounts → (student) → Assign Section. Every change is written to the audit log with the before and after value, because moving a student changes which report their results land in.
-
-**Reporting on one:** use the picker at the top right of the Analytics page. Each section gets its own stored document, so switching between them never shows you a stale figure from the group you were just looking at.
-
-Three behaviours worth knowing:
-
-1. **`BSIT-3A`, `bsit 3a`, and `BSIT_3A` are one section, not three.** Matching ignores case and separators. The label you typed is preserved for display.
-2. **A student with no section still counts in the whole-cohort report.** Being unassigned is normal, not a reason to vanish from the class-wide numbers.
-3. **The per-module cards are NOT filtered by the section picker.** Only the Cohort Overview is. The heading above those cards says so on screen. If you want per-module numbers for one section, the Cohort Overview's own module breakdown (in the Module Breakdown CSV) has them.
-
----
-
-## 6. Exports
+## 5. Exports
 
 Five CSV files plus a PDF path, all from the Export bar.
 
@@ -210,21 +193,21 @@ Five CSV files plus a PDF path, all from the Export bar.
 | Activity Trend | The 30-day time series |
 | **Print / Save as PDF** | Opens the browser's print dialog. Choose "Save as PDF" as the destination. |
 
-Filenames carry the section and the date, so repeated exports do not overwrite each other.
+Filenames carry the date, so exports taken on different days do not overwrite each other.
 
 **One convention that matters when reading a CSV:** an unmeasurable statistic exports as a **blank cell, never as 0**. A 0 in a normalized gain column would be a claim ("no learning occurred"). A blank is the truth ("not measurable yet"). Same for a suppressed discrimination index, which exports blank with the attempt counts in their own adjacent columns.
 
 ---
 
-## 7. Why a number is blank or zero
+## 6. Why a number is blank or zero
 
 | You see | It means |
 |---|---|
-| Normalized gain `—` | No student has both a pre-test and a post-test on record yet |
+| Normalized gain `â€”` | No student has both a pre-test and a post-test on record yet |
 | `Not yet measurable` | Same as above, stated in words |
 | Cross-module transfer `Not measurable yet` | Fewer than two modules have simulation decisions |
 | `D: pending (4/10)` | Not enough attempts for a meaningful top/bottom split |
-| Median time to decide `—` | No decision had its duration measured |
+| Median time to decide `â€”` | No decision had its duration measured |
 | Topic gain blank | That topic has pre-test data or post-test data, but not both |
 | A flat activity chart | No module completions in the last 30 days |
 | Everything reading 0% | See the next section |
@@ -233,7 +216,7 @@ A recurring principle: **an unmeasured duration is stored as `null`, never as `0
 
 ---
 
-## 8. Current state: why your dashboard reads zero
+## 7. Current state: why your dashboard reads zero
 
 As of the last check, the live dashboard shows **1 student, 0 completed modules, and 0% on everything.**
 
@@ -250,7 +233,7 @@ For a defense demo, a handful of students taken end to end through two modules w
 
 ---
 
-## 9. What happens when you delete a test account
+## 8. What happens when you delete a test account
 
 Deleting a student account removes **everything** keyed to that student, so their results stop counting toward every figure on the dashboard:
 
@@ -271,7 +254,7 @@ The deletion also **immediately recomputes** all six module summaries and every 
 
 ---
 
-## 10. Where each number is computed
+## 9. Where each number is computed
 
 If a panelist asks where a figure comes from:
 
@@ -280,20 +263,19 @@ If a panelist asks where a figure comes from:
 | The mathematics | `functions/src/modules/analytics/metrics.ts` | Every statistic, as pure functions, unit tested |
 | Fetch and persist | `functions/src/modules/analytics/service.ts` | Reads raw collections, calls the maths, writes the summary |
 | Entry points | `functions/src/modules/analytics/controllers.ts` | The callables, and the nightly schedule |
-| Section rules | `functions/src/shared/sections.ts` | How a class label becomes a group key |
 | The screen | `src/pages/Admin/Analytics/` | Formatting only, no computation |
 | The exports | `src/pages/Admin/Analytics/reportRows.js` | Serializes stored documents, no computation |
 
 ---
 
-## 11. Five things NOT to claim
+## 10. Five things NOT to claim
 
 Worth reading once before a defense.
 
 1. **Do not quote a normalized gain without its `pairedCount`.** A gain of 0.62 from three students is not a cohort result.
 2. **Do not read the first-attempt safe rate as a pass rate.** It measures whether the *first* instinct was correct, not whether the student eventually succeeded. Everyone eventually succeeds by design.
 3. **Do not treat a high p-value as a good question.** It means the question was easy. Difficulty and quality are different axes, which is exactly why discrimination is reported alongside it.
-4. **Do not compare a section's numbers to the whole cohort's and call the difference significant.** With class-sized groups these are descriptive statistics, not inferential ones. No significance test is being run.
+4. **Do not call any difference between two groups significant.** With a class-sized cohort these are descriptive statistics, not inferential ones. No significance test is being run.
 5. **Do not describe the analytics as real-time.** They are recomputed nightly and on demand. The figure on screen is as of the last aggregation, and the card tells you when that was.
 
 ---

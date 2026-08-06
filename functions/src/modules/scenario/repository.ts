@@ -9,15 +9,15 @@ export async function getScenarioConfig(moduleId: string): Promise<ScenarioConfi
 
 /**
  * Same field names the frontend's scenarioDecisionService.js already
- * writes (user_id, module_id, scenario_id, scenario_choice_id,
- * selected_at, feedback_viewed) plus is_safe_choice, so the
+ * writes (userId, moduleId, scenarioId, scenarioChoiceId,
+ * selectedAt, feedbackViewed) plus isSafeChoice, so the
  * updateLearningAnalytics trigger (modules/analytics) can aggregate
  * without a second lookup against moduleScenarios.
  *
- * attempt_number and duration_ms are what the Kirkpatrick Level 3
+ * attemptNumber and durationMs are what the Kirkpatrick Level 3
  * measures are computed from: first-attempt safe rate needs to know
  * which decision was the first one, and the fast-wrong/slow-wrong split
- * needs how long the student took. duration_ms is null rather than 0
+ * needs how long the student took. durationMs is null rather than 0
  * when the client couldn't measure it, so an unmeasured decision is
  * excluded from timing averages instead of dragging them to zero.
  */
@@ -31,15 +31,15 @@ export async function recordDecision(params: {
   durationMs?: number
 }): Promise<string> {
   const ref = await db.collection(COLLECTIONS.SCENARIO_DECISION_RECORDS).add({
-    user_id: params.userId,
-    module_id: params.moduleId,
-    scenario_id: params.scenarioId,
-    scenario_choice_id: params.choiceId,
-    is_safe_choice: params.isSafe,
-    attempt_number: params.attemptNumber ?? 1,
-    duration_ms: typeof params.durationMs === 'number' ? Math.round(params.durationMs) : null,
-    selected_at: admin.firestore.FieldValue.serverTimestamp(),
-    feedback_viewed: false,
+    userId: params.userId,
+    moduleId: params.moduleId,
+    scenarioId: params.scenarioId,
+    scenarioChoiceId: params.choiceId,
+    isSafeChoice: params.isSafe,
+    attemptNumber: params.attemptNumber ?? 1,
+    durationMs: typeof params.durationMs === 'number' ? Math.round(params.durationMs) : null,
+    selectedAt: admin.firestore.FieldValue.serverTimestamp(),
+    feedbackViewed: false,
   })
   return ref.id
 }

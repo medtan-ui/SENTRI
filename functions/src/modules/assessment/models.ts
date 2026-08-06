@@ -68,7 +68,7 @@ export interface SubmitAssessmentResult {
 }
 
 /**
- * One document per answered question, in the `quiz_responses` collection.
+ * One document per answered question, in the `quizResponses` collection.
  * Written for all three assessment types so item difficulty and
  * discrimination can be computed over any of them.
  */

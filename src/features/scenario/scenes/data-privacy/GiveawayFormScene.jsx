@@ -17,7 +17,7 @@ const DANGER_PRIORITY = [
 ]
 
 function findChoiceId(scenario, targetName) {
-  return scenario.choices.find((c) => c.target === targetName)?.scenario_choice_id
+  return scenario.choices.find((c) => c.target === targetName)?.scenarioChoiceId
 }
 
 const BLANK_FIELDS = { name: '', email: '', address: '', phone: '', birthday: '' }

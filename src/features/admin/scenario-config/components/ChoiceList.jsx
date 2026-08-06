@@ -22,11 +22,11 @@ export default function ChoiceList({ choices, issues, onUpdateChoice }) {
       <div className={styles.list}>
         {choices.map((choice, index) => (
           <ChoiceEditor
-            key={choice.scenario_choice_id}
+            key={choice.scenarioChoiceId}
             choice={choice}
             index={index}
-            errors={issues.filter((issue) => issue.field.startsWith(`choice-${choice.scenario_choice_id}`))}
-            onUpdate={(patch) => onUpdateChoice(choice.scenario_choice_id, patch)}
+            errors={issues.filter((issue) => issue.field.startsWith(`choice-${choice.scenarioChoiceId}`))}
+            onUpdate={(patch) => onUpdateChoice(choice.scenarioChoiceId, patch)}
           />
         ))}
       </div>

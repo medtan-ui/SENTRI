@@ -56,9 +56,9 @@ function defaultProgress(userId, moduleId, moduleOrder, isUnlocked) {
     moduleId,
     moduleOrder,
     isUnlocked,
-    pretestCompleted: false,
-    pretestScore: null,
-    pretestCompletedAt: null,
+    preTestCompleted: false,
+    preTestScore: null,
+    preTestCompletedAt: null,
     postTestCompleted: false,
     postTestScore: null,
     postTestCompletedAt: null,
@@ -93,6 +93,35 @@ export function deriveModuleStatus(progress) {
   return MODULE_STATUS.AVAILABLE
 }
 
+function hasRealModuleProgress(progress) {
+  return Boolean(
+    progress.lessonStarted || progress.lessonCompleted || progress.simulationCompleted || progress.moduleCompleted,
+  )
+}
+
+/**
+ * `isUnlocked` is written once (at seed time, or when the previous module
+ * is completed) and never revisited after that — correct as long as the
+ * curriculum order never changes. But an admin CAN reorder modules
+ * (ModulesPage's move()), and that only ever writes to the `modules`
+ * collection, never to any student's moduleProgress docs, so a student's
+ * stored unlock flags can silently go stale: unlock a module by moving it
+ * to position 1, move it back, and it stays unlocked forever.
+ *
+ * This reconciles one module's stored `isUnlocked` against what it should
+ * be under the *current* order, and self-heals the stored value so this
+ * only has to correct itself once per drift. A module the student has any
+ * real progress on is left exactly as stored — reordering must never look
+ * like it took away something already started.
+ */
+function reconcileUnlock(userId, moduleId, progress, liveShouldBeUnlocked) {
+  if (hasRealModuleProgress(progress) || progress.isUnlocked === liveShouldBeUnlocked) return
+  progress.isUnlocked = liveShouldBeUnlocked
+  mergeDoc(COLLECTION, progressDocId(userId, moduleId), { isUnlocked: liveShouldBeUnlocked }).catch((err) => {
+    console.error('[moduleProgressService] unlock reconcile failed — continuing:', err)
+  })
+}
+
 /**
  * One student's progress on one module, lazily initialized on first read
  * (module order 1 starts unlocked, every other module starts locked).
@@ -102,10 +131,22 @@ export function deriveModuleStatus(progress) {
  */
 export async function getModuleProgress(userId, moduleId) {
   const modules = await listModules()
-  const moduleMeta = modules.find((m) => m.moduleId === moduleId)
-  if (!moduleMeta) return null
+  const index = modules.findIndex((m) => m.moduleId === moduleId)
+  if (index === -1) return null
+  const moduleMeta = modules[index]
   const seed = defaultProgress(userId, moduleId, moduleMeta.moduleOrder, moduleMeta.moduleOrder === 1)
-  return getOrSeedDoc(COLLECTION, progressDocId(userId, moduleId), seed)
+  const progress = await getOrSeedDoc(COLLECTION, progressDocId(userId, moduleId), seed)
+
+  const liveShouldBeUnlocked =
+    index === 0
+      ? true
+      : Boolean(
+          (await getDoc(doc(db, COLLECTION, progressDocId(userId, modules[index - 1].moduleId)))).data()
+            ?.moduleCompleted,
+        )
+  reconcileUnlock(userId, moduleId, progress, liveShouldBeUnlocked)
+
+  return progress
 }
 
 /**
@@ -128,6 +169,16 @@ export async function listStudentModuleProgress(userId) {
       ),
     ),
   )
+
+  // See reconcileUnlock — modules is already sorted by current moduleOrder,
+  // so walking it in order and carrying forward the previous module's
+  // completion is enough to catch every module the admin has reordered.
+  let previousCompleted = true
+  modules.forEach((m, i) => {
+    reconcileUnlock(userId, m.moduleId, progressDocs[i], i === 0 ? true : previousCompleted)
+    previousCompleted = Boolean(progressDocs[i].moduleCompleted)
+  })
+
   return modules.map((m, i) => ({
     moduleId: m.moduleId,
     title: m.title,
@@ -161,6 +212,21 @@ export async function getStudentModuleProgressForAdmin(userId) {
       return snap.exists() ? snap.data() : defaultProgress(userId, m.moduleId, m.moduleOrder, m.moduleOrder === 1)
     }),
   )
+
+  // Same reconciliation as listStudentModuleProgress, for the same reason
+  // (see reconcileUnlock) — but display-only: this function deliberately
+  // never writes (an admin's client has no permission to update another
+  // student's moduleProgress doc anyway, see firestore.rules).
+  let previousCompleted = true
+  modules.forEach((m, i) => {
+    const progress = progressDocs[i]
+    const liveShouldBeUnlocked = i === 0 ? true : previousCompleted
+    if (!hasRealModuleProgress(progress) && progress.isUnlocked !== liveShouldBeUnlocked) {
+      progress.isUnlocked = liveShouldBeUnlocked
+    }
+    previousCompleted = Boolean(progress.moduleCompleted)
+  })
+
   return modules.map((m, i) => ({
     moduleId: m.moduleId,
     title: m.title,
@@ -210,7 +276,7 @@ export async function markSimulationCompleted(userId, moduleId) {
 // Pre-test and post-test completion are no longer written from here.
 // Both are recorded by the submitAssessment Cloud Function, which has to
 // own that write anyway: it grades server-side, writes the per-question
-// `quiz_responses` rows no client may touch, and stores the normalized
+// `quizResponses` rows no client may touch, and stores the normalized
 // gain computed against a pre-test score a client must not be able to
 // influence. See src/services/assessmentService.js.
 

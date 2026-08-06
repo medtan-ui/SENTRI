@@ -50,29 +50,29 @@ export interface UpdateLessonContentInput {
 
 /**
  * The Scenario Engine's own configuration — the exact objects
- * src/features/scenario/engine/ consumes. snake_case because that is what
- * the engine and the stored documents use; inventing a second vocabulary
- * for the same data is what let the old admin model drift away from
- * reality in the first place.
+ * src/features/scenario/engine/ consumes, under the exact field names the
+ * stored documents use. Inventing a second vocabulary for the same data
+ * is what let the old admin model drift away from reality in the first
+ * place.
  */
 export interface ScenarioChoice {
-  scenario_choice_id: string
+  scenarioChoiceId: string
   target: string
-  choice_text: string
-  is_safe_choice: boolean
-  outcome_title: string
-  consequence_type: string
-  feedback_text: string
-  feedback_media_url?: string | null
+  choiceText: string
+  isSafeChoice: boolean
+  outcomeTitle: string
+  consequenceType: string
+  feedbackText: string
+  feedbackMediaUrl?: string | null
 }
 
 export interface ScenarioItem {
-  scenario_id: string
-  scenario_order: number
-  scenario_title: string
-  scenario_description: string
+  scenarioId: string
+  scenarioOrder: number
+  scenarioTitle: string
+  scenarioDescription: string
   videoAvailable: boolean
-  material_url?: string | null
+  materialUrl?: string | null
   posterCaption: string
   scene: string
   coachTarget?: string
@@ -81,8 +81,8 @@ export interface ScenarioItem {
 }
 
 export interface ScenarioConfig {
-  module_id: string
-  module_title: string
+  moduleId: string
+  moduleTitle: string
   coachLevel: 'full' | 'idle' | 'none'
   scenarios: ScenarioItem[]
 }

@@ -9,7 +9,7 @@ const FAKE_SENDER = 'verification@univ-registrar-secure.com'
 const FAKE_LINK_DESTINATION = 'univ-registrar-secure.com/confirm?id=88213'
 
 function findChoiceId(scenario, targetName) {
-  return scenario.choices.find((c) => c.target === targetName)?.scenario_choice_id
+  return scenario.choices.find((c) => c.target === targetName)?.scenarioChoiceId
 }
 
 /**

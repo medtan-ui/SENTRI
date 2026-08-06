@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cohortDocId, normalizeSectionKey } from '../src/utils/sections'
-import { filenameSlug, toCsv } from '../src/utils/exportCsv'
+import { toCsv } from '../src/utils/exportCsv'
 import {
   activityTrendRows,
   cohortSummaryRows,
@@ -10,51 +9,9 @@ import {
 } from '../src/pages/Admin/Analytics/reportRows'
 
 /**
- * Cohort segmentation and report export — the two places where a quiet
- * wrong answer produces a confidently wrong document rather than a
- * visible failure.
- *
- * The section helpers have a second, sharper reason to be tested here:
- * they are a deliberate duplication of functions/src/shared/sections.ts,
- * so the cases below are written against the same inputs the backend test
- * uses. A drift between the two would mean the frontend reads one
- * section's rollup under a different section's name — silently.
+ * Report export — where a quiet wrong answer produces a confidently wrong
+ * document rather than a visible failure.
  */
-
-describe('normalizeSectionKey', () => {
-  it('treats case and separator variations as one section', () => {
-    const variants = ['BSIT-3A', 'bsit 3a', 'BSIT_3A', '  bsit-3a  ', 'BSIT--3A']
-    const keys = new Set(variants.map(normalizeSectionKey))
-    expect(keys).toEqual(new Set(['bsit-3a']))
-  })
-
-  it('collapses every flavour of "no section" to null', () => {
-    expect(normalizeSectionKey(null)).toBeNull()
-    expect(normalizeSectionKey(undefined)).toBeNull()
-    expect(normalizeSectionKey('')).toBeNull()
-    expect(normalizeSectionKey('   ')).toBeNull()
-    // Punctuation alone carries no identity — it would otherwise produce a
-    // section keyed on the empty string.
-    expect(normalizeSectionKey('---')).toBeNull()
-    expect(normalizeSectionKey(42)).toBeNull()
-  })
-})
-
-describe('cohortDocId', () => {
-  it('sends an absent section to the whole-cohort document', () => {
-    expect(cohortDocId(null)).toBe('current')
-    expect(cohortDocId('')).toBe('current')
-  })
-
-  it('gives a section its own document, stable across how it was typed', () => {
-    expect(cohortDocId('BSIT-3A')).toBe('section__bsit-3a')
-    expect(cohortDocId('bsit 3a')).toBe(cohortDocId('BSIT-3A'))
-  })
-
-  it('never produces a document id containing a path separator', () => {
-    expect(cohortDocId('BSIT-3A / evening')).not.toContain('/')
-  })
-})
 
 describe('toCsv', () => {
   it('quotes fields containing a comma, so a label cannot split a column', () => {
@@ -74,20 +31,8 @@ describe('toCsv', () => {
   })
 })
 
-describe('filenameSlug', () => {
-  it('falls back to a named scope rather than an empty filename', () => {
-    expect(filenameSlug(null)).toBe('all-sections')
-    expect(filenameSlug('///')).toBe('all-sections')
-  })
-
-  it('strips characters that would break a download path', () => {
-    expect(filenameSlug('BSIT-3A / evening')).toBe('bsit-3a-evening')
-  })
-})
-
 describe('report rows', () => {
   const cohort = {
-    section: 'BSIT-3A',
     totalStudents: 30,
     activeStudents: 24,
     studentsCompletedAll: 5,
@@ -119,10 +64,8 @@ describe('report rows', () => {
     ],
   }
 
-  it('names the scope a cohort export was computed over', () => {
-    const rows = cohortSummaryRows(cohort)
-    expect(rows[1]).toEqual(['Section', 'BSIT-3A'])
-    expect(cohortSummaryRows({ ...cohort, section: null })[1]).toEqual(['Section', 'All sections'])
+  it('leads with the population the export was computed over', () => {
+    expect(cohortSummaryRows(cohort)[1]).toEqual(['Students in scope', 30])
   })
 
   it('converts the median decision time to whole seconds', () => {

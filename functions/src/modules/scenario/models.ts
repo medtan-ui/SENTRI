@@ -2,9 +2,9 @@
  * modules/scenario/models.ts
  * Mirrors the Scenario Engine's own configuration shape — the objects
  * stored in `moduleScenarios` and consumed by
- * src/features/scenario/engine/. Field names are snake_case here because
- * that is what the engine and the stored documents already use; this file
- * deliberately does not invent a second vocabulary for the same data.
+ * src/features/scenario/engine/. Field names match those documents
+ * exactly; this file deliberately does not invent a second vocabulary for
+ * the same data.
  */
 
 export interface SubmitScenarioDecisionInput {
@@ -21,23 +21,23 @@ export interface SubmitScenarioDecisionInput {
 }
 
 export interface ScenarioChoiceConfig {
-  scenario_choice_id: string
+  scenarioChoiceId: string
   target: string
-  choice_text: string
-  is_safe_choice: boolean
-  outcome_title: string
-  consequence_type: string
-  feedback_text: string
-  feedback_media_url: string | null
+  choiceText: string
+  isSafeChoice: boolean
+  outcomeTitle: string
+  consequenceType: string
+  feedbackText: string
+  feedbackMediaUrl: string | null
 }
 
 export interface ScenarioItemConfig {
-  scenario_id: string
-  scenario_order: number
-  scenario_title: string
-  scenario_description: string
+  scenarioId: string
+  scenarioOrder: number
+  scenarioTitle: string
+  scenarioDescription: string
   videoAvailable: boolean
-  material_url: string | null
+  materialUrl: string | null
   posterCaption: string
   scene: string
   coachTarget?: string
@@ -46,8 +46,8 @@ export interface ScenarioItemConfig {
 }
 
 export interface ScenarioConfig {
-  module_id: string
-  module_title: string
+  moduleId: string
+  moduleTitle: string
   coachLevel: 'full' | 'idle' | 'none'
   scenarios: ScenarioItemConfig[]
 }

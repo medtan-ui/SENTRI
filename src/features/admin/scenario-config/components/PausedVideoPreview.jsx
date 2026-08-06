@@ -16,9 +16,9 @@ export default function PausedVideoPreview({ scenario }) {
     <div className={styles.wrap}>
       <ScenarioPlayer
         videoAvailable={scenario.videoAvailable}
-        materialUrl={scenario.material_url}
+        materialUrl={scenario.materialUrl}
         posterCaption={scenario.posterCaption}
-        scenarioTitle={scenario.scenario_title || '(untitled scenario)'}
+        scenarioTitle={scenario.scenarioTitle || '(untitled scenario)'}
       />
     </div>
   )

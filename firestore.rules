@@ -154,18 +154,18 @@ service cloud.firestore {
     // signed-in student for themselves only. No client ever computes
     // analytics from this collection — a Cloud Function is expected to
     // trigger off these writes (see the TODO in scenarioDecisionService.js).
-    // Update is allowed only to flip feedback_viewed once the student
+    // Update is allowed only to flip feedbackViewed once the student
     // actually dismisses the feedback panel; nothing else about a
     // decision record may change after it's written, and nothing is
     // ever deleted.
-    match /scenario_decision_records/{recordId} {
+    match /scenarioDecisionRecords/{recordId} {
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.userId == request.auth.uid;
       allow read: if request.auth != null
-        && resource.data.user_id == request.auth.uid;
+        && resource.data.userId == request.auth.uid;
       allow update: if request.auth != null
-        && resource.data.user_id == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['feedback_viewed']);
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['feedbackViewed']);
       allow delete: if false;
     }
 
@@ -188,7 +188,7 @@ service cloud.firestore {
     // computed from, and a student able to write it could manufacture
     // their own learning gain. Read is admin-only — a student sees their
     // own results in the submit response, not by querying this.
-    match /quiz_responses/{responseId} {
+    match /quizResponses/{responseId} {
       allow read: if isAdmin();
       allow write: if false;
     }

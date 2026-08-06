@@ -143,7 +143,7 @@ export default function ScenarioRunnerPage() {
       <DashboardLayout role="student">
         <div className={styles.page}>
           <ScenarioIntroTutorial
-            moduleTitle={config?.scenario?.module_title}
+            moduleTitle={config?.scenario?.moduleTitle}
             onContinue={() => setPhase('engine')}
           />
         </div>

@@ -1,7 +1,7 @@
 /**
  * modules/assessment/repository.ts
  * All direct Firestore access for the pre-test / post-test pair and the
- * shared `quiz_responses` item-analysis collection.
+ * shared `quizResponses` item-analysis collection.
  */
 import { admin, db } from '../../shared/admin'
 import { AssessmentType, COLLECTIONS } from '../../shared/constants'
@@ -31,7 +31,7 @@ export interface ResponseInput {
 }
 
 /**
- * Writes one `quiz_responses` document per answered question, in a single
+ * Writes one `quizResponses` document per answered question, in a single
  * batch. Deliberately not part of the caller's transaction: a response
  * row is analytics, and losing the whole submission because an analytics
  * write failed would be the wrong trade. Callers commit the authoritative

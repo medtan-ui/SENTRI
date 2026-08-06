@@ -17,11 +17,11 @@ const CONSEQUENCE_ICON = {
  * explanatory FeedbackPanel — the "your accounts just fell" moment
  * (Scenario 2), or a shorter version for the others. No clip exists
  * yet, so this is a static panel built from the choice's own
- * outcome_title/feedback_text; when feedback_media_url is set for a
+ * outcomeTitle/feedbackText; when feedbackMediaUrl is set for a
  * future module, it renders in place of the icon.
  */
 export default function ConsequenceOverlay({ choice, onContinue }) {
-  const icon = CONSEQUENCE_ICON[choice.consequence_type] || CONSEQUENCE_ICON.none
+  const icon = CONSEQUENCE_ICON[choice.consequenceType] || CONSEQUENCE_ICON.none
   const btnRef = React.useRef(null)
 
   React.useEffect(() => {
@@ -31,13 +31,13 @@ export default function ConsequenceOverlay({ choice, onContinue }) {
   return (
     <div className={styles.overlay} role="alertdialog" aria-modal="true" aria-live="assertive">
       <div className={styles.panel}>
-        {choice.feedback_media_url ? (
-          <img className={styles.media} src={choice.feedback_media_url} alt="" />
+        {choice.feedbackMediaUrl ? (
+          <img className={styles.media} src={choice.feedbackMediaUrl} alt="" />
         ) : (
           <span className={styles.icon} aria-hidden="true">{icon}</span>
         )}
-        <h3 className={styles.title}>{choice.outcome_title}</h3>
-        <p className={styles.text}>{choice.feedback_text}</p>
+        <h3 className={styles.title}>{choice.outcomeTitle}</h3>
+        <p className={styles.text}>{choice.feedbackText}</p>
         <button ref={btnRef} type="button" className={styles.continueBtn} onClick={onContinue}>
           Continue →
         </button>

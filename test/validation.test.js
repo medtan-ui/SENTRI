@@ -14,30 +14,30 @@ import { validatePassword } from '../src/utils/passwordPolicy'
 
 function scenarioWith(overrides = {}) {
   return {
-    scenario_id: 's1',
-    scenario_order: 1,
+    scenarioId: 's1',
+    scenarioOrder: 1,
     scene: 'InboxScene',
-    scenario_title: 'A Title',
-    scenario_description: 'A description.',
+    scenarioTitle: 'A Title',
+    scenarioDescription: 'A description.',
     posterCaption: 'A caption.',
     choices: [
       {
-        scenario_choice_id: 'c1',
+        scenarioChoiceId: 'c1',
         target: 't1',
-        is_safe_choice: false,
-        choice_text: 'Risky thing',
-        outcome_title: 'Bad outcome',
-        consequence_type: 'credential_compromise',
-        feedback_text: 'Here is why.',
+        isSafeChoice: false,
+        choiceText: 'Risky thing',
+        outcomeTitle: 'Bad outcome',
+        consequenceType: 'credential_compromise',
+        feedbackText: 'Here is why.',
       },
       {
-        scenario_choice_id: 'c2',
+        scenarioChoiceId: 'c2',
         target: 't2',
-        is_safe_choice: true,
-        choice_text: 'Safe thing',
-        outcome_title: 'Good outcome',
-        consequence_type: 'none',
-        feedback_text: 'Well done.',
+        isSafeChoice: true,
+        choiceText: 'Safe thing',
+        outcomeTitle: 'Good outcome',
+        consequenceType: 'none',
+        feedbackText: 'Well done.',
       },
     ],
     ...overrides,
@@ -53,40 +53,40 @@ describe('validateScenario', () => {
     // A scene may offer several acceptable endings with different
     // feedback — Password Security's sign-up scenario does exactly this.
     const scenario = scenarioWith()
-    scenario.choices[0].is_safe_choice = true
+    scenario.choices[0].isSafeChoice = true
     expect(validateScenario(scenario).isValid).toBe(true)
   })
 
   it('rejects a scenario with no safe choice at all', () => {
     const scenario = scenarioWith()
-    scenario.choices[1].is_safe_choice = false
+    scenario.choices[1].isSafeChoice = false
     const result = validateScenario(scenario)
     expect(result.isValid).toBe(false)
     expect(result.issues.some((i) => i.field === 'safeChoice')).toBe(true)
   })
 
   it('rejects empty student-visible copy', () => {
-    const result = validateScenario(scenarioWith({ scenario_title: '   ', posterCaption: '' }))
+    const result = validateScenario(scenarioWith({ scenarioTitle: '   ', posterCaption: '' }))
     const fields = result.issues.map((i) => i.field)
-    expect(fields).toContain('scenario_title')
+    expect(fields).toContain('scenarioTitle')
     expect(fields).toContain('posterCaption')
   })
 
   it('rejects a consequence type the engine cannot illustrate', () => {
     const scenario = scenarioWith()
-    scenario.choices[0].consequence_type = 'made_up_type'
+    scenario.choices[0].consequenceType = 'made_up_type'
     const result = validateScenario(scenario)
     expect(result.isValid).toBe(false)
-    expect(result.issues.some((i) => i.field.endsWith('-consequence_type'))).toBe(true)
+    expect(result.issues.some((i) => i.field.endsWith('-consequenceType'))).toBe(true)
   })
 
   it('flags each empty choice field individually so an admin can fix them all at once', () => {
     const scenario = scenarioWith()
-    scenario.choices[0].feedback_text = ''
-    scenario.choices[0].outcome_title = ''
+    scenario.choices[0].feedbackText = ''
+    scenario.choices[0].outcomeTitle = ''
     const fields = validateScenario(scenario).issues.map((i) => i.field)
-    expect(fields).toContain('choice-c1-feedback_text')
-    expect(fields).toContain('choice-c1-outcome_title')
+    expect(fields).toContain('choice-c1-feedbackText')
+    expect(fields).toContain('choice-c1-outcomeTitle')
   })
 
   it('passes every authored scenario shipped with the app', () => {
@@ -98,7 +98,7 @@ describe('validateScenario', () => {
         const result = validateScenario(scenario)
         expect(
           result.isValid,
-          `${moduleId}/${scenario.scenario_id}: ${result.issues.map((i) => i.message).join('; ')}`,
+          `${moduleId}/${scenario.scenarioId}: ${result.issues.map((i) => i.message).join('; ')}`,
         ).toBe(true)
       })
     })

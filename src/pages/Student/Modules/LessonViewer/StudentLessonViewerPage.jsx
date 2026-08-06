@@ -36,7 +36,7 @@ export default function StudentLessonViewerPage() {
     errorMessage: pretestErrorMessage,
     retry: retryPretest,
     assessment: pretest,
-    completed: pretestCompleted,
+    completed: preTestCompleted,
     submitting: pretestSubmitting,
     submit: submitPretest,
   } = useModuleAssessment(moduleId, 'pretest')
@@ -50,7 +50,7 @@ export default function StudentLessonViewerPage() {
   // pretest status resolves: if it was ALREADY completed on an earlier
   // visit, skip the gate entirely; otherwise the gate stays up until the
   // student explicitly clicks through its own "Continue to Lesson" button
-  // (not the instant pretestCompleted flips true on submit — that would
+  // (not the instant preTestCompleted flips true on submit — that would
   // yank the result screen away before they can read it).
   const [skipGate, setSkipGate] = useState(false)
   const [gateCleared, setGateCleared] = useState(false)
@@ -65,9 +65,9 @@ export default function StudentLessonViewerPage() {
   useEffect(() => {
     if (pretestStatus === 'success' && !pretestCaptured.current) {
       pretestCaptured.current = true
-      if (pretestCompleted) setSkipGate(true)
+      if (preTestCompleted) setSkipGate(true)
     }
-  }, [pretestStatus, pretestCompleted])
+  }, [pretestStatus, preTestCompleted])
 
   const showLesson = skipGate || gateCleared
 

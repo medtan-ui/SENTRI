@@ -19,15 +19,15 @@ function errorFor(errors, suffix) {
  * was written against which one is safe); flipping either from a form
  * would leave the scenario unwinnable with no visible cause.
  *
- * `choice_text` is deliberately labelled as admin-facing: a student never
+ * `choiceText` is deliberately labelled as admin-facing: a student never
  * picks from a list of choice texts, they act on the real interface
  * element. It appears in the flow diagram and in decision analytics.
  */
 export default function ChoiceEditor({ choice, index, errors, onUpdate }) {
-  const id = choice.scenario_choice_id
-  const textError = errorFor(errors, '-choice_text')
-  const titleError = errorFor(errors, '-outcome_title')
-  const bodyError = errorFor(errors, '-feedback_text')
+  const id = choice.scenarioChoiceId
+  const textError = errorFor(errors, '-choiceText')
+  const titleError = errorFor(errors, '-outcomeTitle')
+  const bodyError = errorFor(errors, '-feedbackText')
 
   return (
     <div className={styles.card}>
@@ -35,8 +35,8 @@ export default function ChoiceEditor({ choice, index, errors, onUpdate }) {
         <span className={styles.index}>Choice {index + 1}</span>
 
         <div className={styles.headerRight}>
-          <span className={`${badges.pill} ${choice.is_safe_choice ? badges.safe : badges.risky}`}>
-            {choice.is_safe_choice ? 'Safe' : 'Risky'}
+          <span className={`${badges.pill} ${choice.isSafeChoice ? badges.safe : badges.risky}`}>
+            {choice.isSafeChoice ? 'Safe' : 'Risky'}
           </span>
         </div>
       </div>
@@ -52,48 +52,48 @@ export default function ChoiceEditor({ choice, index, errors, onUpdate }) {
       </div>
 
       <div className={forms.fieldGroup}>
-        <label className={forms.fieldLabel} htmlFor={`${id}-choice_text`}>
+        <label className={forms.fieldLabel} htmlFor={`${id}-choiceText`}>
           Choice Description{' '}
           <span className={styles.labelHint}>(admin record and analytics; students never see this text)</span>
         </label>
         <textarea
-          id={`${id}-choice_text`}
+          id={`${id}-choiceText`}
           className={`${forms.textarea} ${textError ? forms.textareaError : ''}`}
           rows={2}
-          value={choice.choice_text}
-          onChange={(e) => onUpdate({ choice_text: e.target.value })}
+          value={choice.choiceText}
+          onChange={(e) => onUpdate({ choiceText: e.target.value })}
         />
         {textError && <span className={forms.errorText}>{textError}</span>}
       </div>
 
       <div className={forms.fieldGroup}>
-        <label className={forms.fieldLabel} htmlFor={`${id}-outcome_title`}>Outcome Title</label>
+        <label className={forms.fieldLabel} htmlFor={`${id}-outcomeTitle`}>Outcome Title</label>
         <input
-          id={`${id}-outcome_title`}
+          id={`${id}-outcomeTitle`}
           className={`${styles.textInput} ${titleError ? forms.textareaError : ''}`}
-          value={choice.outcome_title}
-          onChange={(e) => onUpdate({ outcome_title: e.target.value })}
+          value={choice.outcomeTitle}
+          onChange={(e) => onUpdate({ outcomeTitle: e.target.value })}
         />
         {titleError && <span className={forms.errorText}>{titleError}</span>}
       </div>
 
       <div className={forms.fieldGroup}>
-        <label className={forms.fieldLabel} htmlFor={`${id}-feedback_text`}>
+        <label className={forms.fieldLabel} htmlFor={`${id}-feedbackText`}>
           Feedback Text
-          {!choice.is_safe_choice && ' (shown on the consequence beat, then again in the feedback panel)'}
+          {!choice.isSafeChoice && ' (shown on the consequence beat, then again in the feedback panel)'}
         </label>
         <textarea
-          id={`${id}-feedback_text`}
+          id={`${id}-feedbackText`}
           className={`${forms.textarea} ${bodyError ? forms.textareaError : ''}`}
           rows={3}
-          value={choice.feedback_text}
-          onChange={(e) => onUpdate({ feedback_text: e.target.value })}
+          value={choice.feedbackText}
+          onChange={(e) => onUpdate({ feedbackText: e.target.value })}
         />
         {bodyError && <span className={forms.errorText}>{bodyError}</span>}
       </div>
 
-      {!choice.is_safe_choice && (
-        <ConsequenceEditor choice={choice} error={errorFor(errors, '-consequence_type')} onUpdate={onUpdate} />
+      {!choice.isSafeChoice && (
+        <ConsequenceEditor choice={choice} error={errorFor(errors, '-consequenceType')} onUpdate={onUpdate} />
       )}
     </div>
   )

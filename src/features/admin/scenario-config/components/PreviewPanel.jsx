@@ -30,19 +30,19 @@ const noop = () => {}
  */
 export default function PreviewPanel({ scenario }) {
   const [mode, setMode] = useState('poster')
-  const [choiceId, setChoiceId] = useState(scenario.choices[0]?.scenario_choice_id || null)
+  const [choiceId, setChoiceId] = useState(scenario.choices[0]?.scenarioChoiceId || null)
 
   useEffect(() => {
-    if (!scenario.choices.some((c) => c.scenario_choice_id === choiceId)) {
-      setChoiceId(scenario.choices[0]?.scenario_choice_id || null)
+    if (!scenario.choices.some((c) => c.scenarioChoiceId === choiceId)) {
+      setChoiceId(scenario.choices[0]?.scenarioChoiceId || null)
     }
   }, [scenario.choices, choiceId])
 
-  const riskyChoices = scenario.choices.filter((c) => !c.is_safe_choice)
+  const riskyChoices = scenario.choices.filter((c) => !c.isSafeChoice)
   const feedbackChoice =
-    scenario.choices.find((c) => c.scenario_choice_id === choiceId) || scenario.choices[0]
+    scenario.choices.find((c) => c.scenarioChoiceId === choiceId) || scenario.choices[0]
   const consequenceChoice =
-    riskyChoices.find((c) => c.scenario_choice_id === choiceId) || riskyChoices[0]
+    riskyChoices.find((c) => c.scenarioChoiceId === choiceId) || riskyChoices[0]
 
   return (
     <div className={styles.wrap}>
@@ -68,14 +68,14 @@ export default function PreviewPanel({ scenario }) {
           <span className={styles.choicePickerLabel}>Previewing choice:</span>
           <select
             value={
-              (mode === 'consequence' ? consequenceChoice : feedbackChoice)?.scenario_choice_id || ''
+              (mode === 'consequence' ? consequenceChoice : feedbackChoice)?.scenarioChoiceId || ''
             }
             onChange={(e) => setChoiceId(e.target.value)}
           >
             {(mode === 'consequence' ? riskyChoices : scenario.choices).map((c) => (
-              <option key={c.scenario_choice_id} value={c.scenario_choice_id}>
+              <option key={c.scenarioChoiceId} value={c.scenarioChoiceId}>
                 Choice {scenario.choices.indexOf(c) + 1}:{' '}
-                {c.choice_text ? c.choice_text.slice(0, 40) : '(empty)'}
+                {c.choiceText ? c.choiceText.slice(0, 40) : '(empty)'}
               </option>
             ))}
           </select>

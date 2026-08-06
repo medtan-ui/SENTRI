@@ -63,8 +63,8 @@ describe('loadModuleConfig', () => {
       moduleScenarios: {
         scenarios: [
           {
-            scenario_id: authored.scenario.scenarios[0].scenario_id,
-            scenario_title: 'Admin Scenario Title',
+            scenarioId: authored.scenario.scenarios[0].scenarioId,
+            scenarioTitle: 'Admin Scenario Title',
           },
         ],
       },
@@ -75,7 +75,7 @@ describe('loadModuleConfig', () => {
     expect(config.description).toBe('Admin description.')
     expect(config.lesson.sections[0].title).toBe('Admin Section')
     expect(config.videoId).toBe('dQw4w9WgXcQ')
-    expect(config.scenario.scenarios[0].scenario_title).toBe('Admin Scenario Title')
+    expect(config.scenario.scenarios[0].scenarioTitle).toBe('Admin Scenario Title')
   })
 
   it("translates the admin's Easy/Medium/Hard scale to the student badge scale", async () => {

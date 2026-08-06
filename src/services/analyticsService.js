@@ -10,11 +10,13 @@ import { collection, doc, getDoc, getDocs, limit, orderBy, query } from 'firebas
 import { httpsCallable } from 'firebase/functions'
 import { db, functions } from './firebase'
 import { friendlyCallableError } from './callableErrors'
-import { cohortDocId } from '../utils/sections'
 
 const COLLECTION = 'moduleAnalytics'
 const STUDENT_COLLECTION = 'studentAnalytics'
 const COHORT_COLLECTION = 'cohortAnalytics'
+/** The single whole-cohort rollup document, mirroring COHORT_DOC_ID in
+ * functions/src/modules/analytics/repository.ts. */
+const COHORT_DOC_ID = 'current'
 
 /**
  * Reads a module's last-aggregated analytics summary, or null if it has
@@ -92,45 +94,22 @@ export async function aggregateStudentAnalytics(userId) {
  * The class-level rollup — the only summary that spans every module and
  * every student, and therefore the only place cross-module transfer and
  * cohort-wide learning gain can be reported from. Admin-only.
- *
- * With no section this reads the whole-cohort document; with one it reads
- * that class group's own document, so switching the picker never shows a
- * stale figure from the previously selected group.
- * @param {string|null} [section]
  * @returns {Promise<object|null>}
  */
-export async function getCohortAnalytics(section = null) {
-  const snap = await getDoc(doc(db, COHORT_COLLECTION, cohortDocId(section)))
+export async function getCohortAnalytics() {
+  const snap = await getDoc(doc(db, COHORT_COLLECTION, COHORT_DOC_ID))
   return snap.exists() ? snap.data() : null
 }
 
 /**
- * Recomputes and persists a cohort rollup server-side, for the whole
- * cohort or for one section.
- * @param {string|null} [section]
+ * Recomputes and persists the cohort rollup server-side.
  * @returns {Promise<object>} the freshly computed summary
  */
-export async function aggregateCohortAnalytics(section = null) {
+export async function aggregateCohortAnalytics() {
   try {
     const call = httpsCallable(functions, 'aggregateCohortAnalytics')
-    const { data } = await call({ section: section || null })
-    return data
-  } catch (err) {
-    throw new Error(friendlyCallableError(err))
-  }
-}
-
-/**
- * The class groups currently in use, with their student counts — what
- * populates the Analytics page's section picker. Derived server-side from
- * the account roster, so it can never offer a section nobody is in.
- * @returns {Promise<Array<{ key: string, label: string, studentCount: number }>>}
- */
-export async function listSections() {
-  try {
-    const call = httpsCallable(functions, 'listSections')
     const { data } = await call({})
-    return data.sections
+    return data
   } catch (err) {
     throw new Error(friendlyCallableError(err))
   }

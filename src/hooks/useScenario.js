@@ -40,7 +40,7 @@ export function useScenario(moduleId) {
   const updateScenario = useCallback((scenarioId, patch) => {
     setDraft((prev) => ({
       ...prev,
-      scenarios: prev.scenarios.map((s) => (s.scenario_id === scenarioId ? { ...s, ...patch } : s)),
+      scenarios: prev.scenarios.map((s) => (s.scenarioId === scenarioId ? { ...s, ...patch } : s)),
     }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -49,11 +49,11 @@ export function useScenario(moduleId) {
     setDraft((prev) => ({
       ...prev,
       scenarios: prev.scenarios.map((s) =>
-        s.scenario_id !== scenarioId
+        s.scenarioId !== scenarioId
           ? s
           : {
               ...s,
-              choices: s.choices.map((c) => (c.scenario_choice_id === choiceId ? { ...c, ...patch } : c)),
+              choices: s.choices.map((c) => (c.scenarioChoiceId === choiceId ? { ...c, ...patch } : c)),
             },
       ),
     }))

@@ -18,38 +18,34 @@ import styles from './Leaderboard.module.css'
  * Nothing about anyone's scores, attempts or module history is exposed;
  * the callable behind this returns those columns and no others.
  *
- * @param {{ scope?: 'all'|'section', limit?: number, showScopeToggle?: boolean }} props
+ * @param {{ limit?: number }} props
  */
-export default function Leaderboard({ scope: initialScope = 'all', limit = 5, showScopeToggle = false }) {
-  const [scope, setScope] = useState(initialScope)
+export default function Leaderboard({ limit = 5 }) {
   const [status, setStatus] = useState('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [board, setBoard] = useState(null)
 
-  const load = useCallback(
-    (nextScope) => {
-      let cancelled = false
-      setStatus('loading')
-      setErrorMessage('')
-      getLeaderboard({ scope: nextScope, limit })
-        .then((result) => {
-          if (cancelled) return
-          setBoard(result)
-          setStatus('success')
-        })
-        .catch((err) => {
-          if (cancelled) return
-          setErrorMessage(err?.message || 'The leaderboard could not be loaded right now.')
-          setStatus('error')
-        })
-      return () => {
-        cancelled = true
-      }
-    },
-    [limit],
-  )
+  const load = useCallback(() => {
+    let cancelled = false
+    setStatus('loading')
+    setErrorMessage('')
+    getLeaderboard({ limit })
+      .then((result) => {
+        if (cancelled) return
+        setBoard(result)
+        setStatus('success')
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setErrorMessage(err?.message || 'The leaderboard could not be loaded right now.')
+        setStatus('error')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [limit])
 
-  useEffect(() => load(scope), [load, scope])
+  useEffect(() => load(), [load])
 
   // Your own row is repeated at the bottom only when it isn't already
   // above — a duplicated row is confusing, an absent one is worse.
@@ -57,37 +53,12 @@ export default function Leaderboard({ scope: initialScope = 'all', limit = 5, sh
 
   return (
     <div className={styles.board}>
-      {showScopeToggle && (
-        <div className={styles.scopeToggle} role="tablist" aria-label="Leaderboard scope">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={scope === 'all'}
-            className={styles.scopeBtn}
-            data-active={scope === 'all' || undefined}
-            onClick={() => setScope('all')}
-          >
-            Everyone
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={scope === 'section'}
-            className={styles.scopeBtn}
-            data-active={scope === 'section' || undefined}
-            onClick={() => setScope('section')}
-          >
-            My class
-          </button>
-        </div>
-      )}
-
       {status === 'loading' && <p className={styles.note}>Loading the board…</p>}
 
       {status === 'error' && (
         <div className={styles.note}>
           <p>{errorMessage}</p>
-          <button type="button" className={styles.retryBtn} onClick={() => load(scope)}>
+          <button type="button" className={styles.retryBtn} onClick={() => load()}>
             Try again
           </button>
         </div>
@@ -120,11 +91,7 @@ export default function Leaderboard({ scope: initialScope = 'all', limit = 5, sh
             </>
           )}
 
-          <p className={styles.footnote}>
-            {board.scope === 'section' && board.section
-              ? `${board.section} · ${board.totalRanked} ranked`
-              : `${board.totalRanked} students ranked`}
-          </p>
+          <p className={styles.footnote}>{board.totalRanked} students ranked</p>
         </>
       )}
     </div>

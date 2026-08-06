@@ -67,23 +67,23 @@ const consequenceTypeSchema = z.enum([
 ])
 
 const scenarioChoiceSchema = z.object({
-  scenario_choice_id: z.string().min(1),
+  scenarioChoiceId: z.string().min(1),
   target: z.string().min(1, 'Every choice must name the interactive target that resolves to it.'),
-  choice_text: z.string(),
-  is_safe_choice: z.boolean(),
-  outcome_title: z.string(),
-  consequence_type: consequenceTypeSchema,
-  feedback_text: z.string(),
-  feedback_media_url: z.string().nullable().optional(),
+  choiceText: z.string(),
+  isSafeChoice: z.boolean(),
+  outcomeTitle: z.string(),
+  consequenceType: consequenceTypeSchema,
+  feedbackText: z.string(),
+  feedbackMediaUrl: z.string().nullable().optional(),
 })
 
 const scenarioItemSchema = z.object({
-  scenario_id: z.string().min(1),
-  scenario_order: z.number().int().positive(),
-  scenario_title: z.string().min(1),
-  scenario_description: z.string(),
+  scenarioId: z.string().min(1),
+  scenarioOrder: z.number().int().positive(),
+  scenarioTitle: z.string().min(1),
+  scenarioDescription: z.string(),
   videoAvailable: z.boolean(),
-  material_url: z.string().nullable().optional(),
+  materialUrl: z.string().nullable().optional(),
   posterCaption: z.string(),
   // Names the bespoke React component that renders this scenario. A
   // scenario with no scene renders nothing at all.
@@ -96,8 +96,8 @@ const scenarioItemSchema = z.object({
 export const updateScenarioConfigurationSchema = z.object({
   moduleId: z.string().min(1),
   scenarioConfig: z.object({
-    module_id: z.string().min(1),
-    module_title: z.string().min(1),
+    moduleId: z.string().min(1),
+    moduleTitle: z.string().min(1),
     coachLevel: z.enum(['full', 'idle', 'none']),
     // No fixed count: how many scenarios a module has is decided by how
     // many scene components were authored for it, not by a rule here.
@@ -157,7 +157,7 @@ export function validateScenarioItem(scenario: ScenarioItem): ValidationIssue[] 
   // passwords" as two distinct safe outcomes). Zero is the real defect:
   // the engine only advances on a safe choice, so the scenario would be
   // unwinnable.
-  const safeCount = scenario.choices.filter((c) => c.is_safe_choice).length
+  const safeCount = scenario.choices.filter((c) => c.isSafeChoice).length
   if (safeCount === 0) {
     issues.push({
       field: 'safeChoice',
@@ -165,11 +165,11 @@ export function validateScenarioItem(scenario: ScenarioItem): ValidationIssue[] 
     })
   }
 
-  if (!scenario.scenario_title || !scenario.scenario_title.trim()) {
-    issues.push({ field: 'scenario_title', message: 'Scenario title is empty.' })
+  if (!scenario.scenarioTitle || !scenario.scenarioTitle.trim()) {
+    issues.push({ field: 'scenarioTitle', message: 'Scenario title is empty.' })
   }
-  if (!scenario.scenario_description || !scenario.scenario_description.trim()) {
-    issues.push({ field: 'scenario_description', message: 'Scenario description is empty.' })
+  if (!scenario.scenarioDescription || !scenario.scenarioDescription.trim()) {
+    issues.push({ field: 'scenarioDescription', message: 'Scenario description is empty.' })
   }
   if (!scenario.posterCaption || !scenario.posterCaption.trim()) {
     issues.push({
@@ -181,15 +181,15 @@ export function validateScenarioItem(scenario: ScenarioItem): ValidationIssue[] 
   const targets = new Set<string>()
   scenario.choices.forEach((choice, index) => {
     const label = `Choice ${index + 1}`
-    const id = choice.scenario_choice_id
-    if (!choice.choice_text || !choice.choice_text.trim()) {
-      issues.push({ field: `choice-${id}-choice_text`, message: `${label}: choice description is empty.` })
+    const id = choice.scenarioChoiceId
+    if (!choice.choiceText || !choice.choiceText.trim()) {
+      issues.push({ field: `choice-${id}-choiceText`, message: `${label}: choice description is empty.` })
     }
-    if (!choice.outcome_title || !choice.outcome_title.trim()) {
-      issues.push({ field: `choice-${id}-outcome_title`, message: `${label}: outcome title is empty.` })
+    if (!choice.outcomeTitle || !choice.outcomeTitle.trim()) {
+      issues.push({ field: `choice-${id}-outcomeTitle`, message: `${label}: outcome title is empty.` })
     }
-    if (!choice.feedback_text || !choice.feedback_text.trim()) {
-      issues.push({ field: `choice-${id}-feedback_text`, message: `${label}: feedback text is empty.` })
+    if (!choice.feedbackText || !choice.feedbackText.trim()) {
+      issues.push({ field: `choice-${id}-feedbackText`, message: `${label}: feedback text is empty.` })
     }
     // Two choices bound to the same interactive element means one of them
     // is unreachable — the scene can only resolve a target to one choice.

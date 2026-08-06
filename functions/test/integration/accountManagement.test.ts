@@ -21,7 +21,6 @@ import {
 } from '../../src/auth/controllers'
 import { aggregateStudentAnalytics } from '../../src/modules/analytics/controllers'
 import { COLLECTIONS } from '../../src/shared/constants'
-import { cohortDocId } from '../../src/shared/sections'
 import { makeRequest } from './helpers'
 
 const ADMIN_UID = `admin-${Date.now()}`
@@ -232,7 +231,7 @@ describe('account management: register -> nickname -> deactivate -> reactivate -
  * Deleting an account must take every row keyed to that uid with it.
  *
  * This is written as an exhaustive sweep rather than a spot check for a
- * concrete reason: `quiz_responses` was added later, for item analysis,
+ * concrete reason: `quizResponses` was added later, for item analysis,
  * and was missed from the cascade. A deleted student's per-question
  * answers stayed in the corpus and kept feeding topic mastery, item
  * difficulty, and discrimination forever. Nothing on screen revealed it;
@@ -258,7 +257,6 @@ describe('account deletion: cascading data cleanup', () => {
           displayName: 'Cascade Student',
           nickname: 'Cascade',
           role: 'student',
-          section: 'BSIT-9Z',
         },
         ADMIN,
       ),
@@ -271,7 +269,7 @@ describe('account deletion: cascading data cleanup', () => {
         userId: uid,
         moduleId: MODULE_ID,
         moduleCompleted: true,
-        pretestScore: 40,
+        preTestScore: 40,
         postTestScore: 80,
       }),
       db.collection(COLLECTIONS.LEARNING_ANALYTICS).doc(`${uid}_${MODULE_ID}`).set({
@@ -292,12 +290,12 @@ describe('account deletion: cascading data cleanup', () => {
         isCorrect: true,
       }),
       db.collection(COLLECTIONS.SCENARIO_DECISION_RECORDS).add({
-        user_id: uid,
-        module_id: MODULE_ID,
-        scenario_id: 's1',
-        scenario_choice_id: 'c1',
-        is_safe_choice: true,
-        attempt_number: 1,
+        userId: uid,
+        moduleId: MODULE_ID,
+        scenarioId: 's1',
+        scenarioChoiceId: 'c1',
+        isSafeChoice: true,
+        attemptNumber: 1,
       }),
       db.collection(COLLECTIONS.ANALYTICS_EVENTS).add({ userId: uid, moduleId: MODULE_ID, eventType: 'quiz_submitted' }),
     ])
@@ -318,7 +316,7 @@ describe('account deletion: cascading data cleanup', () => {
     const queried: Array<[string, string]> = [
       [COLLECTIONS.QUIZ_ATTEMPTS, 'userId'],
       [COLLECTIONS.QUIZ_RESPONSES, 'userId'],
-      [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'user_id'],
+      [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'userId'],
       [COLLECTIONS.ANALYTICS_EVENTS, 'userId'],
     ]
     for (const [collectionName, field] of queried) {
@@ -344,10 +342,16 @@ describe('account deletion: cascading data cleanup', () => {
     // Not on the next nightly run: the cohort card is a cached singleton,
     // so without an immediate recompute it would keep counting a student
     // who no longer exists.
-    const snap = await db.collection(COLLECTIONS.COHORT_ANALYTICS).doc(cohortDocId('BSIT-9Z')).get()
-    if (snap.exists) {
-      expect(snap.data()!.totalStudents).toBe(0)
-    }
+    const [snap, students] = await Promise.all([
+      db.collection(COLLECTIONS.COHORT_ANALYTICS).doc('current').get(),
+      db.collection(COLLECTIONS.USERS).where('role', '==', 'student').get(),
+    ])
+    expect(snap.exists).toBe(true)
+    // Compared against the live roster rather than a fixed number, so
+    // accounts seeded by other suites in the same emulator run can't make
+    // this pass or fail for the wrong reason. What it proves is that the
+    // rollup was recomputed and no longer counts the deleted student.
+    expect(snap.data()!.totalStudents).toBe(students.size)
   }, 60000)
 })
 

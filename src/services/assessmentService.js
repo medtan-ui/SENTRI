@@ -10,7 +10,7 @@
  *
  * Grading is server-side (the submitAssessment Cloud Function), not
  * client-side as the pre-test used to be. Two reasons: per-question
- * responses have to land in `quiz_responses`, which no client may write,
+ * responses have to land in `quizResponses`, which no client may write,
  * or item analysis is impossible; and a post-test score is compared
  * against a stored pre-test score, so a client that computed either could
  * manufacture an improvement.

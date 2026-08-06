@@ -35,7 +35,6 @@ export function cohortSummaryRows(cohort) {
 
   return [
     ['Metric', 'Value'],
-    ['Section', cohort.section || 'All sections'],
     ['Students in scope', cell(cohort.totalStudents)],
     ['Students with activity', cell(cohort.activeStudents)],
     ['Students who finished every module', cell(cohort.studentsCompletedAll)],
