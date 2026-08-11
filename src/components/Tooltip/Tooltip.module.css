@@ -12,17 +12,19 @@
   outline: none;
 }
 
+/* A plain flat pill — no arrow, no border. Closer to a native OS tooltip
+   than a speech bubble, on purpose. */
 .bubble {
   position: absolute;
-  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: #26282c;
+  background: #1a1a1a;
   color: #fff;
-  font-size: 12px;
+  font-size: 11.5px;
+  font-weight: 500;
   line-height: 1.4;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 5px 9px;
+  border-radius: 4px;
   white-space: normal;
   width: max-content;
   max-width: 220px;
@@ -30,18 +32,17 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.12s ease, transform 0.12s ease;
   z-index: 20;
 }
 
-.bubble::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: #26282c;
+.wrap[data-position='top'] .bubble {
+  bottom: calc(100% + 6px);
+}
+
+.wrap[data-position='bottom'] .bubble {
+  top: calc(100% + 6px);
+  transform: translateX(-50%) translateY(-4px);
 }
 
 .wrap:hover .bubble,

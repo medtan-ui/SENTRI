@@ -44,13 +44,24 @@
   min-width: 0;
 }
 
-/* ── Tabs ── */
+/* ── Tabs ──
+   overflow-x: auto is only a safety net for a viewport too narrow to fit
+   all three labels — normally they never scroll at all. The scrollbar
+   itself still showed up as a stray control on Windows/Chrome even when
+   there was nothing to scroll, so it's hidden here; the scroll behavior
+   underneath is untouched. */
 .tabs {
   display: flex;
   gap: var(--space-1);
   border-bottom: 1px solid var(--color-border);
   margin-bottom: var(--space-6);
   overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {

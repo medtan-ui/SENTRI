@@ -39,17 +39,17 @@ const TOUR_STEPS = [
   {
     target: 'nav-modules',
     title: 'Content lives under here',
-    body: 'Modules, Scenarios and Quiz Manager are where you author what students see: lesson text, branching scenarios and quiz questions.',
+    body: 'Modules, Scenarios, Quiz Manager and Final Assessment are where you author what students see: lesson text, branching scenarios, quiz questions, and the one test they take at the end.',
   },
   {
     target: 'nav-accounts',
-    title: 'Accounts and class sections',
-    body: 'Create administrator accounts, assign students to sections, reset a password, or grant a quiz retry when someone appeals.',
+    title: 'Accounts',
+    body: 'Create administrator accounts, reset a password, or grant a quiz retry when someone appeals.',
   },
   {
     target: 'nav-analytics',
     title: 'The full analytics report',
-    body: 'Pre-test to final assessment learning gains, item difficulty and per-section rollups, with CSV and PDF export for your documentation.',
+    body: 'Pre-test to final assessment learning gains, item difficulty, and where each question\'s answers went, with CSV and PDF export for your documentation.',
   },
 ]
 

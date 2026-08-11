@@ -122,9 +122,13 @@ export const updateQuizConfigurationSchema = z.object({
   quizConfig: z.object({
     moduleId: z.string().min(1),
     title: z.string().min(1),
+    // No timeLimitMinutes. It was stored and editable but never read by
+    // anything — no countdown, no server-side cutoff — so an admin could
+    // set a limit that did nothing. The schema is not strict, so a client
+    // still sending the field is accepted and the value is dropped, which
+    // is what quietly cleans it out of stored documents on first save.
     settings: z.object({
       passingScore: z.number().min(0).max(100),
-      timeLimitMinutes: z.number().positive(),
       instructions: z.string(),
       available: z.boolean(),
     }),

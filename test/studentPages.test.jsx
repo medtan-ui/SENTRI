@@ -142,7 +142,7 @@ vi.mock('../src/services/analyticsService', () => ({
 vi.mock('../src/services/finalAssessmentService', () => ({
   getFinalAssessment: vi.fn(async () => ({
     title: 'SENTRI Final Assessment',
-    settings: { passingScore: 75, timeLimitMinutes: 30, instructions: '', available: true, attemptsAllowed: 2 },
+    settings: { passingScore: 75, instructions: '', available: true, attemptsAllowed: 2 },
     questions: [],
   })),
   getFinalAssessmentProgress: vi.fn(async () => null),

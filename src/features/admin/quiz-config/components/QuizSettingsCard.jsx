@@ -5,10 +5,16 @@ import styles from './QuizSettingsCard.module.css'
 
 /**
  * QuizSettingsCard
- * The one dedicated card for this quiz's settings — passing score, time
- * limit, instructions, and availability. There is exactly one quiz per
- * module and exactly one attempt per student, so there is nothing here to
- * select or switch between.
+ * The one dedicated card for this quiz's settings — passing score,
+ * instructions, and availability. There is exactly one quiz per module and
+ * exactly one attempt per student, so there is nothing here to select or
+ * switch between.
+ *
+ * There is deliberately no time limit field. One used to sit here and be
+ * saved to the quiz document, but nothing ever read it: no countdown, no
+ * server-side cutoff. A setting that silently does nothing is worse than
+ * no setting, because an admin reasonably assumes a saved limit applies.
+ * SENTRI's assessments are untimed, and now say so by omission.
  */
 export default function QuizSettingsCard({ settings, onChange }) {
   return (
@@ -29,17 +35,6 @@ export default function QuizSettingsCard({ settings, onChange }) {
           />
         </div>
 
-        <div className={forms.fieldGroup}>
-          <label className={forms.fieldLabel} htmlFor="timeLimit">Time Limit (minutes)</label>
-          <input
-            id="timeLimit"
-            type="number"
-            min={1}
-            className={forms.numberInput}
-            value={settings.timeLimitMinutes}
-            onChange={(e) => onChange({ timeLimitMinutes: Number(e.target.value) })}
-          />
-        </div>
       </div>
 
       <div className={forms.fieldGroup}>

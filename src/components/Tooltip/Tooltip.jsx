@@ -13,12 +13,20 @@ import styles from './Tooltip.module.css'
  * shrinking to the child's size — needed when the wrapped element itself
  * relies on `width: 100%` (e.g. a full-width card button), since without
  * it the wrapper's own default sizing would otherwise cap that width.
- * @param {{ label?: string|null, fullWidth?: boolean, children: React.ReactNode }} props
+ * `position` picks which side the bubble opens toward — `'top'` (default)
+ * for anything with room above it, `'bottom'` for anything pinned near the
+ * top of the viewport (the navbar, a page's hero), where an upward bubble
+ * would render off-screen instead of over it.
+ * @param {{ label?: string|null, fullWidth?: boolean, position?: 'top'|'bottom', children: React.ReactNode }} props
  */
-export default function Tooltip({ label, fullWidth = false, children }) {
+export default function Tooltip({ label, fullWidth = false, position = 'top', children }) {
   if (!label) return children
   return (
-    <span className={[styles.wrap, fullWidth ? styles.fullWidth : ''].filter(Boolean).join(' ')} tabIndex={0}>
+    <span
+      className={[styles.wrap, fullWidth ? styles.fullWidth : ''].filter(Boolean).join(' ')}
+      data-position={position}
+      tabIndex={0}
+    >
       {children}
       <span className={styles.bubble} role="tooltip">{label}</span>
     </span>

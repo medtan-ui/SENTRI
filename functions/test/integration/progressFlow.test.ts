@@ -91,7 +91,6 @@ describe('progress flow: configure -> initialize -> lesson -> simulation -> quiz
             title: 'Password Security Knowledge Check',
             settings: {
               passingScore: 80,
-              timeLimitMinutes: 15,
               instructions: 'Do your best.',
               available: true,
             },

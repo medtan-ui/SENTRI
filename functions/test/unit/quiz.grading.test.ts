@@ -5,7 +5,7 @@ function makeQuiz(): QuizConfig {
   return {
     moduleId: 'password-security',
     title: 'Password Security Knowledge Check',
-    settings: { passingScore: 80, timeLimitMinutes: 15, instructions: '', available: true },
+    settings: { passingScore: 80, instructions: '', available: true },
     questions: [
       {
         id: 'q1',

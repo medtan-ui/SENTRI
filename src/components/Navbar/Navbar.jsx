@@ -1,30 +1,28 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { useGamificationState } from '../../context/GamificationContext'
 import Icon from '../Icon/Icon'
-import RewardChip from '../Gamification/RewardChip'
+import Tooltip from '../Tooltip/Tooltip'
+import logo from '../../assets/images/logo.png'
 import styles from './Navbar.module.css'
 
 /**
  * Navbar
- * The fixed top bar. For students it also carries the two reward figures
- * that are worth seeing everywhere rather than only on the dashboard:
- * total XP and the current streak.
+ * The fixed top bar: a hamburger + home logo on the left, the signed-in
+ * user's profile button on the right.
  *
- * They live here, small, instead of as cards on every page. A streak's
- * whole job is to be visible on the day you might skip; a number in the
- * corner does that, while a card demanding attention on six different
- * screens is how a training app starts feeling like a slot machine.
- * Clicking either goes to Progress, where the full picture is.
+ * XP and streak used to live here as a pair of chips. They've moved into
+ * the dashboard hero's rank/streak panel, which is now itself the
+ * clickable link to Progress (see StudentDashboard's `.heroRewards`) — so
+ * the same "tap to see the full picture" affordance survives in one place
+ * instead of two, and this bar no longer has anything that has to
+ * disappear at narrow widths.
  */
 export default function Navbar({ onToggleSidebar }) {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { status, gamification } = useGamificationState()
 
   const name = user?.nickname || user?.displayName
-  const showRewards = user?.role === 'student' && status === 'success' && gamification
 
   return (
     <header className={styles.navbar}>
@@ -37,41 +35,34 @@ export default function Navbar({ onToggleSidebar }) {
         >
           <Icon name="menu" size={20} />
         </button>
-        <span className={styles.brand}>SENTRI</span>
+        <Tooltip label="SENTRI" position="bottom">
+          <button
+            type="button"
+            className={styles.homeBtn}
+            onClick={() => user && navigate(`/${user.role}/dashboard`)}
+            aria-label="Go to your dashboard"
+          >
+            <img src={logo} alt="" className={styles.homeLogo} />
+          </button>
+        </Tooltip>
       </div>
 
       <div className={styles.right}>
-        {showRewards && (
+        <Tooltip label={name || 'Profile'} position="bottom">
           <button
             type="button"
-            className={styles.rewards}
-            data-tour="rewards"
-            onClick={() => navigate('/student/progress')}
-            aria-label={`${gamification.points} XP, ${gamification.currentStreak} day streak. View your progress.`}
+            className={styles.userBadge}
+            data-tour="profile"
+            onClick={() => user && navigate(`/${user.role}/profile`)}
+            aria-label="View your profile"
           >
-            <RewardChip tone="xp" icon="bolt" value={`${gamification.points} XP`} label="experience points" />
-            <RewardChip
-              tone="streak"
-              icon="flame"
-              value={gamification.currentStreak}
-              label="day streak"
-              muted={!gamification.currentStreak}
-            />
+            <span className={styles.avatar} aria-hidden="true">
+              {name?.[0] ?? 'U'}
+            </span>
+            <span className={styles.userName}>{name ?? 'User'}</span>
+            <span className={styles.roleTag}>{user?.role ?? ''}</span>
           </button>
-        )}
-
-        <button
-          type="button"
-          className={styles.userBadge}
-          onClick={() => user && navigate(`/${user.role}/profile`)}
-          aria-label="View your profile"
-        >
-          <span className={styles.avatar} aria-hidden="true">
-            {name?.[0] ?? 'U'}
-          </span>
-          <span className={styles.userName}>{name ?? 'User'}</span>
-          <span className={styles.roleTag}>{user?.role ?? ''}</span>
-        </button>
+        </Tooltip>
       </div>
     </header>
   )

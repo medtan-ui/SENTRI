@@ -44,6 +44,7 @@ export const safeBrowsingConfig = {
           feedbackText:
             'A mass "10,000 papers, no sign-up" download from an unfamiliar .xyz domain is a common way to distribute malware or harvest whatever information you enter — a paid placement in search results says nothing about whether a site is legitimate.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'sb-01-b',
@@ -55,6 +56,7 @@ export const safeBrowsingConfig = {
           feedbackText:
             "An unfamiliar blog offering the exact thesis you searched for is a common lure — the specificity is designed to feel like a lucky find, not a red flag. Unknown personal sites hosting full-text academic papers are worth checking before you click, not after.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'sb-01-c',
@@ -95,6 +97,7 @@ export const safeBrowsingConfig = {
           feedbackText:
             "Proceeding past a certificate warning means the encryption protecting this connection can't be verified — anything sent from here, including anything you type, can potentially be read by whoever is sitting between you and the real site. That warning exists specifically to stop this before it happens.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'sb-02-c',
@@ -129,6 +132,7 @@ export const safeBrowsingConfig = {
           feedbackText:
             "That banner was part of the web page, not your browser — real browsers update themselves automatically or prompt from their own menus, never from a banner inside a site you're visiting. \"Click here to update\" is one of the most common disguises for installing something unwanted.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'sb-03-b',
@@ -140,6 +144,7 @@ export const safeBrowsingConfig = {
           feedbackText:
             "Closing it caused no harm here, so this isn't a dangerous choice in itself — but dismissing a prompt without ever checking where it actually appeared means you still can't tell a fake update banner from a real one next time. The real browser-settings path (its own menu → Settings → About) takes the same effort and actually verifies something.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'sb-03-c',

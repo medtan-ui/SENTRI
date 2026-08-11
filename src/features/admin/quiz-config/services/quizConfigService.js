@@ -51,7 +51,6 @@ function buildDefaultSettings(passingScore, title) {
     title,
     settings: {
       passingScore,
-      timeLimitMinutes: 15,
       instructions:
         "Answer every question to the best of your ability. You'll only get one attempt, so take your time.",
       available: true,

@@ -24,6 +24,8 @@ export interface ResponseRow {
   questionId?: string
   topic?: string | null
   selectedChoiceId?: string | null
+  /** The key this row was graded against, as it stood at answer time. */
+  correctChoiceId?: string | null
   isCorrect?: boolean
   durationMs?: number | null
 }
@@ -220,8 +222,47 @@ export interface ItemAnalysis {
   attemptCount: number
   minAttemptsForDiscrimination: number
   medianDurationMs: number | null
-  distractorCounts?: Record<string, number>
+  /**
+   * Which choice was the keyed answer, taken from the response rows
+   * themselves (`correctChoiceId` is stamped onto every row at submit
+   * time). Null only for an item whose rows predate that field.
+   */
+  correctChoiceId: string | null
+  /**
+   * How the answers actually distributed across the choices, commonest
+   * first. This is the question difficulty and discrimination cannot
+   * answer: *which* wrong answer students were drawn to. A distractor
+   * nobody ever picks is dead weight in the item; one that outdraws the
+   * key is usually a wording problem rather than a knowledge gap.
+   */
+  choiceDistribution: ChoiceDistribution[]
 }
+
+export interface ChoiceDistribution {
+  choiceId: string
+  /**
+   * The choice as a student read it. Null when the item bank could not be
+   * resolved at aggregation time (an item deleted from the bank after it
+   * was answered, say) — the id is still reported, so the row degrades to
+   * what it used to be rather than disappearing.
+   */
+  text: string | null
+  count: number
+  /** Share of this item's responses, 0-100. */
+  rate: number
+  isCorrect: boolean
+}
+
+/**
+ * questionId -> choiceId -> the text a student saw.
+ *
+ * Passed in rather than read here, because this file is pure by
+ * contract — every function in it is arithmetic over already-fetched
+ * documents, which is what makes the whole thing unit-testable without an
+ * emulator. The lookup is assembled in service.ts from the three item
+ * banks (pre-test, quiz, final assessment).
+ */
+export type ChoiceTextLookup = Record<string, Record<string, string>>
 
 function difficultyLabel(p: number): ItemAnalysis['difficultyLabel'] {
   if (p >= 0.9) return 'Very easy'
@@ -238,8 +279,12 @@ const MIN_ATTEMPTS_FOR_DISCRIMINATION = 10
  * Item analysis over one assessment type's responses. Attempts are
  * grouped by attemptId to reconstruct each whole test performance, then
  * the top and bottom 27% (the conventional split) are compared per item.
+ *
+ * @param choiceText optional questionId -> choiceId -> text lookup, used
+ *   only to label the choice distribution. Omitting it costs nothing but
+ *   the labels: every count and rate is computed from the response rows.
  */
-export function itemAnalysis(responses: ResponseRow[]): ItemAnalysis[] {
+export function itemAnalysis(responses: ResponseRow[], choiceText: ChoiceTextLookup = {}): ItemAnalysis[] {
   const byType = new Map<string, ResponseRow[]>()
   responses.forEach((row) => {
     const type = row.assessmentType || 'unknown'
@@ -298,12 +343,31 @@ export function itemAnalysis(responses: ResponseRow[]): ItemAnalysis[] {
         .map((r) => r.durationMs)
         .filter((d): d is number => typeof d === 'number')
 
-      const distractorCounts: Record<string, number> = {}
+      // Every row carries the key it was graded against, so the correct
+      // choice is recoverable without consulting the item bank — which
+      // matters, because the bank can be edited after the fact and the
+      // rows record what was actually true at answer time.
+      const correctChoiceId = questionRows.find((r) => r.correctChoiceId)?.correctChoiceId ?? null
+
+      const counts = new Map<string, number>()
       questionRows.forEach((r) => {
-        if (r.selectedChoiceId) {
-          distractorCounts[r.selectedChoiceId] = (distractorCounts[r.selectedChoiceId] || 0) + 1
-        }
+        if (!r.selectedChoiceId) return
+        counts.set(r.selectedChoiceId, (counts.get(r.selectedChoiceId) ?? 0) + 1)
       })
+
+      const textForQuestion = choiceText[questionId] ?? {}
+      const choiceDistribution: ChoiceDistribution[] = [...counts.entries()]
+        .map(([choiceId, count]) => ({
+          choiceId,
+          text: textForQuestion[choiceId] ?? null,
+          count,
+          rate: total > 0 ? Math.round((count / total) * 100) : 0,
+          isCorrect: choiceId === correctChoiceId,
+        }))
+        // Commonest first, so the answer students actually gravitated to
+        // is the one you read first. Ties break on id to keep the output
+        // stable between aggregations.
+        .sort((a, b) => b.count - a.count || a.choiceId.localeCompare(b.choiceId))
 
       results.push({
         questionId,
@@ -319,7 +383,8 @@ export function itemAnalysis(responses: ResponseRow[]): ItemAnalysis[] {
         attemptCount: ranked.length,
         minAttemptsForDiscrimination: MIN_ATTEMPTS_FOR_DISCRIMINATION,
         medianDurationMs: median(durations),
-        distractorCounts,
+        correctChoiceId,
+        choiceDistribution,
       })
     })
   })

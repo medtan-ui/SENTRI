@@ -51,6 +51,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             "Reminder-78 has no verification badge, was created days ago, and has almost no post history — the hallmarks of a throwaway account built to run a scheme like this one, not a real sponsor with a prize to give away.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'dp-01-c',
@@ -96,6 +97,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             "You entered your birthdate. That's an identity-verification factor at almost every bank in the country — combined with your name, it's often enough to pass a security check as you. A raffle has no legitimate reason to ask for it.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'dp-02-a-address',
@@ -107,6 +109,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             'You entered your home address. A raffle has no legitimate use for it — whoever has it now knows exactly where you live, tied to your real name and email.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'dp-02-a-phone',
@@ -118,6 +121,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             "You entered your phone number. It's now tied to your real name and can be resold directly to whoever wants to reach you next — including the messages that are about to start arriving.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'dp-02-c',
@@ -163,6 +167,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             "Replying — even just \"STOP\" — tells whoever's sending these that a real person reads this number. That confirmation makes it more valuable on the same lists that sold it in the first place, not less.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'dp-03-b',
@@ -174,6 +179,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             "Changing the number stops these specific messages, but the information that leaked — name, address, and birthday — hasn't gone anywhere and is still linked to her. A new number doesn't undo what a resold identity can still be used for.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'dp-03-c',

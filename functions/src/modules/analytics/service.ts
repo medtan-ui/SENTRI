@@ -17,8 +17,11 @@ import { admin, db } from '../../shared/admin'
 import { REAL_MODULE_IDS } from '../../shared/constants'
 import { getModuleOrThrow } from '../../shared/moduleGuards'
 import * as assessmentRepo from '../assessment/repository'
+import * as quizRepo from '../quiz/repository'
+import * as finalAssessmentRepo from '../finalAssessment/repository'
 import * as repo from './repository'
 import {
+  ChoiceTextLookup,
   behaviourMetrics,
   cohortNormalizedGain,
   itemAnalysis,
@@ -58,14 +61,65 @@ function isoDay(date: Date): string {
   return date.toISOString().slice(0, 10)
 }
 
+/** Anything shaped like an item bank: pre-test, quiz, final assessment. */
+interface BankLike {
+  questions?: Array<{ id?: string; choices?: Array<{ id?: string; text?: string }>; sourceModuleId?: string }>
+}
+
+/**
+ * questionId -> choiceId -> choice text, for every item a student could
+ * have answered under this module.
+ *
+ * Three banks feed it: the module's pre-test, its quiz, and the items of
+ * the one final assessment that were seeded from this module (matched on
+ * `sourceModuleId`, which is also how a final assessment response row is
+ * attributed to a module in the first place).
+ *
+ * Only the item analysis's choice distribution needs this, purely to
+ * label a choice with what the student read instead of a raw id. It is
+ * therefore best-effort by design: a bank that has been edited or deleted
+ * since an item was answered simply yields no label, and the distribution
+ * still reports counts and rates from the response rows, which are the
+ * authoritative record of what actually happened.
+ *
+ * Cost is three document reads per module aggregation — eighteen for a
+ * whole nightly pass, against full-collection reads it already does.
+ */
+async function buildChoiceTextLookup(moduleId: string): Promise<ChoiceTextLookup> {
+  const [pretest, quiz, finalConfig] = await Promise.all([
+    assessmentRepo.getAssessmentConfig(moduleId).catch(() => null),
+    quizRepo.getQuizConfig(moduleId).catch(() => null),
+    finalAssessmentRepo.getConfig().catch(() => null),
+  ])
+
+  const lookup: ChoiceTextLookup = {}
+  const absorb = (bank: BankLike | null, onlyThisModule: boolean) => {
+    bank?.questions?.forEach((question) => {
+      if (!question?.id) return
+      if (onlyThisModule && question.sourceModuleId !== moduleId) return
+      const byChoice: Record<string, string> = {}
+      question.choices?.forEach((choice) => {
+        if (choice?.id && typeof choice.text === 'string') byChoice[choice.id] = choice.text
+      })
+      if (Object.keys(byChoice).length > 0) lookup[question.id] = { ...lookup[question.id], ...byChoice }
+    })
+  }
+
+  absorb(pretest as BankLike | null, false)
+  absorb(quiz as BankLike | null, false)
+  absorb(finalConfig as BankLike | null, true)
+  return lookup
+}
+
 export async function aggregateModuleAnalytics(moduleId: string): Promise<ModuleAnalyticsDoc> {
   await getModuleOrThrow(moduleId)
 
-  const [progressDocs, attempts, decisions, responses] = await Promise.all([
+  const [progressDocs, attempts, decisions, responses, choiceText] = await Promise.all([
     repo.getModuleProgressForModule(moduleId),
     repo.getQuizAttemptsForModule(moduleId),
     repo.getScenarioDecisionsForModule(moduleId),
     assessmentRepo.getResponsesForModule(moduleId),
+    buildChoiceTextLookup(moduleId),
   ])
 
   const totalStudents = progressDocs.length
@@ -112,7 +166,7 @@ export async function aggregateModuleAnalytics(moduleId: string): Promise<Module
     pairedCount: gain.pairedCount,
     postTestCompletedCount: postByStudent.size,
     topicMastery: topicMastery(responses),
-    itemAnalysis: itemAnalysis(responses),
+    itemAnalysis: itemAnalysis(responses, choiceText),
     behaviour: behaviourMetrics(decisions),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   }

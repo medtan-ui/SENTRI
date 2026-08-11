@@ -3,6 +3,7 @@ import { toCsv } from '../src/utils/exportCsv'
 import {
   activityTrendRows,
   cohortSummaryRows,
+  distractorRows,
   itemAnalysisRows,
   moduleBreakdownRows,
   topicMasteryRows,
@@ -133,5 +134,72 @@ describe('report rows', () => {
       { id: 'online-safety', name: 'Online Safety' },
     ]
     expect(itemAnalysisRows(modules, {})).toHaveLength(1)
+  })
+
+  it('names the final assessment by its own name, not by its stored type', () => {
+    // Its rows are stored as `posttest` so pre/post item analysis keeps
+    // comparing identical items. Exporting that raw would put a word in
+    // the paper for something students never see.
+    const modules = [{ id: 'password-security', name: 'Password Security' }]
+    const summaries = {
+      'password-security': {
+        itemAnalysis: [
+          { questionId: 'q1', assessmentType: 'posttest', responses: 1, correct: 1 },
+          { questionId: 'q2', assessmentType: 'pretest', responses: 1, correct: 1 },
+        ],
+      },
+    }
+    const [, post, pre] = itemAnalysisRows(modules, summaries)
+    expect(post[1]).toBe('Final assessment')
+    expect(pre[1]).toBe('Pre-test')
+  })
+})
+
+describe('distractorRows', () => {
+  const modules = [{ id: 'password-security', name: 'Password Security' }]
+  const summaries = {
+    'password-security': {
+      itemAnalysis: [
+        {
+          questionId: 'q1',
+          assessmentType: 'quiz',
+          topic: 'mfa',
+          responses: 4,
+          choiceDistribution: [
+            { choiceId: 'c2', text: 'Click the link to be sure', count: 2, rate: 50, isCorrect: false },
+            { choiceId: 'c1', text: 'Check the sender address', count: 1, rate: 25, isCorrect: true },
+            { choiceId: 'c3', text: null, count: 1, rate: 25, isCorrect: false },
+          ],
+        },
+      ],
+    },
+  }
+
+  it('emits one row per choice, not one per question', () => {
+    const rows = distractorRows(modules, summaries)
+    expect(rows).toHaveLength(4) // header + three choices
+  })
+
+  it('marks the key so a distractor outdrawing it is findable by sorting', () => {
+    const [, top, key] = distractorRows(modules, summaries)
+    expect(top[6]).toBe('no')
+    expect(top[7]).toBe(2)
+    expect(key[6]).toBe('yes')
+    expect(key[7]).toBe(1)
+  })
+
+  it('leaves an unresolved choice text blank rather than repeating its id', () => {
+    const [, , , unlabelled] = distractorRows(modules, summaries)
+    expect(unlabelled[4]).toBe('c3')
+    expect(unlabelled[5]).toBe('')
+  })
+
+  it('emits a header-only table for an aggregate written before this existed', () => {
+    // Stored moduleAnalytics documents predating the choice distribution
+    // have no such field. The export must degrade, not throw.
+    const stale = { 'password-security': { itemAnalysis: [{ questionId: 'q1', assessmentType: 'quiz' }] } }
+    expect(distractorRows(modules, stale)).toHaveLength(1)
+    expect(distractorRows(modules, {})).toHaveLength(1)
+    expect(distractorRows(modules, null)).toHaveLength(1)
   })
 })

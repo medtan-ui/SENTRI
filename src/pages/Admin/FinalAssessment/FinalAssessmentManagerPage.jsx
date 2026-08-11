@@ -117,18 +117,9 @@ export default function FinalAssessmentManagerPage() {
               />
             </div>
 
-            <div className={forms.fieldGroup}>
-              <label className={forms.fieldLabel} htmlFor="faTimeLimit">Time Limit (minutes)</label>
-              <input
-                id="faTimeLimit"
-                type="number"
-                min={0}
-                className={forms.numberInput}
-                value={draft.settings.timeLimitMinutes}
-                onChange={(e) => actions.updateSettings({ timeLimitMinutes: Number(e.target.value) })}
-              />
-            </div>
-
+            {/* No time limit field, deliberately — see QuizSettingsCard.
+                The final assessment is untimed, and the seeded
+                instructions say so to the student. */}
             <div className={forms.fieldGroup}>
               <label className={forms.fieldLabel} htmlFor="faAttempts">Attempts Allowed</label>
               <input

@@ -90,7 +90,9 @@ const FINAL_ASSESSMENT_SEED = {
   title: 'SENTRI Final Assessment',
   settings: {
     passingScore: 75,
-    timeLimitMinutes: 30,
+    // No time limit. There used to be one stored here, but nothing ever
+    // enforced it, and an untimed assessment is the right call anyway:
+    // this measures retention, not speed.
     instructions:
       'This covers all six modules you have completed. Answer every question to the best of your ability — ' +
       'take your time, there is no rush.',

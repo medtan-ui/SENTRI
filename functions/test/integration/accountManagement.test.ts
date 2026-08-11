@@ -231,16 +231,46 @@ describe('account management: register -> nickname -> deactivate -> reactivate -
  * Deleting an account must take every row keyed to that uid with it.
  *
  * This is written as an exhaustive sweep rather than a spot check for a
- * concrete reason: `quizResponses` was added later, for item analysis,
- * and was missed from the cascade. A deleted student's per-question
- * answers stayed in the corpus and kept feeding topic mastery, item
- * difficulty, and discrimination forever. Nothing on screen revealed it;
- * the numbers were just quietly wrong.
+ * concrete reason: the cascade has now been missed three times, once per
+ * feature that added a collection.
  *
- * So when a new uid-bearing collection is added, add it here too. A test
- * that only checks the collections someone remembered is a test that
- * fails the same way the code did.
+ *   `quizResponses`  — a deleted student's per-question answers stayed in
+ *      the corpus and kept feeding topic mastery, item difficulty and
+ *      discrimination forever. Nothing on screen revealed it; the numbers
+ *      were just quietly wrong.
+ *   `gamification`   — the deleted student stayed on the leaderboard, and
+ *      recreating the same person produced two rows under one name.
+ *   `finalAssessmentProgress` — an invisible orphan, found by inspection.
+ *
+ * The shape below is the response to that. The collections are declared
+ * as data, seeded from that declaration, and asserted from the same
+ * declaration, so covering a new one is a single list entry rather than
+ * three edits someone can do two of. The lists deliberately mirror
+ * `deleteStudentData` in auth/repository.ts — if you add a line there,
+ * add one here.
  */
+
+/** Doc id is the bare uid. */
+const UID_DOC_COLLECTIONS = [
+  COLLECTIONS.STUDENT_ANALYTICS,
+  COLLECTIONS.GAMIFICATION,
+  COLLECTIONS.FINAL_ASSESSMENT_PROGRESS,
+  // Retired, but still deleted defensively — a long-lived account may
+  // carry one from the badge system the gamification module replaced.
+  'userBadges',
+]
+
+/** Doc id is `${uid}_${moduleId}`. */
+const UID_MODULE_DOC_COLLECTIONS = [COLLECTIONS.MODULE_PROGRESS, COLLECTIONS.LEARNING_ANALYTICS]
+
+/** Queried by an owning-uid field rather than addressed by doc id. */
+const UID_QUERIED_COLLECTIONS: Array<[string, string]> = [
+  [COLLECTIONS.QUIZ_ATTEMPTS, 'userId'],
+  [COLLECTIONS.QUIZ_RESPONSES, 'userId'],
+  [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'userId'],
+  [COLLECTIONS.ANALYTICS_EVENTS, 'userId'],
+]
+
 describe('account deletion: cascading data cleanup', () => {
   const ADMIN = `cascade-admin-${Date.now()}`
   const MODULE_ID = 'password-security'
@@ -263,23 +293,14 @@ describe('account deletion: cascading data cleanup', () => {
     )) as { uid: string }
     uid = created.uid
 
-    // One row in every collection that stores this student's uid.
+    // One row in every collection that stores this student's uid. The
+    // payloads are deliberately minimal: what is under test is that the
+    // document is gone afterwards, not what was in it.
     await Promise.all([
-      db.collection(COLLECTIONS.MODULE_PROGRESS).doc(`${uid}_${MODULE_ID}`).set({
-        userId: uid,
-        moduleId: MODULE_ID,
-        moduleCompleted: true,
-        preTestScore: 40,
-        postTestScore: 80,
-      }),
-      db.collection(COLLECTIONS.LEARNING_ANALYTICS).doc(`${uid}_${MODULE_ID}`).set({
-        userId: uid,
-        moduleId: MODULE_ID,
-        safeChoices: 2,
-        riskyChoices: 1,
-        totalDecisions: 3,
-      }),
-      db.collection(COLLECTIONS.STUDENT_ANALYTICS).doc(uid).set({ userId: uid, modulesCompleted: 1 }),
+      ...UID_DOC_COLLECTIONS.map((name) => db.collection(name).doc(uid).set({ userId: uid })),
+      ...UID_MODULE_DOC_COLLECTIONS.map((name) =>
+        db.collection(name).doc(`${uid}_${MODULE_ID}`).set({ userId: uid, moduleId: MODULE_ID }),
+      ),
       db.collection(COLLECTIONS.QUIZ_ATTEMPTS).add({ userId: uid, moduleId: MODULE_ID, score: 80, passed: true }),
       db.collection(COLLECTIONS.QUIZ_RESPONSES).add({
         userId: uid,
@@ -301,25 +322,42 @@ describe('account deletion: cascading data cleanup', () => {
     ])
   }, 60000)
 
+  it('seeded a row in every collection the cascade is responsible for', async () => {
+    // Guards the test itself. Every assertion below is "this document is
+    // gone", which passes trivially against a document that was never
+    // there — so a typo'd collection name in the seed would turn the real
+    // check into a no-op that still reports green.
+    const docs = await Promise.all([
+      ...UID_DOC_COLLECTIONS.map((name) => db.collection(name).doc(uid).get()),
+      ...UID_MODULE_DOC_COLLECTIONS.map((name) => db.collection(name).doc(`${uid}_${MODULE_ID}`).get()),
+    ])
+    expect(docs.map((snap) => snap.exists)).toEqual(docs.map(() => true))
+
+    for (const [collectionName, field] of UID_QUERIED_COLLECTIONS) {
+      // eslint-disable-next-line no-await-in-loop
+      const snap = await db.collection(collectionName).where(field, '==', uid).get()
+      expect({ collection: collectionName, seeded: snap.size }).toEqual({ collection: collectionName, seeded: 1 })
+    }
+  }, 60000)
+
   it('leaves no row behind in any collection keyed to the deleted uid', async () => {
     await deleteUserAccount.run(makeRequest({ uid }, ADMIN))
 
-    const [progress, learning, studentAnalytics] = await Promise.all([
-      db.collection(COLLECTIONS.MODULE_PROGRESS).doc(`${uid}_${MODULE_ID}`).get(),
-      db.collection(COLLECTIONS.LEARNING_ANALYTICS).doc(`${uid}_${MODULE_ID}`).get(),
-      db.collection(COLLECTIONS.STUDENT_ANALYTICS).doc(uid).get(),
+    const remainingDocs = await Promise.all([
+      ...UID_DOC_COLLECTIONS.map(async (name) => ({
+        collection: name,
+        exists: (await db.collection(name).doc(uid).get()).exists,
+      })),
+      ...UID_MODULE_DOC_COLLECTIONS.map(async (name) => ({
+        collection: name,
+        exists: (await db.collection(name).doc(`${uid}_${MODULE_ID}`).get()).exists,
+      })),
     ])
-    expect(progress.exists).toBe(false)
-    expect(learning.exists).toBe(false)
-    expect(studentAnalytics.exists).toBe(false)
+    // Compared as a whole array so a failure names the collection that
+    // was missed instead of just reporting `true !== false`.
+    expect(remainingDocs).toEqual(remainingDocs.map(({ collection }) => ({ collection, exists: false })))
 
-    const queried: Array<[string, string]> = [
-      [COLLECTIONS.QUIZ_ATTEMPTS, 'userId'],
-      [COLLECTIONS.QUIZ_RESPONSES, 'userId'],
-      [COLLECTIONS.SCENARIO_DECISION_RECORDS, 'userId'],
-      [COLLECTIONS.ANALYTICS_EVENTS, 'userId'],
-    ]
-    for (const [collectionName, field] of queried) {
+    for (const [collectionName, field] of UID_QUERIED_COLLECTIONS) {
       // eslint-disable-next-line no-await-in-loop
       const snap = await db.collection(collectionName).where(field, '==', uid).get()
       expect({ collection: collectionName, remaining: snap.size }).toEqual({

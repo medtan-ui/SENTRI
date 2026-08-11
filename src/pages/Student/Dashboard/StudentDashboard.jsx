@@ -6,6 +6,7 @@ import ErrorState from '../../../components/ErrorState/ErrorState'
 import Icon from '../../../components/Icon/Icon'
 import ModuleGrid, { MODULE_STATUS_META, moduleDestination } from '../../../components/ModuleGrid/ModuleGrid'
 import TutorialCard from '../../../components/TutorialCard/TutorialCard'
+import Tooltip from '../../../components/Tooltip/Tooltip'
 import RankMeter from '../../../components/Gamification/RankMeter'
 import StreakTrack from '../../../components/Gamification/StreakTrack'
 import BadgeShelf from '../../../components/Gamification/BadgeShelf'
@@ -70,19 +71,24 @@ const TOUR_STEPS = [
     body: 'Six modules, each with a lesson, a hands-on scenario and a short quiz. They unlock in order as you finish them.',
   },
   {
+    target: 'quiz-overview',
+    title: 'Every quiz, in one place',
+    body: "Jump straight to any quiz you've already unlocked from here instead of hunting through each module. Fun fact: clear all six and a final assessment covering everything unlocks too.",
+  },
+  {
     target: 'continue',
     title: 'One button to pick up where you left off',
     body: 'This always points at the next thing you have to do, so you never have to work out where you got to.',
   },
   {
     target: 'rewards',
-    title: 'XP and your daily streak',
-    body: 'You earn XP for every step you finish, and your streak grows on any day you train. Both follow you on every page.',
+    title: 'XP, your streak, and your rank',
+    body: 'You earn XP for every step you finish, and your streak grows on any day you train. Tap this any time to see the full picture: badges, rank, and the leaderboard.',
   },
   {
-    target: 'nav-progress',
-    title: 'Badges, ranks and the leaderboard',
-    body: 'Progress has the full picture: how far you have come, every badge and how you compare with your class.',
+    target: 'profile',
+    title: 'Your profile',
+    body: 'Update your details, change your password, or replay this tour any time from here.',
   },
 ]
 
@@ -169,24 +175,32 @@ export default function StudentDashboard() {
           </div>
 
           {rewardsReady && (
-            <div className={styles.heroRewards}>
-              <RankMeter
-                variant="dark"
-                points={gamification.points}
-                level={gamification.level}
-                rankName={gamification.rankName}
-                rankFloor={gamification.rankFloor}
-                nextRankAt={gamification.nextRankAt}
-                nextRankName={gamification.nextRankName}
-              />
-              <div className={styles.heroDivider} aria-hidden="true" />
-              <StreakTrack
-                variant="dark"
-                currentStreak={gamification.currentStreak}
-                longestStreak={gamification.longestStreak}
-                lastActiveDate={gamification.lastActiveDate}
-              />
-            </div>
+            <Tooltip label="See progress" position="bottom">
+              <button
+                type="button"
+                className={styles.heroRewards}
+                data-tour="rewards"
+                onClick={() => navigate('/student/progress')}
+                aria-label={`Level ${gamification.level}, ${gamification.rankName}, ${gamification.points} XP, ${gamification.currentStreak} day streak. View your full progress.`}
+              >
+                <RankMeter
+                  variant="dark"
+                  points={gamification.points}
+                  level={gamification.level}
+                  rankName={gamification.rankName}
+                  rankFloor={gamification.rankFloor}
+                  nextRankAt={gamification.nextRankAt}
+                  nextRankName={gamification.nextRankName}
+                />
+                <div className={styles.heroDivider} aria-hidden="true" />
+                <StreakTrack
+                  variant="dark"
+                  currentStreak={gamification.currentStreak}
+                  longestStreak={gamification.longestStreak}
+                  lastActiveDate={gamification.lastActiveDate}
+                />
+              </button>
+            </Tooltip>
           )}
         </section>
 
@@ -205,7 +219,18 @@ export default function StudentDashboard() {
 
         {/* ── 3. The curriculum ── */}
         <section className={styles.moduleSection} data-tour="modules">
-          <h2 className={styles.sectionHeading}>Your modules</h2>
+          <div className={styles.moduleSectionHeader}>
+            <h2 className={styles.sectionHeading}>Your modules</h2>
+            <button
+              type="button"
+              className={styles.panelLink}
+              data-tour="quiz-overview"
+              onClick={() => navigate('/student/quiz')}
+            >
+              View all quizzes
+              <Icon name="chevronRight" size={14} />
+            </button>
+          </div>
 
           <TutorialCard />
 

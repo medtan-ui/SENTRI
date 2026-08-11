@@ -18,10 +18,28 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  /* The sidebar sits above the navbar (z-index 200 vs 100) and, on
+     desktop, is always visible rather than off-canvas — so without this,
+     the sidebar's own box physically covers this corner of the navbar and
+     nothing in it (the home button included) is reachable. Push clear of
+     it, matching DashboardLayout's .main. */
+  margin-left: var(--sidebar-width);
 }
 
+@media (max-width: 768px) {
+  .left {
+    /* Mobile: the sidebar is off-canvas until opened, so there's nothing
+       to clear. */
+    margin-left: 0;
+  }
+}
+
+/* Desktop: the sidebar is permanently open (not off-canvas), so there is
+   nothing for this button to toggle — showing it invited a click that did
+   nothing but drop the backdrop over the page for no reason. It only has
+   a job below 768px, where the sidebar goes off-canvas. */
 .menuBtn {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 34px;
@@ -37,37 +55,40 @@
   background: var(--color-bg);
 }
 
-.brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--color-gold);
-  letter-spacing: 0.06em;
+@media (max-width: 768px) {
+  .menuBtn {
+    display: flex;
+  }
+}
+
+.homeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.homeBtn:hover {
+  background: var(--color-bg);
+}
+
+.homeLogo {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .right {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-}
-
-/* The XP + streak pair. One button, not two, because both go to the same
-   place and two adjacent targets would just be a bigger hit area split
-   down the middle for no reason. */
-.rewards {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  padding: 4px 6px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.rewards:hover {
-  background: var(--color-bg);
 }
 
 .userBadge {
@@ -121,11 +142,4 @@
 @media (max-width: 700px) {
   .userName { display: none; }
   .roleTag { display: none; }
-}
-
-/* Below this the reward chips and a name would compete for the same
-   40px. The chips lose: they are reinforcement, and Progress is one tap
-   away through the sidebar. */
-@media (max-width: 480px) {
-  .rewards { display: none; }
 }

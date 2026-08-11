@@ -164,6 +164,69 @@ describe('itemAnalysis', () => {
     const [item] = itemAnalysis(responses)
     expect(item.medianDurationMs).toBe(5000)
   })
+
+  describe('choice distribution', () => {
+    // Four students. Two picked the distractor c2, one picked the key,
+    // one picked c3 — the shape of an item whose wrong answer is winning.
+    const responses: ResponseRow[] = [
+      { attemptId: 'a', questionId: 'q1', assessmentType: 'quiz', selectedChoiceId: 'c2', correctChoiceId: 'c1', isCorrect: false },
+      { attemptId: 'b', questionId: 'q1', assessmentType: 'quiz', selectedChoiceId: 'c2', correctChoiceId: 'c1', isCorrect: false },
+      { attemptId: 'c', questionId: 'q1', assessmentType: 'quiz', selectedChoiceId: 'c1', correctChoiceId: 'c1', isCorrect: true },
+      { attemptId: 'd', questionId: 'q1', assessmentType: 'quiz', selectedChoiceId: 'c3', correctChoiceId: 'c1', isCorrect: false },
+    ]
+
+    it('counts each choice and reports its share, commonest first', () => {
+      const [item] = itemAnalysis(responses)
+      expect(item.choiceDistribution).toEqual([
+        { choiceId: 'c2', text: null, count: 2, rate: 50, isCorrect: false },
+        { choiceId: 'c1', text: null, count: 1, rate: 25, isCorrect: true },
+        { choiceId: 'c3', text: null, count: 1, rate: 25, isCorrect: false },
+      ])
+    })
+
+    it('marks the key from the response rows, not from the item bank', () => {
+      // The bank can be edited after an item is answered. The rows carry
+      // the key they were actually graded against, which is the honest
+      // one to report a historic distribution against.
+      const [item] = itemAnalysis(responses)
+      expect(item.correctChoiceId).toBe('c1')
+      expect(item.choiceDistribution.filter((c) => c.isCorrect)).toHaveLength(1)
+    })
+
+    it('labels choices when a text lookup is supplied', () => {
+      const [item] = itemAnalysis(responses, {
+        q1: { c1: 'Check the sender address', c2: 'Click the link to be sure' },
+      })
+      const byId = new Map(item.choiceDistribution.map((c) => [c.choiceId, c.text]))
+      expect(byId.get('c1')).toBe('Check the sender address')
+      expect(byId.get('c2')).toBe('Click the link to be sure')
+      // c3 has no entry in the lookup — an item edited since it was
+      // answered. It still reports, with a null label rather than being
+      // dropped from a distribution whose percentages must add up.
+      expect(byId.get('c3')).toBeNull()
+      expect(item.choiceDistribution.reduce((sum, c) => sum + c.rate, 0)).toBe(100)
+    })
+
+    it('skips rows with no recorded choice rather than inventing one', () => {
+      const [item] = itemAnalysis([
+        { attemptId: 'a', questionId: 'q1', assessmentType: 'quiz', selectedChoiceId: null, correctChoiceId: 'c1', isCorrect: false },
+        { attemptId: 'b', questionId: 'q1', assessmentType: 'quiz', selectedChoiceId: 'c1', correctChoiceId: 'c1', isCorrect: true },
+      ])
+      expect(item.choiceDistribution).toHaveLength(1)
+      expect(item.choiceDistribution[0].choiceId).toBe('c1')
+      // Rate is out of all responses to the item, unanswered included, so
+      // it cannot read as "100% picked the key" on a half-answered item.
+      expect(item.choiceDistribution[0].rate).toBe(50)
+    })
+
+    it('returns an empty distribution rather than undefined when nothing was picked', () => {
+      const [item] = itemAnalysis([
+        { attemptId: 'a', questionId: 'q1', assessmentType: 'quiz', isCorrect: false },
+      ])
+      expect(item.choiceDistribution).toEqual([])
+      expect(item.correctChoiceId).toBeNull()
+    })
+  })
 })
 
 describe('behaviourMetrics', () => {

@@ -32,9 +32,11 @@ const questionSchema = z
 
 export const updateFinalAssessmentSchema = z.object({
   title: z.string().min(1, 'The final assessment needs a title.'),
+  // No timeLimitMinutes — see the note in modules/admin/validators.ts.
+  // Nothing counted down and nothing cut off, so the field was removed
+  // rather than left as a setting that lies about what it does.
   settings: z.object({
     passingScore: z.number().min(0).max(100),
-    timeLimitMinutes: z.number().min(0).max(600),
     instructions: z.string(),
     available: z.boolean(),
     attemptsAllowed: z.number().int().min(1).max(10),

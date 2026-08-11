@@ -4,6 +4,7 @@ import { downloadCsv, isoDateStamp } from '../../../utils/exportCsv'
 import {
   activityTrendRows,
   cohortSummaryRows,
+  distractorRows,
   itemAnalysisRows,
   moduleBreakdownRows,
   topicMasteryRows,
@@ -18,6 +19,10 @@ import styles from './AdminAnalyticsPage.module.css'
  *   CSV  — one file per table, from the aggregates already on screen. No
  *          library, no server round trip, and no recomputation, so an
  *          exported number and the number above it are the same number.
+ *          One table per file rather than one big sheet, because these
+ *          have genuinely different grains: a cohort summary is one row,
+ *          item analysis is one row per question, and the distractor
+ *          breakdown is one row per choice.
  *   PDF  — the browser's own print dialog against a print stylesheet
  *          (see AdminAnalyticsPage.module.css). "Save as PDF" is a
  *          destination in every modern print dialog, which makes this a
@@ -70,6 +75,14 @@ export default function ExportToolbar({ cohort, modules, summaries }) {
         onClick={() => exportFile('item-analysis', itemAnalysisRows(modules, summaries))}
       >
         Item Analysis
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        disabled={!ready}
+        onClick={() => exportFile('distractor-analysis', distractorRows(modules, summaries))}
+      >
+        Distractor Analysis
       </Button>
       <Button
         size="sm"

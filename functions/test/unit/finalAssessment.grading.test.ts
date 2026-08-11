@@ -19,7 +19,6 @@ const config: FinalAssessmentConfig = {
   title: 'SENTRI Final Assessment',
   settings: {
     passingScore: 75,
-    timeLimitMinutes: 30,
     instructions: '',
     available: true,
     attemptsAllowed: 2,

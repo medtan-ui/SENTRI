@@ -39,7 +39,6 @@ export interface FinalAssessmentQuestion {
 
 export interface FinalAssessmentSettings {
   passingScore: number
-  timeLimitMinutes: number
   instructions: string
   /** An admin can close the final assessment without deleting it. */
   available: boolean

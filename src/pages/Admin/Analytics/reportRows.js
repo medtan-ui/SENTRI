@@ -21,6 +21,25 @@ function gainCell(gain) {
 }
 
 /**
+ * Stored assessment types, in the words the rest of the app uses.
+ *
+ * `posttest` is the stored value for the end-of-curriculum final
+ * assessment: its per-question rows are written under that type so the
+ * pre/post item analysis keeps comparing identical items without a change
+ * to any query. Exporting the raw value would put a word in the paper for
+ * an artefact that no longer exists as a student-facing thing.
+ */
+const ASSESSMENT_LABELS = {
+  pretest: 'Pre-test',
+  quiz: 'Quiz',
+  posttest: 'Final assessment',
+}
+
+function assessmentLabel(type) {
+  return ASSESSMENT_LABELS[type] ?? type ?? ''
+}
+
+/**
  * The one-page cohort summary: the figures the capstone's own objectives
  * are reported against, as label/value pairs rather than a wide table,
  * because that is the shape they get pasted into a document as.
@@ -40,9 +59,9 @@ export function cohortSummaryRows(cohort) {
     ['Students who finished every module', cell(cohort.studentsCompletedAll)],
     ['Average modules completed', cell(cohort.avgModulesCompleted)],
     ['Average pre-test score (%)', cell(cohort.avgPreTestScore)],
-    ['Average post-test score (%)', cell(cohort.avgPostTestScore)],
+    ['Average final assessment score (%)', cell(cohort.avgPostTestScore)],
     ['Normalized gain (Hake g)', gainCell(cohort.normalizedGain)],
-    ['Students with a paired pre/post', cell(cohort.pairedCount)],
+    ['Students with both a pre-test and a final assessment', cell(cohort.pairedCount)],
     ['First-attempt safe rate (%)', cell(b.firstAttemptSafeRate)],
     ['Consequence trigger rate (%)', cell(b.consequenceTriggerRate)],
     ['Total simulation decisions', cell(b.totalDecisions)],
@@ -103,11 +122,11 @@ export function topicMasteryRows(cohort) {
   const header = [
     'Topic',
     'Pre-test correct (%)',
-    'Post-test correct (%)',
+    'Final assessment correct (%)',
     'Quiz correct (%)',
     'Gain (percentage points)',
     'Pre-test responses',
-    'Post-test responses',
+    'Final assessment responses',
     'Quiz responses',
   ]
   const topics = cohort?.topicMastery || []
@@ -159,7 +178,7 @@ export function itemAnalysisRows(modules, summaries) {
     items.forEach((item) => {
       rows.push([
         m.name,
-        item.assessmentType,
+        assessmentLabel(item.assessmentType),
         item.questionId,
         item.topic || '',
         item.responses,
@@ -175,6 +194,61 @@ export function itemAnalysisRows(modules, summaries) {
           ? ''
           : Math.round(item.medianDurationMs / 1000),
       ])
+    })
+  })
+
+  return [header, ...rows]
+}
+
+/**
+ * Where each item's answers actually went, one row per choice.
+ *
+ * A separate table rather than extra columns on the item analysis, for a
+ * plain reason: items have different numbers of choices, so packing them
+ * across a fixed set of columns would either truncate or leave most cells
+ * empty. One row per choice is the shape that sorts, filters and pivots.
+ *
+ * The column an instructor is really looking for is the one where "Is
+ * key" reads no and "Times chosen" beats the keyed row — that is a
+ * distractor outdrawing the answer, which is a wording problem far more
+ * often than a knowledge gap.
+ *
+ * @param {Array<{ id: string, name: string }>} modules
+ * @param {Record<string, object>} summaries moduleId -> moduleAnalytics doc
+ * @returns {Array<Array<unknown>>}
+ */
+export function distractorRows(modules, summaries) {
+  const header = [
+    'Module',
+    'Assessment',
+    'Question ID',
+    'Topic',
+    'Choice ID',
+    'Choice text',
+    'Is key',
+    'Times chosen',
+    'Share of responses (%)',
+  ]
+
+  const rows = []
+  modules.forEach((m) => {
+    const items = summaries?.[m.id]?.itemAnalysis || []
+    items.forEach((item) => {
+      ;(item.choiceDistribution || []).forEach((choice) => {
+        rows.push([
+          m.name,
+          assessmentLabel(item.assessmentType),
+          item.questionId,
+          item.topic || '',
+          choice.choiceId,
+          // Blank, not the id again: the id is already its own column, and
+          // repeating it here would read as if that were the choice text.
+          choice.text || '',
+          choice.isCorrect ? 'yes' : 'no',
+          cell(choice.count),
+          cell(choice.rate),
+        ])
+      })
     })
   })
 

@@ -195,7 +195,7 @@ describe('modules/admin/validators — quiz business rules', () => {
     const config: QuizConfig = {
       moduleId: 'password-security',
       title: 'Quiz',
-      settings: { passingScore: 80, timeLimitMinutes: 15, instructions: '', available: true },
+      settings: { passingScore: 80, instructions: '', available: true },
       questions: [makeQuestion(), makeQuestion({ id: 'q2', explanation: '' })],
     }
     const result = validateQuizConfig(config)

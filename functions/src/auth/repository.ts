@@ -121,6 +121,14 @@ export async function deleteUserProfile(uid: string): Promise<void> {
  * re-creating the same person produced a second row under the same name.
  * A ghost in the analytics is quiet; a ghost on the leaderboard is the
  * first thing anyone notices.
+ *
+ * `finalAssessmentProgress` was the third, found by inspection rather
+ * than by a symptom: it is read only for the student's own result screen,
+ * so an orphan there is invisible until the same uid is somehow reissued.
+ * Three misses in three feature additions is the argument for the test
+ * that covers this being a list to extend, not a spot check — see
+ * test/integration/accountManagement.test.ts, which now seeds every
+ * collection named here.
  */
 export async function deleteStudentData(uid: string): Promise<void> {
   const directDocDeletes = REAL_MODULE_IDS.flatMap((moduleId) => [
@@ -143,6 +151,7 @@ export async function deleteStudentData(uid: string): Promise<void> {
     ...directDocDeletes,
     db.collection(COLLECTIONS.STUDENT_ANALYTICS).doc(uid).delete(),
     db.collection(COLLECTIONS.GAMIFICATION).doc(uid).delete(),
+    db.collection(COLLECTIONS.FINAL_ASSESSMENT_PROGRESS).doc(uid).delete(),
     // Retired collection: nothing reads or writes `userBadges` any more
     // (its two surviving badges live in the gamification catalog), but a
     // long-lived account may still have a document from when it did.

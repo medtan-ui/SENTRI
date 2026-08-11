@@ -466,6 +466,95 @@
   cursor: help;
 }
 
+/* ── Choice distribution ───────────────────────────────────────────────
+   Where an item's answers actually went. Takes the full row width below
+   the item's own numbers, because it is a small table rather than one
+   more figure to sit alongside them. */
+.choiceBlock {
+  flex: 1 1 100%;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border);
+}
+
+.choiceHeading {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.choiceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.choiceRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.choiceText {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.choiceRow[data-correct] .choiceText {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* The keyed answer is marked rather than colour-coded alone, so the
+   distinction survives a greyscale print of the analytics page. */
+.choiceKey {
+  flex: none;
+  padding: 0 4px;
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-success);
+}
+
+.choiceBarTrack {
+  height: 5px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.choiceBarFill {
+  display: block;
+  height: 100%;
+  background: var(--color-text-muted);
+}
+
+/* A distractor outdrawing the key is the finding this whole block exists
+   to surface, so the key's own bar is the one that reads as "correct". */
+.choiceRow[data-correct] .choiceBarFill {
+  background: var(--color-success);
+}
+
+.choiceCount {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────
    The analytics page is the densest screen in the app. On a phone the
    paired stat tiles become a single column, and the topic-mastery rows
@@ -503,6 +592,17 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
+  }
+
+  /* Same call as the topic rows above: at this width the choice label and
+     its count are what carry meaning, so the bar goes rather than
+     squeezing three columns into ~300px. */
+  .choiceRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .choiceBarTrack {
+    display: none;
   }
 
   .transferItem {

@@ -38,6 +38,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             "That button doesn't go to the real student portal — it opens a lookalike login page built to steal your credentials. Hovering over a link before clicking it would have shown you the real destination.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ph-01-b',
@@ -49,6 +50,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             'Replying tells whoever sent this that your address is active and someone is reading it — that makes you a more attractive target, and it does nothing to verify whether the email itself is real.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ph-01-c',
@@ -83,6 +85,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             'The page at tip-edu-verify.net just captured your email and password. Account takeover typically follows within minutes — the attacker can use these same credentials to sign into your real accounts before you even notice.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ph-02-b',
@@ -94,6 +97,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             "Forgot password? on a fake site doesn't recover anything real — you're still interacting with the attacker's page, and whatever you enter next can be captured just the same.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ph-02-c',

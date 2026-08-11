@@ -1,21 +1,28 @@
 /**
- * Integration test — the full measurement loop, run against the Firestore
- * + Auth emulators (see package.json's `test:integration`). Every
- * callable is invoked through its actual exported `.run()`, the same
+ * Integration test — one module's measurement loop, run against the
+ * Firestore + Auth emulators (see package.json's `test:integration`).
+ * Every callable is invoked through its actual exported `.run()`, the same
  * controller -> service -> repository path production traffic takes.
  *
- * Flow: an admin configures a module, its quiz, and its pre/post item
- * bank; a student takes the pre-test, works through the module, submits
- * the quiz, then takes the post-test — which must compute and store a
- * normalized gain against the pre-test score the server itself recorded.
- * The admin then grants a quiz retry, and the retake must raise the
- * recorded score without ever lowering it.
+ * Flow: an admin configures a module, its quiz, and its pre-test item
+ * bank; a student takes the pre-test, works through the module, and
+ * submits the quiz. The admin then grants a quiz retry, and the retake
+ * must raise the recorded score without ever lowering it.
  *
- * This covers the claims the Learning Analytics framework rests on:
- * per-question responses actually land in `quizResponses`, the
- * one-attempt rules on both bookend assessments really are enforced
- * server-side, and the appeal path is the only way past the single-attempt
- * quiz rule.
+ * This covers the claims the Learning Analytics framework rests on at the
+ * module level: per-question responses actually land in `quizResponses`,
+ * the one-attempt rules really are enforced server-side, and the appeal
+ * path is the only way past the single-attempt quiz rule.
+ *
+ * ── What is deliberately NOT here ────────────────────────────────────
+ * The "after" measurement. There used to be a per-module post-test taken
+ * minutes after each quiz, and it ran through this same `submitAssessment`
+ * callable. It was replaced by one end-of-curriculum final assessment with
+ * its own module and its own callable, so the whole post half of this flow
+ * moved to finalAssessmentFlow.test.ts. What is left behind here is a
+ * single test asserting that `submitAssessment` genuinely no longer
+ * accepts a post-test, which is the part of the removal a caller could
+ * otherwise discover only in production.
  */
 import { db } from '../../src/shared/admin'
 import { createModuleConfiguration, updateQuizConfiguration } from '../../src/modules/admin/controllers'
@@ -57,7 +64,7 @@ async function responsesFor(assessmentType: string) {
   return snap.docs.map((d) => d.data())
 }
 
-describe('assessment flow: pre-test -> module -> quiz -> post-test -> retry appeal', () => {
+describe('assessment flow: pre-test -> module -> quiz -> retry appeal', () => {
   beforeAll(async () => {
     await db.collection(COLLECTIONS.USERS).doc(ADMIN_UID).set({
       role: 'admin',
@@ -126,7 +133,7 @@ describe('assessment flow: pre-test -> module -> quiz -> post-test -> retry appe
           quizConfig: {
             moduleId: MODULE_ID,
             title: 'Data Privacy Knowledge Check',
-            settings: { passingScore: 80, timeLimitMinutes: 15, instructions: 'Do your best.', available: true },
+            settings: { passingScore: 80, instructions: 'Do your best.', available: true },
             questions: [
               {
                 id: QUIZ_Q,
@@ -202,7 +209,13 @@ describe('assessment flow: pre-test -> module -> quiz -> post-test -> retry appe
     ).rejects.toMatchObject({ code: 'failed-precondition' })
   })
 
-  it('refuses a post-test before the quiz has been submitted', async () => {
+  it('no longer accepts a post-test at all', async () => {
+    // The six per-module post-tests were replaced by one
+    // end-of-curriculum final assessment with its own callable. This
+    // callable's schema was narrowed to `pretest` alone, and that
+    // narrowing is the contract a stale client would hit — so it is
+    // asserted rather than assumed. See finalAssessmentFlow.test.ts for
+    // the measurement that took its place.
     await expect(
       submitAssessment.run(
         makeRequest(
@@ -210,14 +223,18 @@ describe('assessment flow: pre-test -> module -> quiz -> post-test -> retry appe
           STUDENT_UID,
         ),
       ),
-    ).rejects.toMatchObject({ code: 'failed-precondition' })
+    ).rejects.toMatchObject({ code: 'invalid-argument' })
   })
 
   it('rejects an answer referencing a choice that does not exist', async () => {
+    // Choice validation runs before the one-attempt transaction, so this
+    // is invalid-argument even though this student's pre-test is already
+    // on record — a malformed payload is reported as malformed rather
+    // than masked by whichever gate happens to fire first.
     await expect(
       submitAssessment.run(
         makeRequest(
-          { moduleId: MODULE_ID, assessmentType: 'posttest', answers: { [Q1]: 'not-a-real-choice' } },
+          { moduleId: MODULE_ID, assessmentType: 'pretest', answers: { [Q1]: 'not-a-real-choice' } },
           STUDENT_UID,
         ),
       ),
@@ -246,53 +263,25 @@ describe('assessment flow: pre-test -> module -> quiz -> post-test -> retry appe
     expect(responses[0].isCorrect).toBe(false)
   })
 
-  it('computes and stores a normalized gain on the post-test', async () => {
-    const result = await submitAssessment.run(
-      makeRequest(
-        {
-          moduleId: MODULE_ID,
-          assessmentType: 'posttest',
-          answers: { [Q1]: Q1_RIGHT, [Q2]: Q2_RIGHT },
-        },
-        STUDENT_UID,
-      ),
-    )
-
-    expect(result.score).toBe(100)
-    expect(result.preTestScore).toBe(0)
-    // 0 -> 100 closes all of the available headroom.
-    expect(result.normalizedGain).toBe(1)
-
-    const progress = (await progressRef().get()).data()!
-    expect(progress.postTestCompleted).toBe(true)
-    expect(progress.postTestScore).toBe(100)
-    expect(progress.normalizedGain).toBe(1)
-  })
-
-  it('rejects a second post-test submission', async () => {
-    await expect(
-      submitAssessment.run(
-        makeRequest(
-          { moduleId: MODULE_ID, assessmentType: 'posttest', answers: { [Q1]: Q1_RIGHT, [Q2]: Q2_RIGHT } },
-          STUDENT_UID,
-        ),
-      ),
-    ).rejects.toMatchObject({ code: 'failed-precondition' })
-  })
-
-  it('reports the module-level learning gain from the stored scores', async () => {
+  it('reports a module-level gain as not yet measurable with no final assessment taken', async () => {
+    // This student has a pre-test but no "after" measurement, because the
+    // after is now one test at the end of the whole curriculum and they
+    // have finished exactly one module. A normalized gain over an
+    // unmeasured half must come back null, never 0 — a 0 would claim no
+    // learning occurred, which is a far stronger statement than "we
+    // cannot tell yet". The populated case is in finalAssessmentFlow.
     const summary = await aggregateModuleAnalytics.run(makeRequest({ moduleId: MODULE_ID }, ADMIN_UID))
 
-    expect(summary.avgPreTestScore).toBe(0)
-    expect(summary.avgPostTestScore).toBe(100)
-    expect(summary.normalizedGain).toBe(1)
-    expect(summary.pairedCount).toBe(1)
-    expect(summary.postTestCompletedCount).toBe(1)
+    expect(summary.normalizedGain).toBeNull()
+    expect(summary.pairedCount).toBe(0)
+    expect(summary.postTestCompletedCount).toBe(0)
 
+    // The pre half is measured and must still report, so the dashboard
+    // can show a baseline before anyone reaches the final assessment.
     const permissions = summary.topicMastery.find((t) => t.topic === 'app-permissions')!
     expect(permissions.preCorrectRate).toBe(0)
-    expect(permissions.postCorrectRate).toBe(100)
-    expect(permissions.gain).toBe(100)
+    expect(permissions.preCount).toBe(1)
+    expect(permissions.gain).toBeNull()
   })
 
   it('refuses a quiz retry request from a non-admin', async () => {

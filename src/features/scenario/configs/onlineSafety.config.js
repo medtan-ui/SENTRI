@@ -54,6 +54,7 @@ export const onlineSafetyConfig = {
           feedbackText:
             "Accepting a request from an account you don't recognize gives a stranger the same access you'd give someone you actually know — to your posts, your activity, and anyone else on your friends list. None of that took more than one tap to check.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'os-01-c',
@@ -76,6 +77,7 @@ export const onlineSafetyConfig = {
           feedbackText:
             "This time the signals were actually in front of you — no mutual friends, a two-week-old account, photos that show up elsewhere — and the request was confirmed anyway. That's a different mistake than not checking at all, and worth noticing in yourself: seeing a warning sign isn't the same as acting on it.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
       ],
     },
@@ -99,6 +101,7 @@ export const onlineSafetyConfig = {
           feedbackText:
             "The person waiting at the spot wasn't who the profile said they were. In the moment it took to realize that, your phone was already out of your hands — and by the time you'd worked out what was happening, you were already headed back toward campus. What happened next isn't something you caused by talking to someone online or agreeing to meet them — it's something someone else deliberately set up. Telling a parent, a guardian, campus security, or the police right away is the correct next step, not something to be embarrassed about.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'os-02-c',
@@ -121,6 +124,7 @@ export const onlineSafetyConfig = {
           feedbackText:
             "Closing the chat stopped anything from happening to you today — not showing up is exactly what kept you safe here. But the account itself is untouched: nothing was reported, so it's still free to send this same message to the next person who answers it.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
       ],
     },
@@ -144,6 +148,7 @@ export const onlineSafetyConfig = {
           feedbackText:
             "Closing the app does nothing to the account itself — no report, no block, no record anywhere. It's free to try the same approach on someone else, and the conversation is only harder to find again later if it turns out to be needed.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'os-03-c',
@@ -166,6 +171,7 @@ export const onlineSafetyConfig = {
           feedbackText:
             "A public comment doesn't just confront them — it tells them, and anyone who reads the thread, exactly which account has been noticed, giving them time to delete it and start over under a new name before anyone reports it. It also puts your own name and profile in front of that same audience, attached to a post about a stranger who tried to get you alone.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
       ],
     },

@@ -126,17 +126,29 @@ export default function ModuleLearningDetail({ summary }) {
                       </span>
                     )}
                   </span>
-                  {item.distractorCounts && Object.keys(item.distractorCounts).length > 0 && (
-                    <div style={{ fontSize: '0.75rem', marginTop: '4px', color: '#666', gridColumn: '1 / -1' }}>
-                      <strong>Distractor Breakdown:</strong>{' '}
-                      {Object.entries(item.distractorCounts).map(([choiceId, count]) => {
-                        const pct = item.responses > 0 ? Math.round((count / item.responses) * 100) : 0
-                        return (
-                          <span key={choiceId} style={{ marginRight: '8px', background: '#eee', padding: '2px 6px', borderRadius: '4px' }}>
-                            Choice {choiceId}: {count} ({pct}%)
-                          </span>
-                        )
-                      })}
+                  {(item.choiceDistribution || []).length > 0 && (
+                    <div className={styles.choiceBlock}>
+                      <span className={styles.choiceHeading}>Where the answers went</span>
+                      <ul className={styles.choiceList}>
+                        {item.choiceDistribution.map((choice) => (
+                          <li
+                            key={choice.choiceId}
+                            className={styles.choiceRow}
+                            data-correct={choice.isCorrect || undefined}
+                          >
+                            <span className={styles.choiceText}>
+                              {choice.text || choice.choiceId}
+                              {choice.isCorrect && <span className={styles.choiceKey}>key</span>}
+                            </span>
+                            <span className={styles.choiceBarTrack}>
+                              <span className={styles.choiceBarFill} style={{ width: `${choice.rate}%` }} />
+                            </span>
+                            <span className={styles.choiceCount}>
+                              {choice.count} ({choice.rate}%)
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </li>

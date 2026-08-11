@@ -146,6 +146,7 @@
    This card only supplies the heading row around it. */
 .badgesCard {
   margin-top: var(--space-2);
+  margin-bottom: var(--space-6);
 }
 
 .cardHeaderRow {

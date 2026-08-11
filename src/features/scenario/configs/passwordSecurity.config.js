@@ -14,6 +14,11 @@
  * @property {'credential_compromise'|'account_takeover'|'data_exposure'|'device_compromise'|'financial_loss'|'physical_risk'|'none'} consequenceType
  * @property {string} feedbackText
  * @property {string|null} feedbackMediaUrl
+ * @property {string|null} [consequenceVideoUrl] risky choices only — the
+ *   clip shown once per run before the consequence text, in the same
+ *   format as a scenario's own `materialUrl` (a YouTube link/id or a
+ *   direct video file URL). Null while no clip has been recorded yet,
+ *   which is what makes ConsequenceVideo show its placeholder card.
  *
  * @typedef {Object} ScenarioConfig
  * @property {string} scenarioId
@@ -69,6 +74,7 @@ export const passwordSecurityConfig = {
           feedbackText:
             "All three accounts now share one password. If any single one of these services is ever breached, an attacker can try that same password against the other two — and it will work.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ps-01-b',
@@ -80,6 +86,7 @@ export const passwordSecurityConfig = {
           feedbackText:
             'Passwords like these share an obvious pattern. Once an attacker sees one of them, guessing the other two is trivial — predictable variation offers almost no real protection.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ps-01-c',
@@ -126,6 +133,7 @@ export const passwordSecurityConfig = {
           feedbackText:
             "That button led to a lookalike login page, and it just captured your password. Because you used the same password everywhere in Scenario 1, the attacker now tries it against Campus Mail and PeraSend too — and gets into both. One click on a fake page took down all three accounts.",
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ps-02-b',
@@ -137,6 +145,7 @@ export const passwordSecurityConfig = {
           feedbackText:
             'Replying tells the attacker your address is active and someone is reading it — that alone makes you a more attractive target for a follow-up attempt, and it does nothing to verify whether the email was real.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ps-02-c',
@@ -172,6 +181,7 @@ export const passwordSecurityConfig = {
           feedbackText:
             'The portal is safe now, but Campus Mail and PeraSend still use the old, compromised password. An attacker who captured it can still get into both — securing one account out of three is not enough when the same password was everywhere.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ps-03-b',
@@ -183,6 +193,7 @@ export const passwordSecurityConfig = {
           feedbackText:
             'The attacker already has your password and is not waiting. PeraSend — the one account tied directly to your money — is still sitting open along with the other two. Every hour this is delayed is an hour they can move money out, not just read your mail.',
           feedbackMediaUrl: null,
+          consequenceVideoUrl: null,
         },
         {
           scenarioChoiceId: 'ps-03-c',

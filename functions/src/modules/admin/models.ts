@@ -112,7 +112,6 @@ export interface QuizQuestion {
 
 export interface QuizSettings {
   passingScore: number
-  timeLimitMinutes: number
   instructions: string
   available: boolean
 }
