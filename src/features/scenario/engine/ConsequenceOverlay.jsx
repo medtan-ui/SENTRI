@@ -19,6 +19,12 @@ const CONSEQUENCE_ICON = {
  * yet, so this is a static panel built from the choice's own
  * outcomeTitle/feedbackText; when feedbackMediaUrl is set for a
  * future module, it renders in place of the icon.
+ *
+ * Currently unused by ScenarioEngine — the engine goes straight from a
+ * resolved choice to FeedbackPanel, which is where the video placeholder
+ * and wrong-answer beat now live. Left in place (rather than deleted)
+ * because ConsequenceEditor/consequenceType/feedbackMediaUrl in the admin
+ * scenario-config authoring flow still target it.
  */
 export default function ConsequenceOverlay({ choice, onContinue }) {
   const icon = CONSEQUENCE_ICON[choice.consequenceType] || CONSEQUENCE_ICON.none

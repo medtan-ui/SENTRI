@@ -31,7 +31,38 @@ import { ModuleProgressDoc } from '../progress/models'
 import { defaultProgress, progressRef } from '../progress/repository'
 import { applyUnlockPlan, planUnlock } from '../progress/service'
 import * as repo from './repository'
-import { PerQuestionResult, QuizConfig, SubmitQuizResult } from './models'
+import { PerQuestionResult, QuizConfig, StudentQuizConfig, SubmitQuizResult } from './models'
+
+/**
+ * getQuizForStudent
+ * The read a student's own quiz-taking page actually uses — never the raw
+ * moduleQuizzes document. Strips correctChoiceId and explanation from every
+ * question before it leaves the server, so the answer key is no longer
+ * visible in the network response (or to a direct Firestore read with a
+ * student's own auth token) before they submit. Grading still happens in
+ * submitQuiz below, against the server's own unfiltered read of this same
+ * document — this function never grades anything, only serves the form.
+ *
+ * Returns null (not a thrown error) when the module has no quiz configured
+ * yet, so the page's existing "Quiz Unavailable" state handles it with no
+ * new client-side branching.
+ */
+export async function getQuizForStudent(moduleId: string): Promise<StudentQuizConfig | null> {
+  const quiz = await repo.getQuizConfig(moduleId)
+  if (!quiz) return null
+  return {
+    moduleId: quiz.moduleId,
+    title: quiz.title,
+    settings: quiz.settings,
+    questions: quiz.questions.map((q) => ({
+      id: q.id,
+      order: q.order,
+      text: q.text,
+      choices: q.choices.map((c) => ({ id: c.id, text: c.text })),
+      topic: q.topic,
+    })),
+  }
+}
 
 export function gradeQuiz(
   quiz: QuizConfig,

@@ -35,11 +35,15 @@ export {
 
 export { submitScenarioDecision } from './modules/scenario/controllers'
 
-export { submitQuiz } from './modules/quiz/controllers'
+export { getQuizForStudent, submitQuiz } from './modules/quiz/controllers'
 
-export { submitAssessment } from './modules/assessment/controllers'
+export { getAssessmentForStudent, submitAssessment } from './modules/assessment/controllers'
 
-export { submitFinalAssessment, updateFinalAssessment } from './modules/finalAssessment/controllers'
+export {
+  getFinalAssessmentForStudent,
+  submitFinalAssessment,
+  updateFinalAssessment,
+} from './modules/finalAssessment/controllers'
 
 
 

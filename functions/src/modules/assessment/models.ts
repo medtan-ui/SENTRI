@@ -65,6 +65,29 @@ export interface SubmitAssessmentResult {
 }
 
 /**
+ * The shape a student's own pre-test page actually receives —
+ * correctChoiceId and explanation deliberately dropped (see
+ * getAssessmentForStudent in service.ts).
+ */
+export interface StudentAssessmentChoice {
+  id: string
+  text: string
+}
+
+export interface StudentAssessmentQuestion {
+  id: string
+  text: string
+  choices: StudentAssessmentChoice[]
+  topic?: string
+}
+
+export interface StudentAssessmentConfig {
+  moduleId: string
+  title: string
+  questions: StudentAssessmentQuestion[]
+}
+
+/**
  * One document per answered question, in the `quizResponses` collection.
  * Written for all three assessment types so item difficulty and
  * discrimination can be computed over any of them.

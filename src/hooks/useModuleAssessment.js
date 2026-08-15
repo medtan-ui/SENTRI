@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { getAssessment, submitAssessment } from '../services/assessmentService'
+import { getAssessmentForStudent, submitAssessment } from '../services/assessmentService'
 import { recordEvent } from '../services/analyticsEventService'
 import { getModuleProgress } from '../services/moduleProgressService'
 
@@ -46,7 +46,7 @@ export function useModuleAssessment(moduleId, assessmentType = 'pretest') {
     setStatus('loading')
     setErrorMessage('')
 
-    Promise.all([getAssessment(moduleId), getModuleProgress(userId, moduleId)])
+    Promise.all([getAssessmentForStudent(moduleId), getModuleProgress(userId, moduleId)])
       .then(([assessmentDoc, progress]) => {
         if (cancelled) return
         setAssessment(assessmentDoc)

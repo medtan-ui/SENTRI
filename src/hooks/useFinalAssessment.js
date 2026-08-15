@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useStudentModules } from './useStudentModules'
 import { MODULE_STATUS } from '../services/moduleProgressService'
 import {
-  getFinalAssessment,
+  getFinalAssessmentForStudent,
   getFinalAssessmentProgress,
   submitFinalAssessment,
 } from '../services/finalAssessmentService'
@@ -43,7 +43,7 @@ export function useFinalAssessment() {
     setStatus('loading')
     setErrorMessage('')
 
-    Promise.all([getFinalAssessment(), getFinalAssessmentProgress(userId)])
+    Promise.all([getFinalAssessmentForStudent(), getFinalAssessmentProgress(userId)])
       .then(([config, progressDoc]) => {
         if (cancelled) return
         setAssessment(config)

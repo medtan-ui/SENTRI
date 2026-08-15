@@ -34,8 +34,32 @@ import {
   AssessmentConfig,
   AssessmentItemResult,
   BookendAssessmentType,
+  StudentAssessmentConfig,
   SubmitAssessmentResult,
 } from './models'
+
+/**
+ * getAssessmentForStudent
+ * The read the student pre-test page actually uses — never the raw
+ * modulePretests document. Strips correctChoiceId and explanation from
+ * every question, same reasoning and shape as quiz/service.ts's
+ * getQuizForStudent. Returns null (not a thrown error) when this module's
+ * item bank hasn't been configured yet.
+ */
+export async function getAssessmentForStudent(moduleId: string): Promise<StudentAssessmentConfig | null> {
+  const config = await repo.getAssessmentConfig(moduleId)
+  if (!config) return null
+  return {
+    moduleId: config.moduleId,
+    title: config.title,
+    questions: config.questions.map((q) => ({
+      id: q.id,
+      text: q.text,
+      choices: q.choices.map((c) => ({ id: c.id, text: c.text })),
+      topic: q.topic,
+    })),
+  }
+}
 
 export function gradeAssessment(
   config: AssessmentConfig,

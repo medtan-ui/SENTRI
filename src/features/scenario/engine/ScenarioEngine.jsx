@@ -6,8 +6,6 @@ import { ScenarioInteractionProvider } from './ScenarioInteractionContext'
 import { SCENE_REGISTRY } from '../scenes/sceneRegistry'
 import ScenarioProgress from './ScenarioProgress'
 import ScenarioPlayer from './ScenarioPlayer'
-import ConsequenceVideo from './ConsequenceVideo'
-import ConsequenceOverlay from './ConsequenceOverlay'
 import FeedbackPanel from './FeedbackPanel'
 import { sceneLabelFor } from './sceneLabels'
 import styles from './ScenarioEngine.module.css'
@@ -44,7 +42,7 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
   } = engine
 
   const SceneComponent = SCENE_REGISTRY[currentScenario.scene]
-  const showScene = ['paused_interactive', 'resolving', 'consequence_video', 'consequence', 'feedback'].includes(state)
+  const showScene = ['paused_interactive', 'resolving', 'feedback'].includes(state)
 
   return (
     <ScenarioInteractionProvider value={interaction}>
@@ -89,16 +87,6 @@ export default function ScenarioEngine({ config, onBackToLesson, onContinueToQui
                 onResolve={actions.selectChoice}
               />
             </div>
-          )}
-
-          {/* The clip beat before the consequence text, played once per
-              risky choice per run — see ConsequenceVideo. */}
-          {state === 'consequence_video' && selectedChoice && (
-            <ConsequenceVideo choice={selectedChoice} onContinue={actions.dismissConsequenceVideo} />
-          )}
-
-          {state === 'consequence' && selectedChoice && (
-            <ConsequenceOverlay choice={selectedChoice} onContinue={actions.dismissConsequence} />
           )}
 
           {state === 'feedback' && selectedChoice && (

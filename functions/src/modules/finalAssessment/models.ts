@@ -52,6 +52,30 @@ export interface FinalAssessmentConfig {
   questions: FinalAssessmentQuestion[]
 }
 
+/**
+ * The shape a student's own final assessment page actually receives —
+ * correctChoiceId, explanation, and sourceModuleId (an authoring detail)
+ * deliberately dropped (see getFinalAssessmentForStudent in service.ts).
+ */
+export interface StudentFinalAssessmentChoice {
+  id: string
+  text: string
+}
+
+export interface StudentFinalAssessmentQuestion {
+  id: string
+  order: number
+  text: string
+  choices: StudentFinalAssessmentChoice[]
+  topic?: string
+}
+
+export interface StudentFinalAssessmentConfig {
+  title: string
+  settings: FinalAssessmentSettings
+  questions: StudentFinalAssessmentQuestion[]
+}
+
 export interface SubmitFinalAssessmentInput {
   answers: Record<string, string>
   durations?: Record<string, number>

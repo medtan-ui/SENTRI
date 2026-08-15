@@ -15,10 +15,10 @@
  * @property {string} feedbackText
  * @property {string|null} feedbackMediaUrl
  * @property {string|null} [consequenceVideoUrl] risky choices only — the
- *   clip shown once per run before the consequence text, in the same
- *   format as a scenario's own `materialUrl` (a YouTube link/id or a
- *   direct video file URL). Null while no clip has been recorded yet,
- *   which is what makes ConsequenceVideo show its placeholder card.
+ *   clip shown inside the consequence overlay, in the same format as a
+ *   scenario's own `materialUrl` (a YouTube link/id or a direct video
+ *   file URL). Null while no clip has been recorded yet, which is what
+ *   makes ConsequenceOverlay show its placeholder card.
  *
  * @typedef {Object} ScenarioConfig
  * @property {string} scenarioId

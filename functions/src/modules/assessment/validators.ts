@@ -1,5 +1,9 @@
 import { z } from 'zod'
 
+export const getAssessmentForStudentSchema = z.object({
+  moduleId: z.string().min(1, 'moduleId is required.'),
+})
+
 export const submitAssessmentSchema = z.object({
   moduleId: z.string().min(1, 'moduleId is required.'),
   // Pre-test only. The post measurement is no longer per-module — it is

@@ -6,19 +6,22 @@ import Card from '../../../../components/Card/Card'
 import Button from '../../../../components/Button/Button'
 import ModuleAccessGuard from '../../../../components/ModuleAccessGuard/ModuleAccessGuard'
 import { useModuleProgress } from '../../../../hooks/useModuleProgress'
-import { getQuiz, submitQuiz } from '../../../../services/quizService'
+import { getQuizForStudent, submitQuiz } from '../../../../services/quizService'
 import { recordEvent, startTimedEvent } from '../../../../services/analyticsEventService'
 import styles from './StudentQuizPage.module.css'
 
 /**
  * StudentQuizPage — /student/modules/:moduleId/quiz
- * Reads the same moduleQuizzes document the admin editor authors (to
- * render questions/choices), but grading and recording the attempt
- * happens authoritatively server-side via the submitQuiz Cloud Function
- * — this page never computes a score itself. Submitting always completes
- * the module and unlocks the next one, pass or fail. After a successful
- * submit, useModuleProgress is refetched so attempts/moduleCompleted
- * reflect the server's write.
+ * Renders questions/choices from getQuizForStudent, a Cloud Function read
+ * of the same moduleQuizzes document the admin editor authors — but with
+ * correctChoiceId and explanation stripped before it ever reaches this
+ * page, unlike the admin editor's own direct Firestore read of that
+ * document. Grading and recording the attempt happens authoritatively
+ * server-side via the submitQuiz Cloud Function — this page never
+ * computes a score itself. Submitting always completes the module and
+ * unlocks the next one, pass or fail. After a successful submit,
+ * useModuleProgress is refetched so attempts/moduleCompleted reflect the
+ * server's write.
  *
  * One attempt by default. A student who appealed and was granted a retry
  * has `attemptsAllowed > attempts` on their progress doc, and this page
@@ -62,7 +65,7 @@ export default function StudentQuizPage() {
     setResult(null)
     firstTouchedAt.current = {}
     quizTimerRef.current = null
-    getQuiz(moduleId)
+    getQuizForStudent(moduleId)
       .then((data) => {
         if (!cancelled) setQuiz(data)
       })

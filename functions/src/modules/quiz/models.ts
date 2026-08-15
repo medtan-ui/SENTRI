@@ -60,3 +60,29 @@ export interface SubmitQuizResult {
   attemptsAllowed: number
   attemptsRemaining: number
 }
+
+/**
+ * The shape a student's own quiz-taking page actually receives —
+ * correctChoiceId and explanation deliberately dropped (see
+ * getQuizForStudent in service.ts). Never returned to an admin editor,
+ * which still reads the full QuizConfig via the existing getQuiz path.
+ */
+export interface StudentQuizChoice {
+  id: string
+  text: string
+}
+
+export interface StudentQuizQuestion {
+  id: string
+  order: number
+  text: string
+  choices: StudentQuizChoice[]
+  topic?: string
+}
+
+export interface StudentQuizConfig {
+  moduleId: string
+  title: string
+  settings: QuizSettings
+  questions: StudentQuizQuestion[]
+}

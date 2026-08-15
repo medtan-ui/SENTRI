@@ -50,6 +50,19 @@
   animation: sentriPop 420ms var(--ease-out-soft) 340ms both;
 }
 
+.videoWrap {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  margin-bottom: var(--space-4);
+}
+
+.video {
+  width: 100%;
+  display: block;
+}
+
 .icon {
   display: inline-flex;
   align-items: center;
@@ -128,6 +141,13 @@
 
 .primaryBtn:hover {
   background: var(--color-gold-dark);
+}
+
+.primaryBtn:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 /* Declared here rather than shared from global.css: Vite scopes

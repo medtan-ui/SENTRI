@@ -31,8 +31,33 @@ import {
   FinalAssessmentConfig,
   FinalAssessmentItemResult,
   FinalAssessmentProgressDoc,
+  StudentFinalAssessmentConfig,
   SubmitFinalAssessmentResult,
 } from './models'
+
+/**
+ * getFinalAssessmentForStudent
+ * The read the student final assessment page actually uses — never the raw
+ * finalAssessment/config document. Strips correctChoiceId, explanation, and
+ * sourceModuleId from every question, same reasoning as the module quiz's
+ * getQuizForStudent. Returns null (not a thrown error) when the assessment
+ * hasn't been configured yet.
+ */
+export async function getFinalAssessmentForStudent(): Promise<StudentFinalAssessmentConfig | null> {
+  const config = await repo.getConfig()
+  if (!config) return null
+  return {
+    title: config.title,
+    settings: config.settings,
+    questions: config.questions.map((q) => ({
+      id: q.id,
+      order: q.order,
+      text: q.text,
+      choices: q.choices.map((c) => ({ id: c.id, text: c.text })),
+      topic: q.topic,
+    })),
+  }
+}
 
 /**
  * Hake's normalized gain: how much of the available headroom a student

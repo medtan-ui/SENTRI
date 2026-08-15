@@ -45,22 +45,25 @@ service cloud.firestore {
 
     // ── Training Curriculum configuration data ──────────────────────
     // Still admin-only for write everywhere — content authoring stays on
-    // the admin Module Configuration pages. Every collection here is now
-    // readable by any signed-in student, because the student pages now
-    // genuinely read them: the dashboard/progress system reads `modules`
-    // for moduleOrder/status, the Quiz page reads `moduleQuizzes`, and
-    // the Lesson Viewer and Scenario Engine read `moduleLessons` and
-    // `moduleScenarios` through src/services/moduleLoader.js (which used
-    // to serve local mock data instead).
+    // the admin Module Configuration pages. `modules` (moduleOrder/status,
+    // nothing sensitive) is readable by any signed-in student, because the
+    // dashboard/progress system genuinely reads it directly. The Lesson
+    // Viewer and Scenario Engine similarly read `moduleLessons` and
+    // `moduleScenarios` through src/services/moduleLoader.js — also
+    // nothing answer-bearing in either.
     //
-    // Known accepted tradeoff: moduleQuizzes documents store
-    // correctChoiceId alongside the questions, so a student who inspects
-    // network traffic can see the answer key, and quiz grading happens
-    // client-side (the student's own moduleProgress write is what
-    // records the result — see below). Closing both gaps properly means
-    // a Cloud Function that strips answers server-side and grades
-    // attempts itself; deliberately out of scope for now, tracked as a
-    // follow-up hardening step rather than silently ignored.
+    // `moduleQuizzes` is different: it stores correctChoiceId alongside the
+    // questions, and grading is authoritative server-side (submitQuiz), so
+    // a student has no legitimate reason to read that field. The direct,
+    // full-document read below is admin-only for exactly that reason; the
+    // student Quiz page instead calls the getQuizForStudent Cloud Function
+    // (functions/src/modules/quiz), which strips correctChoiceId and
+    // explanation before returning questions. `resource == null` is what
+    // still lets a signed-in student's read succeed when a module's quiz
+    // has never been seeded by anyone yet — that "read" can only ever
+    // observe "nothing here," never real content, so it's harmless to
+    // allow; it's what makes the `create` lazy-seed below reachable at all
+    // (a client has to observe not-found before it knows to seed).
     //
     // Both `modules` and `moduleQuizzes` lazily seed their own document
     // from static mock content the first time anyone reads a module that
@@ -97,17 +100,20 @@ service cloud.firestore {
     }
 
     match /moduleQuizzes/{moduleId} {
-      allow read: if request.auth != null;
+      allow read: if isAdmin() || (request.auth != null && resource == null);
       allow create: if request.auth != null && isRealModuleId(moduleId);
       allow update, delete: if isAdmin();
     }
 
     // Per-module pre-test — ungraded baseline check a student takes once,
     // the first time they open a module. Same lazy-seed shape as
-    // moduleQuizzes: any signed-in user reads, only a real module id may be
-    // (lazily) created, and only an admin could ever edit the questions.
+    // moduleQuizzes, including the same admin-only direct read: it also
+    // carries correctChoiceId, and the student pre-test page reads through
+    // getAssessmentForStudent (functions/src/modules/assessment) instead,
+    // which strips it. Only a real module id may be (lazily) created, and
+    // only an admin could ever edit the questions.
     match /modulePretests/{moduleId} {
-      allow read: if request.auth != null;
+      allow read: if isAdmin() || (request.auth != null && resource == null);
       allow create: if request.auth != null && isRealModuleId(moduleId);
       allow update, delete: if isAdmin();
     }
@@ -119,14 +125,16 @@ service cloud.firestore {
     // ── Final assessment ─────────────────────────────────────────────
     // One config document for the whole curriculum (id 'config'), not one
     // per module — the six per-module post-tests were replaced by this
-    // single end-of-curriculum test. Same lazy-seed shape as
-    // moduleQuizzes: any signed-in user may read it (that read IS the
-    // student assessment page), a student may create it if they are the
-    // first to open it, and only an admin may edit it afterward. It
-    // carries correctChoiceId for the same accepted tradeoff documented
-    // above — grading itself is server-side, in submitFinalAssessment.
+    // single end-of-curriculum test. Same lazy-seed shape and same
+    // admin-only direct read as moduleQuizzes: it also carries
+    // correctChoiceId, and the student final assessment page reads through
+    // getFinalAssessmentForStudent (functions/src/modules/finalAssessment)
+    // instead, which strips it. A student may still create it if they are
+    // the first to ever open it (resource == null covers the read that
+    // precedes that create), and only an admin may edit it afterward.
+    // Grading itself is server-side, in submitFinalAssessment.
     match /finalAssessment/{docId} {
-      allow read: if request.auth != null;
+      allow read: if isAdmin() || (request.auth != null && resource == null);
       allow create: if request.auth != null && docId == 'config';
       allow update, delete: if isAdmin();
     }

@@ -11,9 +11,7 @@ const PULSE_IDLE_MS = 15000
 /**
  * useScenarioEngine
  * The Video-Pause-Interact-Branch state machine:
- *   loading -> playing -> paused_interactive -> resolving
- *     -> consequence_video (risky, first time on that choice this run)
- *     -> consequence (risky only) -> feedback
+ *   loading -> playing -> paused_interactive -> resolving -> feedback
  *     -> paused_interactive (retry, same pause point) | advancing -> (next scenario | complete)
  *
  * Also owns the idle-pulse scheduling (a quiet breathing highlight on the
@@ -45,13 +43,6 @@ export function useScenarioEngine(config, userId) {
 
   const currentDecisionIdRef = useRef(null)
   const targetRegistry = useRef(new Map())
-
-  // Which risky choices have already had their consequence clip played in
-  // this run. Held in a ref, not state: nothing renders from it, it is only
-  // read at the moment a risky choice resolves. Deliberately not persisted
-  // — a student who leaves the runner and comes back gets a fresh run, and
-  // can watch the clips again.
-  const watchedConsequenceVideosRef = useRef(new Set())
 
   // When the current scene last became interactive. The difference
   // between this and the moment a choice lands is the time-to-decide
@@ -162,36 +153,15 @@ export function useScenarioEngine(config, userId) {
     [state, currentScenario, userId, config.moduleId, attemptCount],
   )
 
-  // ── resolving -> consequence_video | consequence (risky) | feedback (safe) ──
-  // The clip beat only happens the first time a given risky choice lands in
-  // this run; a retry that repeats the same wrong move goes straight to the
-  // consequence text, so the same clip never plays twice.
+  // ── resolving -> feedback (both safe and risky go straight there) ──
   useEffect(() => {
     if (state !== 'resolving' || !selectedChoice) return undefined
     const t = setTimeout(() => {
-      if (!selectedChoice.isSafeChoice) {
-        setAttemptCount((n) => n + 1)
-        const choiceId = selectedChoice.scenarioChoiceId
-        if (watchedConsequenceVideosRef.current.has(choiceId)) {
-          setState('consequence')
-        } else {
-          watchedConsequenceVideosRef.current.add(choiceId)
-          setState('consequence_video')
-        }
-      } else {
-        setState('feedback')
-      }
+      if (!selectedChoice.isSafeChoice) setAttemptCount((n) => n + 1)
+      setState('feedback')
     }, RESOLVING_MS)
     return () => clearTimeout(t)
   }, [state, selectedChoice])
-
-  const dismissConsequenceVideo = useCallback(() => {
-    setState('consequence')
-  }, [])
-
-  const dismissConsequence = useCallback(() => {
-    setState('feedback')
-  }, [])
 
   const retry = useCallback(() => {
     markFeedbackViewed(currentDecisionIdRef.current)
@@ -252,8 +222,6 @@ export function useScenarioEngine(config, userId) {
     },
     actions: {
       selectChoice,
-      dismissConsequenceVideo,
-      dismissConsequence,
       retry,
       continueToNext,
     },

@@ -32,6 +32,39 @@ export async function getFinalAssessment() {
   return getOrSeedDoc(CONFIG_COLLECTION, CONFIG_DOC_ID, getDefaultFinalAssessment())
 }
 
+async function callGetFinalAssessmentForStudent() {
+  try {
+    const call = httpsCallable(functions, 'getFinalAssessmentForStudent')
+    const { data } = await call()
+    return data.assessment
+  } catch (err) {
+    throw new Error(friendlyCallableError(err))
+  }
+}
+
+/**
+ * The read the student final assessment page actually uses — goes through
+ * the getFinalAssessmentForStudent Cloud Function instead of a direct
+ * Firestore read of the config document, so correctChoiceId/explanation
+ * never cross the wire before the student submits. getFinalAssessment()
+ * above (raw Firestore read, answer key included) stays exactly as it was
+ * for the admin editor (useFinalAssessmentConfig), which has to see the
+ * answer key to edit it — this is a second, narrower read path alongside
+ * it, not a replacement. Falls back to that seeding read (same reasoning
+ * as quizService's getQuizForStudent) the one time the config document has
+ * never been read by anyone before.
+ *
+ * @returns {Promise<{title:string, settings:object, questions:Array}|null>}
+ *   null when the final assessment hasn't been configured/seeded yet.
+ */
+export async function getFinalAssessmentForStudent() {
+  const sanitized = await callGetFinalAssessmentForStudent()
+  if (sanitized) return sanitized
+  const seeded = await getFinalAssessment()
+  if (!seeded) return null
+  return callGetFinalAssessmentForStudent()
+}
+
 /**
  * This student's final assessment record, or null if they've never taken
  * it. Read directly (not through a callable) because it holds nothing a

@@ -32,6 +32,48 @@ export async function getQuiz(moduleId) {
   return getOrSeedDoc(COLLECTION, moduleId, getDefaultQuizConfig(moduleId))
 }
 
+async function callGetQuizForStudent(moduleId) {
+  try {
+    const call = httpsCallable(functions, 'getQuizForStudent')
+    const { data } = await call({ moduleId })
+    return data.quiz
+  } catch (err) {
+    throw new Error(friendlyCallableError(err))
+  }
+}
+
+/**
+ * The read StudentQuizPage actually uses to render the quiz form — goes
+ * through the getQuizForStudent Cloud Function instead of a direct
+ * Firestore read of this collection, so correctChoiceId/explanation never
+ * cross the wire to a student before they submit. getQuiz() above (raw
+ * Firestore read, answer key included) stays exactly as it was for the
+ * admin Quiz Configuration editor, which has to see the answer key to edit
+ * it — this is a second, narrower read path alongside it, not a
+ * replacement.
+ *
+ * The Cloud Function only reads; it never seeds a missing document (that
+ * default content lives in getDefaultQuizConfig, a frontend-only module —
+ * duplicating it into the backend just to seed wasn't worth the drift
+ * risk). So if this module's quiz has genuinely never been read by anyone
+ * before (no admin has opened Quiz Configuration, no student has taken it),
+ * the sanitized call comes back null and this falls back to the original
+ * seeding read once, then asks again. That fallback is the one and only
+ * moment the raw answer key still reaches a student's client — a one-time
+ * bootstrap per module, not something that happens on every attempt.
+ *
+ * @param {string} moduleId
+ * @returns {Promise<object|null>} null when this module has no quiz
+ *   configured yet (mirrors getQuiz's null-on-missing contract).
+ */
+export async function getQuizForStudent(moduleId) {
+  const sanitized = await callGetQuizForStudent(moduleId)
+  if (sanitized) return sanitized
+  const seeded = await getQuiz(moduleId)
+  if (!seeded) return null
+  return callGetQuizForStudent(moduleId)
+}
+
 /**
  * @param {string} moduleId
  * @param {object} patch
