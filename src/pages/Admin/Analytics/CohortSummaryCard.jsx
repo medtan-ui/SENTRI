@@ -45,6 +45,41 @@ function TrendChart({ points }) {
   )
 }
 
+
+/**
+ * BadgeDistribution
+ * How many students hold each badge, rarest first. Rarest first because
+ * that ordering answers the question an instructor actually has when
+ * looking at this: which achievements are out of reach for most of the
+ * class, and therefore which ones are worth talking about or worth
+ * re-tuning. The same figures are what a student sees on their own shelf
+ * as "12% have this", so the two views can never disagree.
+ */
+function BadgeDistribution({ rows, totalStudents }) {
+  if (!rows || rows.length === 0) {
+    return <p className={styles.emptyText}>No badge data yet. Refresh the cohort to compute it.</p>
+  }
+  const sorted = [...rows].sort((a, b) => a.earnedCount - b.earnedCount)
+
+  return (
+    <ul className={styles.badgeStatList}>
+      {sorted.map((row) => (
+        <li key={row.badgeId} className={styles.badgeStatRow}>
+          <span className={styles.badgeStatName}>{row.name}</span>
+          <span className={styles.badgeStatBarTrack} aria-hidden="true">
+            <span className={styles.badgeStatBarFill} style={{ width: `${Math.min(100, row.earnedPct)}%` }} />
+          </span>
+          <span className={styles.badgeStatValue}>
+            {row.earnedCount}
+            <span className={styles.badgeStatTotal}> / {totalStudents}</span>
+            <span className={styles.badgeStatPct}>{row.earnedPct}%</span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 /**
  * CohortSummaryCard
  * The class-level view: how the whole cohort is moving, whether awareness
@@ -179,6 +214,15 @@ export default function CohortSummaryCard({ summary, refreshing, onRefresh }) {
           <section className={styles.section}>
             <h3 className={styles.sectionHeading}>Activity, Last 30 Days</h3>
             <TrendChart points={summary.completionTrend} />
+          </section>
+
+          {/* ── Achievements: who is actually reaching what ── */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionHeading}>Badges Earned</h3>
+            <BadgeDistribution
+              rows={summary.badgeDistribution}
+              totalStudents={summary.totalStudents}
+            />
           </section>
         </>
       )}

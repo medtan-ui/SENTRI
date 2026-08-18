@@ -101,3 +101,19 @@
   padding: var(--space-3);
   align-items: center;
 }
+
+/* The cohort share, in the same register as a game library's "12% of
+   players have this": quiet by default, picked out only when the badge
+   is genuinely uncommon, so rarity reads as information rather than as
+   decoration on every card. */
+.rarity {
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-light);
+}
+
+.rarity[data-rare='true'] {
+  color: var(--color-gold-dark);
+}

@@ -119,6 +119,9 @@ export default function SimulationCompletePage() {
               <Button variant="primary" size="lg" onClick={() => navigate(`/student/modules/${moduleId}/quiz`)}>
                 Start Quiz
               </Button>
+              <Button variant="ghost" onClick={() => navigate(`/student/modules/${moduleId}`)}>
+                Read the lesson again
+              </Button>
               <Button variant="ghost" onClick={() => navigate('/student/dashboard')}>
                 Return to Dashboard
               </Button>

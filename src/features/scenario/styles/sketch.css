@@ -1,0 +1,124 @@
+/* =====================================================
+   Scenario scenes — hand-drawn storyboard treatment
+   =====================================================
+
+   Every scene in the Scenario Engine is drawn the way the capstone's own
+   storyboards are drawn: ink on paper, flat, a little wobbly, no
+   gradients and no soft shadows. Two reasons this is a style layer
+   rather than a rewrite of each scene:
+
+     1. The scenes are wired, not decorative. Which element is an
+        InteractiveTarget, what resolves to which choice, and where the
+        callouts sit are all load-bearing. Restyling them in place keeps
+        every one of those relationships exactly as it was.
+     2. There are sixteen of them. One vocabulary here, applied by the
+        stage, means a seventeenth scene arrives already drawn.
+
+   The treatment is applied by `.sketchStage`, which the engine puts on
+   the stage and nothing else uses, so the drawing stops at the edge of
+   the simulation. The rest of SENTRI keeps its own identity — the
+   storyboard look says "this is the scenario", and it should mean
+   that.
+
+   The scene stylesheets themselves reference these tokens directly (ink
+   borders, paper surfaces, offset shadows). What lives here is what
+   cannot sensibly live in sixteen files: the palette, the lettering, and
+   the paper the whole thing sits on.
+   ===================================================== */
+
+/* The palette is defined globally so a scene stylesheet resolves its
+   colours wherever it happens to be mounted (an admin preview, a future
+   tutorial screen) — an unresolved var() in a border shorthand drops the
+   whole border, which would quietly un-draw a scene. The treatment below
+   is what stays scoped to the stage. */
+:root {
+  /* Ink: near-black with a trace of warmth, so it reads as a pen rather
+     than as UI black on white. */
+  --sketch-ink: #1e1b18;
+  --sketch-ink-soft: #5a544c;
+  --sketch-line: #2a2622;
+
+  /* Paper, in three steps: the sheet, a shaded panel, and a filled
+     block. Three is enough to build any of the interfaces the scenes
+     draw, and a fourth would start doing the job colour should do. */
+  --sketch-paper: #fdfbf4;
+  --sketch-paper-alt: #f1ecdf;
+  --sketch-paper-dim: #e3dccb;
+
+  /* The only colours a drawing gets to use, matched to what the
+     storyboards actually ink in: a blue for app chrome and chat, red for
+     alarm, green for safety, and the app's own gold for anything the
+     student is meant to notice. */
+  --sketch-blue: #2f5d9e;
+  --sketch-red: #c0392b;
+  --sketch-green: #1e7e34;
+  --sketch-gold: var(--color-gold);
+
+  /* Flat offset blocks instead of blur — a marker outline, not a light
+     source. */
+  --sketch-shadow: 3px 3px 0 rgba(30, 27, 24, 0.85);
+  --sketch-shadow-sm: 2px 2px 0 rgba(30, 27, 24, 0.7);
+
+  /* The hand-drawn box: asymmetric horizontal and vertical radii, which
+     is what stops a rectangle from looking ruled. Two variants so
+     neighbouring boxes don't repeat the same wobble. */
+  --sketch-radius-a: 14px 5px 16px 6px / 6px 16px 5px 14px;
+  --sketch-radius-b: 6px 15px 5px 13px / 13px 5px 15px 6px;
+
+  --sketch-font: 'Patrick Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.sketchStage {
+  color: var(--sketch-ink);
+}
+
+/* Everything inside a scene is lettered, including form controls, which
+   inherit nothing by default. Slightly up-sized and loosened: Patrick
+   Hand runs small and tight next to Inter at the same nominal size, and
+   these scenes carry real paragraphs of email copy. */
+.sketchStage,
+.sketchStage input,
+.sketchStage textarea,
+.sketchStage select,
+.sketchStage button {
+  font-family: var(--sketch-font);
+  letter-spacing: 0.012em;
+}
+
+.sketchStage {
+  font-size: 1.06em;
+  line-height: 1.5;
+}
+
+/* The sheet the whole simulation is drawn on. The two gradients are a
+   very faint tooth, not a texture: enough that the paper isn't a flat
+   fill, not so much that small lettering has to fight it. */
+.sketchStage {
+  background-color: #fbf8ef;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(30, 27, 24, 0.016) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(30, 27, 24, 0.012) 0 1px, transparent 1px 4px);
+  border-radius: var(--sketch-radius-a);
+}
+
+/* A drawn frame sits a hair off square. One rule, on the outermost
+   device frame only, so the whole picture tilts together instead of
+   every card tilting on its own. */
+.sketchStage [class*='window'],
+.sketchStage [class*='phoneBody'],
+.sketchStage [class*='monitor'] {
+  transform: rotate(-0.18deg);
+}
+
+/* Images and screenshots inside scenes join the drawing rather than
+   sitting on top of it. */
+.sketchStage img {
+  filter: grayscale(0.85) contrast(1.06);
+}
+
+/* Focus has to stay obvious on paper: the app's usual soft ring
+   disappears against this palette, so targets get an ink ring instead. */
+.sketchStage :focus-visible {
+  outline: 2px dashed var(--sketch-ink);
+  outline-offset: 2px;
+}

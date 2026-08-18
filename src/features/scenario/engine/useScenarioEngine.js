@@ -14,16 +14,33 @@ const PULSE_IDLE_MS = 15000
  *   loading -> playing -> paused_interactive -> resolving -> feedback
  *     -> paused_interactive (retry, same pause point) | advancing -> (next scenario | complete)
  *
+ * `playing` behaves differently depending on whether this scenario has a
+ * real opening clip. With none configured (every module today), it is a
+ * short fixed beat over the poster and the scene arrives on its own —
+ * which is what keeps the simulation testable before any video exists.
+ * With a clip pasted into Material URL, nothing is timed: the player
+ * holds until the student presses Start Scenario, so a 40-second clip is
+ * never cut off after a second and a bit.
+ *
  * Also owns the idle-pulse scheduling (a quiet breathing highlight on the
  * target itself, via InteractiveTarget's .idlePulse) and the target
  * registry scenes/InteractiveTarget share — everything a bespoke scene
  * needs comes back out of this hook; scenes never touch Firestore or
  * timers themselves.
  *
+ * ── Replays ──────────────────────────────────────────────────────────
+ * A student who already finished this simulation can walk back through
+ * it any time, and that run is practice: no decision is recorded, so the
+ * safe/risky figures an instructor reads stay the measurement of the
+ * first, real attempt. The run still scores itself on screen, and a
+ * clean replay still counts for the badge that asks for one (reported
+ * through onRunComplete, not through the decision records).
+ *
  * @param {import('../configs/passwordSecurity.config').ModuleScenarioConfig} config
  * @param {string|null} userId
+ * @param {{ isReplay?: boolean }} [options]
  */
-export function useScenarioEngine(config, userId) {
+export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
   const [state, setState] = useState('loading')
   const [scenarioIndex, setScenarioIndex] = useState(0)
   const [attemptCount, setAttemptCount] = useState(0)
@@ -52,6 +69,11 @@ export function useScenarioEngine(config, userId) {
 
   const currentScenario = config.scenarios[scenarioIndex]
   const totalScenarios = config.scenarios.length
+  // A clip only counts as real when there is actually a URL behind the
+  // flag — an admin clearing Material URL turns videoAvailable off with
+  // it (see the admin VideoSection), but a config authored by hand could
+  // still carry one without the other.
+  const hasIntroClip = Boolean(currentScenario.videoAvailable && currentScenario.materialUrl)
   const isLastScenario = scenarioIndex === totalScenarios - 1
   const coachLevel = config.coachLevel || 'full'
   const guidedHintActive = !selectedChoice && attemptCount >= 3
@@ -109,13 +131,27 @@ export function useScenarioEngine(config, userId) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, scenarioIndex])
 
-  // ── playing -> paused_interactive ── (poster/video beat; never blocks
-  // on videoAvailable, per spec — always advances after a fixed beat)
+  // ── playing -> paused_interactive ──
+  // Only auto-advances when there is no clip to watch. With one
+  // configured, the student's own Start Scenario press is what moves this
+  // on (startScenario below) — there is no way to know from a YouTube
+  // embed whether they actually watched it, so the honest thing is to
+  // stop taking the decision away from them.
   useEffect(() => {
-    if (state !== 'playing') return undefined
+    if (state !== 'playing' || hasIntroClip) return undefined
     const t = setTimeout(() => setState('paused_interactive'), PLAYING_MS)
     return () => clearTimeout(t)
-  }, [state])
+  }, [state, hasIntroClip])
+
+  /**
+   * startScenario
+   * Leaves the opening clip for the interactive scene. Only reachable
+   * from the held `playing` state, i.e. only when a clip is configured;
+   * with no clip the beat above has already moved on by itself.
+   */
+  const startScenario = useCallback(() => {
+    setState((prev) => (prev === 'playing' ? 'paused_interactive' : prev))
+  }, [])
 
   /**
    * selectChoice
@@ -136,6 +172,9 @@ export function useScenarioEngine(config, userId) {
       setSelectedChoice(choice)
       setState('resolving')
 
+      // Practice runs leave no trace in the record on purpose.
+      if (isReplay) return
+
       recordDecision({
         userId,
         moduleId: config.moduleId,
@@ -150,7 +189,7 @@ export function useScenarioEngine(config, userId) {
         currentDecisionIdRef.current = decisionId
       })
     },
-    [state, currentScenario, userId, config.moduleId, attemptCount],
+    [state, currentScenario, userId, config.moduleId, attemptCount, isReplay],
   )
 
   // ── resolving -> feedback (both safe and risky go straight there) ──
@@ -164,14 +203,14 @@ export function useScenarioEngine(config, userId) {
   }, [state, selectedChoice])
 
   const retry = useCallback(() => {
-    markFeedbackViewed(currentDecisionIdRef.current)
+    if (!isReplay) markFeedbackViewed(currentDecisionIdRef.current)
     currentDecisionIdRef.current = null
     setSelectedChoice(null)
     setState('paused_interactive')
-  }, [])
+  }, [isReplay])
 
   const continueToNext = useCallback(() => {
-    markFeedbackViewed(currentDecisionIdRef.current)
+    if (!isReplay) markFeedbackViewed(currentDecisionIdRef.current)
     currentDecisionIdRef.current = null
     // Only reachable from a safe resolution (the feedback panel offers
     // Continue for safe choices and Try Again for risky ones), so
@@ -181,7 +220,7 @@ export function useScenarioEngine(config, userId) {
       prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
     )
     setState('advancing')
-  }, [currentScenario, attemptCount])
+  }, [currentScenario, attemptCount, isReplay])
 
   // ── advancing -> next scenario's loading, or complete ──
   useEffect(() => {
@@ -201,7 +240,11 @@ export function useScenarioEngine(config, userId) {
 
   return {
     state,
+    isReplay,
     currentScenario,
+    hasIntroClip,
+    // True while the opening clip is on screen waiting to be started.
+    awaitingStart: state === 'playing' && hasIntroClip,
     scenarioIndex,
     totalScenarios,
     isLastScenario,
@@ -221,6 +264,7 @@ export function useScenarioEngine(config, userId) {
       pulseIdleActive,
     },
     actions: {
+      startScenario,
       selectChoice,
       retry,
       continueToNext,

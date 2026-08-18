@@ -18,8 +18,8 @@ import { getGamificationSchema, getLeaderboardSchema } from './validators'
 export const getMyGamification = defineCallable('getMyGamification', async (request) => {
   const input = parseOrThrow(getGamificationSchema, request.data ?? {})
   const userId = await resolveTargetUid(request, input.userId)
-  const state = await service.getMine(userId)
-  return { gamification: state, catalog: service.getBadgeCatalog() }
+  const [state, catalog] = await Promise.all([service.getMine(userId), service.getBadgeCatalog()])
+  return { gamification: state, catalog }
 })
 
 /**

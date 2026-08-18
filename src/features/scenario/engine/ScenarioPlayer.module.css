@@ -40,3 +40,66 @@
   width: 100%;
   display: block;
 }
+
+/* ── Clip with a Start Scenario press ──
+   Only rendered once a real clip exists; the poster path above is
+   untouched, so nothing about the current no-video runs changes. */
+.clipWrap {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  animation: sentriRise 340ms var(--ease-out-soft) both;
+}
+
+.startRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.startNote {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.startBtn {
+  border: none;
+  background: var(--color-gold);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-button);
+  transition: background var(--transition-fast);
+}
+
+.startBtn:hover {
+  background: var(--color-gold-dark);
+}
+
+/* Declared here rather than shared from global.css: Vite scopes
+   @keyframes names inside CSS modules and rewrites references to match,
+   so a name defined in a plain stylesheet resolves to nothing from in
+   here and the animation silently never plays. See the Motion block in
+   src/styles/global.css. */
+
+@keyframes sentriRise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.startBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.startBtn:disabled:hover {
+  background: var(--color-gold);
+}

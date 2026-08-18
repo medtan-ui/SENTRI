@@ -115,7 +115,20 @@ export interface CohortAnalyticsDoc {
    * admin dashboard charts, so progress is visible as a trend and not
    * only as a current snapshot. */
   completionTrend: TrendPoint[]
+  /** How many students hold each badge, and the share of the cohort that
+   * is. Read by the admin dashboard, and by getMyGamification so a
+   * student's own shelf can show how rare each badge is. */
+  badgeDistribution: BadgeDistributionPoint[]
   updatedAt: FirebaseFirestore.FieldValue
+}
+
+export interface BadgeDistributionPoint {
+  badgeId: string
+  name: string
+  tier: string
+  earnedCount: number
+  /** Percent of the whole student roster, one decimal place. */
+  earnedPct: number
 }
 
 export interface CohortModulePoint {

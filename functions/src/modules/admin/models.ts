@@ -64,6 +64,7 @@ export interface ScenarioChoice {
   consequenceType: string
   feedbackText: string
   feedbackMediaUrl?: string | null
+  consequenceVideoUrl?: string | null
 }
 
 export interface ScenarioItem {

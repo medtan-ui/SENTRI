@@ -5,7 +5,6 @@ import InboxScene from './phishing-awareness/InboxScene'
 import FakePortalScene from './phishing-awareness/FakePortalScene'
 import SearchResultsScene from './malware-awareness/SearchResultsScene'
 import DownloadScene from './malware-awareness/DownloadScene'
-import FakeAlertScene from './malware-awareness/FakeAlertScene'
 import ResearchSearchScene from './safe-browsing/ResearchSearchScene'
 import CertWarningScene from './safe-browsing/CertWarningScene'
 import FakeUpdateScene from './safe-browsing/FakeUpdateScene'
@@ -30,7 +29,6 @@ export const SCENE_REGISTRY = {
   FakePortalScene,
   SearchResultsScene,
   DownloadScene,
-  FakeAlertScene,
   ResearchSearchScene,
   CertWarningScene,
   FakeUpdateScene,

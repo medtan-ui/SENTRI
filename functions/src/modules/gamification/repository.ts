@@ -8,6 +8,7 @@
  */
 import { admin, db } from '../../shared/admin'
 import { COLLECTIONS, ROLES } from '../../shared/constants'
+import { COHORT_DOC_ID } from '../analytics/repository'
 import { ModuleProgressDoc } from '../progress/models'
 import { GamificationDoc } from './models'
 
@@ -132,4 +133,28 @@ export async function countAhead(points: number): Promise<number> {
 export async function countRanked(): Promise<number> {
   const snap = await db.collection(COLLECTIONS.GAMIFICATION).count().get()
   return snap.data().count
+}
+
+/**
+ * The badge rarity figures the cohort rollup already computes
+ * (analytics/service buildBadgeDistribution). Read here rather than
+ * recounted: a student opening their shelf should cost one document
+ * read, not a scan of everyone else's reward documents.
+ *
+ * Returns an empty list when the rollup has never been built, which the
+ * caller renders as "no rarity known yet" rather than as zero percent.
+ */
+export async function getBadgeDistribution(): Promise<
+  Array<{ badgeId: string; earnedCount: number; earnedPct: number }>
+> {
+  const snap = await db.collection(COLLECTIONS.COHORT_ANALYTICS).doc(COHORT_DOC_ID).get()
+  const rows = snap.exists ? (snap.data()?.badgeDistribution as unknown) : null
+  if (!Array.isArray(rows)) return []
+  return rows
+    .filter((row) => row && typeof row.badgeId === 'string')
+    .map((row) => ({
+      badgeId: row.badgeId as string,
+      earnedCount: typeof row.earnedCount === 'number' ? row.earnedCount : 0,
+      earnedPct: typeof row.earnedPct === 'number' ? row.earnedPct : 0,
+    }))
 }

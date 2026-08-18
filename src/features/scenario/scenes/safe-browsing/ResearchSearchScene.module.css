@@ -1,6 +1,6 @@
 .scene {
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sketch-font);
 }
 
 .decorative {
@@ -18,17 +18,17 @@
   align-items: center;
   gap: 8px;
   max-width: 360px;
-  background: #ffffff;
-  border: 1px solid #d4d7dc;
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
   border-radius: 999px;
   padding: 8px 14px;
   font-size: 13px;
-  color: #26282c;
+  color: var(--sketch-ink);
   margin-bottom: var(--space-3);
 }
 
 .searchQuery {
-  color: #3c3f44;
+  color: var(--sketch-ink);
 }
 
 .filterTabs {
@@ -36,19 +36,19 @@
   gap: var(--space-4);
   padding-bottom: var(--space-3);
   margin-bottom: var(--space-4);
-  border-bottom: 1px solid #eceef1;
+  border-bottom: 2px solid var(--sketch-line);
   font-size: 12.5px;
 }
 
 .filterActive {
-  color: #2e5fa3;
+  color: var(--sketch-blue);
   font-weight: 700;
-  border-bottom: 2px solid #2e5fa3;
+  border-bottom: 2px solid var(--sketch-line);
   padding-bottom: 6px;
 }
 
 .filter {
-  color: #7a7f88;
+  color: var(--sketch-ink-soft);
 }
 
 .resultsColumn {
@@ -73,34 +73,34 @@
   flex-direction: column;
   gap: 3px;
   padding: var(--space-3);
-  border-radius: 6px;
+  border-radius: var(--sketch-radius-b);
 }
 
 .adTag {
   align-self: flex-start;
   font-size: 10px;
   font-weight: 700;
-  color: #5a5f68;
-  background: #eceef1;
+  color: var(--sketch-ink);
+  background: var(--sketch-paper-alt);
   padding: 1px 6px;
-  border-radius: 3px;
+  border-radius: var(--sketch-radius-b);
   margin-bottom: 2px;
 }
 
 .resultUrl {
   font-size: 11.5px;
-  color: #1e7e34;
+  color: var(--sketch-green);
 }
 
 .resultTitle {
   font-size: 15px;
-  color: #1a0dab;
+  color: var(--sketch-blue);
   font-weight: 400;
 }
 
 .resultSnippet {
   font-size: 12.5px;
-  color: #4a4e56;
+  color: var(--sketch-ink);
   line-height: 1.45;
 }
 
@@ -112,12 +112,12 @@
   display: flex;
   gap: var(--space-3);
   font-size: 12.5px;
-  color: #7a7f88;
+  color: var(--sketch-ink-soft);
   padding-top: var(--space-2);
 }
 
 .pageNumberActive {
-  color: #2e5fa3;
+  color: var(--sketch-blue);
   font-weight: 700;
 }
 
@@ -127,13 +127,13 @@
   bottom: 0;
   left: 0;
   z-index: 15;
-  background: #fdfdfd;
-  border: 1px solid #d4d7dc;
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
   border-bottom: none;
   border-left: none;
   border-top-right-radius: 4px;
   padding: 4px 10px;
   font-size: 11px;
-  color: #3c3f44;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
+  color: var(--sketch-ink);
+  box-shadow: var(--sketch-shadow-sm);
 }

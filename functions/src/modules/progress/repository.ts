@@ -30,6 +30,7 @@ export function defaultProgress(
     lessonStarted: false,
     lessonCompleted: false,
     simulationCompleted: false,
+    simulationFlawless: false,
     quizCompleted: false,
     moduleCompleted: false,
     score: null,

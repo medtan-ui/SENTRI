@@ -213,7 +213,12 @@ export default function StudentLessonViewerPage() {
         <div className={styles.layout}>
           <div className={styles.mainColumn}>
             <Card className={styles.block}>
-              <YouTubePlayer videoId={config.videoId} title={config.title} />
+              {/* `url`, not `videoId`: the admin Lesson Content field accepts a
+                  pasted watch link as readily as a bare id (its own preview
+                  parses one), so this side has to parse it too — handed
+                  straight through as `videoId` a full URL builds a broken
+                  embed src instead of falling back to the placeholder. */}
+              <YouTubePlayer url={config.videoId} title={config.title} />
             </Card>
 
             <Card className={styles.block}>

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { SCENARIO_CONTENT_VERSION } from '../src/services/scenarioService'
 
 /**
  * loadModuleConfig is the single seam between "a module id" and
@@ -61,6 +62,7 @@ describe('loadModuleConfig', () => {
         videoId: 'dQw4w9WgXcQ',
       },
       moduleScenarios: {
+        contentVersion: SCENARIO_CONTENT_VERSION,
         scenarios: [
           {
             scenarioId: authored.scenario.scenarios[0].scenarioId,

@@ -65,6 +65,11 @@ function defaultProgress(userId, moduleId, moduleOrder, isUnlocked) {
     lessonStarted: false,
     lessonCompleted: false,
     simulationCompleted: false,
+    // Set the first time a run through this module's simulation is
+    // finished without a single risky choice — including a replay, which
+    // records nothing else. Only ever set to true, never cleared: it
+    // marks that a clean run happened, not that the last one was clean.
+    simulationFlawless: false,
     quizCompleted: false,
     moduleCompleted: false,
     score: null,
@@ -261,10 +266,13 @@ export async function markLessonCompleted(userId, moduleId) {
   }
 }
 
-export async function markSimulationCompleted(userId, moduleId) {
+export async function markSimulationCompleted(userId, moduleId, { flawless = false } = {}) {
   try {
     await mergeDoc(COLLECTION, progressDocId(userId, moduleId), {
       simulationCompleted: true,
+      // Never written as false: a messy replay after a clean first run
+      // must not take back the clean run that already happened.
+      ...(flawless ? { simulationFlawless: true } : {}),
       lastAccessed: serverTimestamp(),
     })
   } catch (err) {

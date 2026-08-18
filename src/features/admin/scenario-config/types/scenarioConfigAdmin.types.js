@@ -16,7 +16,7 @@
  *   scenario: scenarioTitle, scenarioDescription, posterCaption,
  *             materialUrl, videoAvailable, postCompletionReflection
  *   choice:   choiceText, outcomeTitle, consequenceType,
- *             feedbackText, feedbackMediaUrl
+ *             feedbackText, feedbackMediaUrl, consequenceVideoUrl
  *
  * Structural, shown read-only (wired to hand-authored React scene
  * components — a form cannot regenerate these, and changing them would
@@ -61,6 +61,7 @@ export const CONSEQUENCE_TYPE_LABELS = {
  * @property {'credential_compromise'|'account_takeover'|'data_exposure'|'device_compromise'|'financial_loss'|'physical_risk'|'none'} consequenceType
  * @property {string} feedbackText
  * @property {string|null} feedbackMediaUrl
+ * @property {string|null} [consequenceVideoUrl]
  */
 
 /**

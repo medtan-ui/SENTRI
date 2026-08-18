@@ -75,6 +75,11 @@ const scenarioChoiceSchema = z.object({
   consequenceType: consequenceTypeSchema,
   feedbackText: z.string(),
   feedbackMediaUrl: z.string().nullable().optional(),
+  // The clip the feedback panel leads with after a risky choice. Same
+  // formats as a scenario's own materialUrl (YouTube link/id, or a direct
+  // video file URL); null until one has been recorded, which is what makes
+  // FeedbackPanel fall back to the placeholder card.
+  consequenceVideoUrl: z.string().nullable().optional(),
 })
 
 const scenarioItemSchema = z.object({

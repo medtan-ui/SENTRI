@@ -367,3 +367,12 @@
     padding: var(--space-6) var(--space-4);
   }
 }
+
+/* Keeps the way out and the way on in one row, with the primary action
+   still visibly the primary one. */
+.submitActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}

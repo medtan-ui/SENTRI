@@ -105,3 +105,10 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
 }
+
+/* The clip preview sits under its URL field the same way VideoSection's
+   does for a scenario's opening clip — an admin should be able to tell at
+   a glance whether what they pasted resolves, before saving. */
+.videoPreview {
+  margin-top: var(--space-3);
+}

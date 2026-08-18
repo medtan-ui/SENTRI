@@ -1,6 +1,6 @@
 .scene {
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sketch-font);
 }
 
 .decorative {
@@ -24,9 +24,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #ffffff;
-  border: 1px solid #d4d7dc;
-  border-radius: 14px;
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-a);
   padding: 5px 12px;
 }
 
@@ -36,20 +36,20 @@
 
 .addressText {
   font-size: 12.5px;
-  color: #3c3f44;
+  color: var(--sketch-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .domainSegment {
-  border-radius: 3px;
+  border-radius: var(--sketch-radius-b);
   transition: background 140ms ease, color 140ms ease;
 }
 
 .domainHighlighted {
-  background: #fdecea;
-  color: #9a1c0f;
+  background: var(--sketch-paper-alt);
+  color: var(--sketch-red);
   font-weight: 700;
   padding: 0 2px;
 }
@@ -63,14 +63,14 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  background: #fff;
-  border: 1px solid #d4d7dc;
-  border-radius: 8px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-a);
+  box-shadow: var(--sketch-shadow-sm);
   z-index: 20;
   padding: 10px 12px;
   font-size: 12px;
-  color: #3c3f44;
+  color: var(--sketch-ink);
 }
 
 .backToSafetyBtn {
@@ -78,15 +78,17 @@
   flex-shrink: 0;
   font-size: 12px;
   font-weight: 700;
-  color: #fff;
-  background: #1e7e34;
+  color: var(--sketch-paper);
+  background: var(--sketch-green);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: var(--sketch-radius-b);
   white-space: nowrap;
+  border: 2px solid var(--sketch-line);
 }
 
 /* ── Fake portal page ── */
 .portalPage {
+  position: relative;
   min-height: 380px;
   display: flex;
   flex-direction: column;
@@ -109,23 +111,23 @@
 .portalName {
   font-size: 16px;
   font-weight: 700;
-  color: #1f3a5f;
+  color: var(--sketch-blue);
 }
 
 .loginCard {
   width: 100%;
   max-width: 300px;
-  background: #ffffff;
-  border: 1px solid #d9dbe0;
-  border-radius: 10px;
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-a);
   padding: var(--space-5);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--sketch-shadow-sm);
 }
 
 .loginTitle {
   font-size: 14.5px;
   font-weight: 700;
-  color: #26282c;
+  color: var(--sketch-ink);
   margin-bottom: var(--space-4);
   text-align: center;
 }
@@ -134,7 +136,7 @@
   display: block;
   font-size: 11px;
   font-weight: 600;
-  color: #7a7f88;
+  color: var(--sketch-ink-soft);
   margin-bottom: 4px;
   margin-top: var(--space-3);
 }
@@ -143,17 +145,17 @@
 .passwordInput {
   width: 100%;
   font-size: 13.5px;
-  color: #26282c;
-  background: #ffffff;
-  border: 1px solid #c9ccd1;
-  border-radius: 6px;
+  color: var(--sketch-ink);
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-b);
   padding: 8px 10px;
-  font-family: inherit;
+  font-family: var(--sketch-font);
 }
 
 .emailInput {
-  background: #f3f4f6;
-  color: #5a5f68;
+  background: var(--sketch-paper-alt);
+  color: var(--sketch-ink);
 }
 
 .passwordInput:focus {
@@ -163,7 +165,7 @@
 .emptyWarning {
   display: block;
   font-size: 11px;
-  color: #c0392b;
+  color: var(--sketch-red);
   margin-top: 4px;
 }
 
@@ -179,10 +181,11 @@
   text-align: center;
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
-  background: #2e5fa3;
+  color: var(--sketch-paper);
+  background: var(--sketch-blue);
   padding: 9px 0;
-  border-radius: 6px;
+  border-radius: var(--sketch-radius-b);
+  border: 2px solid var(--sketch-line);
 }
 
 .forgotWrap {
@@ -195,6 +198,35 @@
 .forgotLink {
   display: inline-block;
   font-size: 12px;
-  color: #2e5fa3;
+  color: var(--sketch-blue);
   text-decoration: underline;
+}
+
+/* The storyboard's last phishing panel: a red alert strip the instant the
+   credentials are handed over. Shown for the beat between submitting and
+   the feedback panel taking the stage. */
+.phishingAlert {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-5);
+  transform: translateX(-50%);
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--sketch-radius-b);
+  background: var(--sketch-red);
+  color: var(--sketch-paper);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: var(--sketch-shadow-sm);
+  animation: portalAlertIn 220ms var(--ease-out-soft) both;
+  border: 2px solid var(--sketch-line);
+}
+
+@keyframes portalAlertIn {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
 }

@@ -34,8 +34,15 @@ import { getOrSeedDoc, overwriteDoc, mergeDoc } from './firestoreDoc'
 
 const COLLECTION = 'moduleScenarios'
 
-/** Bumped whenever the persisted scenario shape changes incompatibly. */
-export const SCENARIO_CONTENT_VERSION = 2
+/** Bumped whenever the persisted scenario shape changes incompatibly.
+ *
+ * v3: the phishing module's safe path moved from reporting the email to
+ * verifying with the instructor, and the malware module lost a scenario
+ * and gained a site-check choice. Stored text written against v2 names
+ * elements those scenes no longer have, so a v2 document has to be
+ * treated as stale rather than layered over the new config — see
+ * mergeScenarioConfig. */
+export const SCENARIO_CONTENT_VERSION = 3
 
 /** Scenario-level fields an admin may edit. Everything else is structural. */
 export const EDITABLE_SCENARIO_FIELDS = [
@@ -54,6 +61,7 @@ export const EDITABLE_CHOICE_FIELDS = [
   'consequenceType',
   'feedbackText',
   'feedbackMediaUrl',
+  'consequenceVideoUrl',
 ]
 
 /** The consequence types ConsequenceOverlay knows how to illustrate. */
@@ -113,6 +121,15 @@ export function mergeScenarioConfig(stored, moduleId) {
   if (!authored) return null
   if (!stored || !Array.isArray(stored.scenarios)) return authored
 
+  // A document saved against an older authored config describes scenes
+  // that have since changed shape: its choice text can name a control
+  // that no longer exists, and its feedback can explain a decision the
+  // student is no longer asked to make. Layering that over the new
+  // config would produce a scenario that plays one way and reads
+  // another, which is worse than losing an admin's edits, so a stale
+  // document is ignored entirely and the authored content stands.
+  if (stored.contentVersion !== SCENARIO_CONTENT_VERSION) return authored
+
   const storedScenarios = new Map(
     stored.scenarios.filter((s) => s && s.scenarioId).map((s) => [s.scenarioId, s]),
   )
@@ -166,7 +183,22 @@ export async function readScenario(moduleId) {
  * @returns {Promise<object|null>}
  */
 export async function getScenario(moduleId) {
-  const stored = await getOrSeedDoc(COLLECTION, moduleId, seedFor(moduleId))
+  const seed = seedFor(moduleId)
+  const stored = await getOrSeedDoc(COLLECTION, moduleId, seed)
+
+  // On the admin path a stale document is also rewritten, not just
+  // ignored: the editor should be editing what students are actually
+  // being shown, and leaving the old text in Firestore would mean the
+  // next save silently reintroduced it.
+  if (seed && stored && stored.contentVersion !== SCENARIO_CONTENT_VERSION) {
+    try {
+      await overwriteDoc(COLLECTION, moduleId, seed)
+    } catch (err) {
+      console.error(`[scenarioService] refreshing stale ${moduleId} scenario doc failed — showing authored content anyway:`, err)
+    }
+    return mergeScenarioConfig(seed, moduleId)
+  }
+
   return mergeScenarioConfig(stored, moduleId)
 }
 

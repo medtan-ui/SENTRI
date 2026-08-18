@@ -1,6 +1,6 @@
 .scene {
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sketch-font);
 }
 
 .decorative {
@@ -22,7 +22,7 @@
   width: 100%;
   height: 100%;
   font-size: 15px;
-  color: #5a5f68;
+  color: var(--sketch-ink);
 }
 
 .chromeMenu {
@@ -30,9 +30,9 @@
   top: calc(100% + 6px);
   right: 0;
   min-width: 150px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: var(--sketch-paper);
+  border-radius: var(--sketch-radius-a);
+  box-shadow: var(--sketch-shadow-sm);
   overflow: hidden;
   z-index: 30;
 }
@@ -41,7 +41,7 @@
   display: block;
   padding: 9px 12px;
   font-size: 12.5px;
-  color: #26282c;
+  color: var(--sketch-ink);
   white-space: nowrap;
 }
 
@@ -49,8 +49,8 @@
   display: block;
   padding: 9px 12px 9px 26px;
   font-size: 12px;
-  color: #4a4e56;
-  border-top: 1px solid #eceef1;
+  color: var(--sketch-ink);
+  border-top: 2px solid var(--sketch-line);
   white-space: nowrap;
 }
 
@@ -76,9 +76,9 @@
   white-space: nowrap;
   font-size: 11px;
   font-weight: 700;
-  color: #9a1c0f;
-  background: #fdecea;
-  border: 1px solid rgba(192, 57, 43, 0.35);
+  color: var(--sketch-red);
+  background: var(--sketch-paper-alt);
+  border: 2px solid var(--sketch-line);
   padding: 3px 9px;
   border-radius: 999px;
 }
@@ -89,8 +89,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background: #2e5fa3;
+  background: var(--sketch-blue);
   padding: 10px var(--space-4);
+  border: 2px solid var(--sketch-line);
 }
 
 .bannerIcon {
@@ -101,17 +102,17 @@
   flex: 1;
   font-size: 12.5px;
   font-weight: 600;
-  color: #fff;
+  color: var(--sketch-paper);
 }
 
 .updateBtn {
   display: inline-block;
   font-size: 11.5px;
   font-weight: 700;
-  color: #2e5fa3;
-  background: #fff;
+  color: var(--sketch-blue);
+  background: var(--sketch-paper);
   padding: 5px 12px;
-  border-radius: 5px;
+  border-radius: var(--sketch-radius-b);
   white-space: nowrap;
 }
 
@@ -126,7 +127,7 @@
   width: 100%;
   height: 100%;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--sketch-paper);
 }
 
 .bannerCallout {
@@ -134,9 +135,9 @@
   text-align: center;
   font-size: 11px;
   font-weight: 700;
-  color: #9a1c0f;
-  background: #fdecea;
-  border-bottom: 1px solid rgba(192, 57, 43, 0.35);
+  color: var(--sketch-red);
+  background: var(--sketch-paper-alt);
+  border-bottom: 2px solid var(--sketch-line);
   padding: 5px;
 }
 
@@ -146,7 +147,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  color: #3c3f44;
+  color: var(--sketch-ink);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -154,5 +155,5 @@
 .articleTitle {
   font-size: 16px;
   font-weight: 700;
-  color: #26282c;
+  color: var(--sketch-ink);
 }

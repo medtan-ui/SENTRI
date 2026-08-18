@@ -68,11 +68,18 @@ export function useModuleProgress(moduleId) {
     await markLessonCompleted(userId, moduleId)
   }, [userId, moduleId])
 
-  const completeSimulation = useCallback(async () => {
-    if (!userId || !moduleId) return
-    setProgress((prev) => (prev ? { ...prev, simulationCompleted: true } : prev))
-    await markSimulationCompleted(userId, moduleId)
-  }, [userId, moduleId])
+  const completeSimulation = useCallback(
+    async ({ flawless = false } = {}) => {
+      if (!userId || !moduleId) return
+      setProgress((prev) =>
+        prev
+          ? { ...prev, simulationCompleted: true, simulationFlawless: prev.simulationFlawless || flawless }
+          : prev,
+      )
+      await markSimulationCompleted(userId, moduleId, { flawless })
+    },
+    [userId, moduleId],
+  )
 
   return {
     status,

@@ -131,14 +131,19 @@ export function totalsFrom(
     .map((row) => row.score)
     .filter((score): score is number => typeof score === 'number')
 
-  // A flawless run is a module whose simulation is finished AND whose
-  // decision record shows no risky choice. Both halves are required:
-  // zero risky choices on a simulation nobody has started is vacuous,
-  // and a finished simulation with no behaviour row at all (decision
-  // recording fails soft by design) is not evidence of a clean run.
+  // A flawless run is a module whose simulation is finished AND that was
+  // got through without a risky choice. Two sources say so, and either is
+  // enough. The decision records are the first run's evidence: zero risky
+  // choices on a simulation nobody has started is vacuous, and a finished
+  // simulation with no behaviour row at all (decision recording fails
+  // soft by design) is not evidence of a clean run. `simulationFlawless`
+  // covers the replay case, where nothing is recorded on purpose but a
+  // student who comes back and gets it perfectly right has still done the
+  // thing the badge is for.
   const behaviourByModule = new Map(behaviourRows.map((row) => [row.moduleId, row]))
   const flawlessSimulations = progressRows.filter((row) => {
     if (!row.simulationCompleted) return false
+    if (row.simulationFlawless) return true
     const behaviour = behaviourByModule.get(row.moduleId)
     return Boolean(behaviour) && behaviour!.riskyChoices === 0 && behaviour!.safeChoices > 0
   }).length
@@ -316,6 +321,37 @@ export async function getLeaderboard(
 }
 
 /** The badge catalog, so the client can show locked badges and what earns them. */
-export function getBadgeCatalog(): { badges: ReturnType<typeof badgeCatalogForClient>; total: number } {
-  return { badges: badgeCatalogForClient(), total: BADGES.length }
+export async function getBadgeCatalog(): Promise<{
+  badges: Array<
+    ReturnType<typeof badgeCatalogForClient>[number] & {
+      earnedCount: number | null
+      earnedPct: number | null
+    }
+  >
+  total: number
+}> {
+  // Rarity comes from the cohort rollup, so it is as fresh as the last
+  // aggregation run (nightly, or whenever an admin refreshes). Null, not
+  // zero, when that rollup has never been built: "nobody has this" and
+  // "nobody has counted yet" are different statements and the shelf
+  // should only make the first one when it is true.
+  let distribution: Array<{ badgeId: string; earnedCount: number; earnedPct: number }> = []
+  try {
+    distribution = await repo.getBadgeDistribution()
+  } catch {
+    distribution = []
+  }
+  const byId = new Map(distribution.map((row) => [row.badgeId, row]))
+
+  return {
+    badges: badgeCatalogForClient().map((badge) => {
+      const row = byId.get(badge.id)
+      return {
+        ...badge,
+        earnedCount: row ? row.earnedCount : null,
+        earnedPct: row ? row.earnedPct : null,
+      }
+    }),
+    total: BADGES.length,
+  }
 }

@@ -20,8 +20,12 @@ const RETRY_LOCK_SECONDS = 5
  * `consequenceVideoUrl`, same formats as a scenario's own `materialUrl`);
  * with nothing recorded yet, YouTubePlayer's own placeholder card stands
  * in. "Try Again" stays disabled for RETRY_LOCK_SECONDS after the panel
- * mounts — long enough to actually look at the clip/explanation before
- * retrying — then unlocks on its own; nothing auto-closes the panel.
+ * mounts — long enough to actually read the explanation — and when a real
+ * clip is configured it stays disabled until that clip reports it
+ * finished, so a 60-second consequence can no longer be dismissed after
+ * 5. A clip that cannot be tracked (YouTube's API blocked, an unplayable
+ * video) falls back to the plain countdown rather than trapping anyone.
+ * Nothing ever auto-closes the panel.
  *
  * A safely-resolved scenario may also carry a `postCompletionReflection`
  * in its config — a closing note shown only here, only once the scenario
@@ -30,22 +34,38 @@ const RETRY_LOCK_SECONDS = 5
  * scenario's copy into this shared component.
  *
  * The "First try" ribbon marks a safe call made with no risky attempts
- * behind it. It is the only place in a run where doing well is
+ * behind it, on a first run only. It is the only place in a run where doing well is
  * acknowledged in the moment rather than tallied at the end, and it costs
  * nothing to a student who needed a second go — they simply don't see it,
  * rather than seeing a marker saying they missed it.
  */
-export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry, onContinue }) {
+export default function FeedbackPanel({
+  choice,
+  scenario,
+  attemptCount,
+  isReplay = false,
+  onRetry,
+  onContinue,
+}) {
   const isSafe = choice.isSafeChoice
   const guided = !isSafe && attemptCount >= 3
   const reflection = isSafe ? scenario?.postCompletionReflection : null
-  const firstTry = isSafe && attemptCount === 0
+  // Never on a replay: they have already been through this scenario, so
+  // "first try" would be marking something that isn't true.
+  const firstTry = isSafe && attemptCount === 0 && !isReplay
   const btnRef = React.useRef(null)
 
   const videoUrl = choice.consequenceVideoUrl || ''
   const youTubeId = parseYouTubeId(videoUrl)
 
   const [lockSecondsLeft, setLockSecondsLeft] = React.useState(isSafe ? 0 : RETRY_LOCK_SECONDS)
+  const [clipEnded, setClipEnded] = React.useState(false)
+  const [trackingUnavailable, setTrackingUnavailable] = React.useState(false)
+
+  // A configured clip owns the lock; the countdown is only the floor
+  // underneath it (and the whole lock when no clip exists yet).
+  const waitingOnClip = !isSafe && Boolean(videoUrl) && !clipEnded && !trackingUnavailable
+  const locked = waitingOnClip || lockSecondsLeft > 0
 
   React.useEffect(() => {
     if (lockSecondsLeft <= 0) return undefined
@@ -56,9 +76,9 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
   React.useEffect(() => {
     // Only steal focus once the button is actually clickable, so a
     // keyboard/screen-reader user isn't dropped onto a disabled control.
-    if (lockSecondsLeft === 0) btnRef.current?.focus()
+    if (!locked) btnRef.current?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lockSecondsLeft === 0])
+  }, [locked])
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-live="polite">
@@ -73,9 +93,24 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
         {!isSafe && (
           <div className={styles.videoWrap}>
             {videoUrl && !youTubeId ? (
-              <video className={styles.video} src={videoUrl} autoPlay muted playsInline controls />
+              <video
+                className={styles.video}
+                src={videoUrl}
+                autoPlay
+                muted
+                playsInline
+                controls
+                onEnded={() => setClipEnded(true)}
+                onError={() => setTrackingUnavailable(true)}
+              />
             ) : (
-              <YouTubePlayer videoId={youTubeId} title={choice.outcomeTitle} />
+              <YouTubePlayer
+                videoId={youTubeId}
+                title={choice.outcomeTitle}
+                autoplay={Boolean(youTubeId)}
+                onEnded={youTubeId ? () => setClipEnded(true) : undefined}
+                onTrackingUnavailable={() => setTrackingUnavailable(true)}
+              />
             )}
           </div>
         )}
@@ -105,9 +140,13 @@ export default function FeedbackPanel({ choice, scenario, attemptCount, onRetry,
             type="button"
             className={styles.primaryBtn}
             onClick={onRetry}
-            disabled={lockSecondsLeft > 0}
+            disabled={locked}
           >
-            {lockSecondsLeft > 0 ? `Try Again (${lockSecondsLeft}s)` : 'Try Again'}
+            {waitingOnClip
+              ? 'Try Again (watch the clip)'
+              : lockSecondsLeft > 0
+                ? `Try Again (${lockSecondsLeft}s)`
+                : 'Try Again'}
           </button>
         )}
       </div>

@@ -5,18 +5,19 @@
   width: 100%;
   max-width: 780px;
   margin: 0 auto;
-  border-radius: 8px;
+  border-radius: var(--sketch-radius-a);
   overflow: hidden;
-  background: #2b2d31;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background: var(--sketch-ink);
+  box-shadow: var(--sketch-shadow-sm);
   display: flex;
   flex-direction: column;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sketch-font);
+  border: 2px solid var(--sketch-line);
 }
 
 .desktopArea {
   position: relative;
-  background: #e9ebee;
+  background: var(--sketch-paper-alt);
   min-height: 340px;
   display: flex;
   align-items: center;
@@ -27,11 +28,12 @@
 .taskbar {
   height: 44px;
   flex-shrink: 0;
-  background: #1f2023;
+  background: var(--sketch-ink);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
+  border: 2px solid var(--sketch-line);
 }
 
 .taskbarLeft,
@@ -43,7 +45,7 @@
 }
 
 .startIconDecorative {
-  color: #d6d8db;
+  color: var(--sketch-paper-dim);
   font-size: 17px;
 }
 
@@ -53,9 +55,9 @@
   bottom: calc(100% + 8px);
   left: 0;
   min-width: 160px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background: var(--sketch-paper);
+  border-radius: var(--sketch-radius-a);
+  box-shadow: var(--sketch-shadow-sm);
   overflow: hidden;
   /* Below the engine's own consequence (35) / feedback (30) overlays,
      so an open menu can never block them if it's still mounted when
@@ -75,7 +77,7 @@
 }
 
 .clock {
-  color: #d6d8db;
+  color: var(--sketch-paper-dim);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -87,9 +89,9 @@
   right: 0;
   bottom: 0;
   z-index: 25;
-  background: #f4f5f6;
-  border-top: 1px solid #d4d7dc;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--sketch-paper-alt);
+  border-top: 2px solid var(--sketch-line);
+  box-shadow: var(--sketch-shadow-sm);
   animation: downloadsBarSlideUp 320ms ease-out;
 }
 

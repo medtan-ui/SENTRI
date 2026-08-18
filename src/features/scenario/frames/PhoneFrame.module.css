@@ -7,25 +7,27 @@
   width: 100%;
   max-width: 320px;
   margin: 0 auto;
-  border-radius: 32px;
+  border-radius: var(--sketch-radius-a);
   overflow: hidden;
-  background: #1c1c1e;
+  background: var(--sketch-ink);
   padding: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: var(--sketch-shadow-sm);
+  font-family: var(--sketch-font);
   display: flex;
   flex-direction: column;
+  border: 2px solid var(--sketch-line);
 }
 
 .notch {
   width: 80px;
   height: 16px;
-  background: #1c1c1e;
+  background: var(--sketch-ink);
   border-radius: 0 0 10px 10px;
   margin: 0 auto;
   position: relative;
   z-index: 2;
   flex-shrink: 0;
+  border: 2px solid var(--sketch-line);
 }
 
 .statusBar {
@@ -34,8 +36,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 5px 16px;
-  background: #ffffff;
-  color: #1c1c1e;
+  background: var(--sketch-paper);
+  color: var(--sketch-ink);
   font-size: 11px;
   font-weight: 600;
 }
@@ -46,7 +48,7 @@
 
 .carrierLabel {
   font-weight: 500;
-  color: #6b6f76;
+  color: var(--sketch-ink);
 }
 
 .statusIcons {
@@ -60,7 +62,7 @@
    stays predictable regardless of how tall a scene's content is ── */
 .viewport {
   position: relative;
-  background: #f9f9fa;
+  background: var(--sketch-paper);
   overflow-y: auto;
   overflow-x: hidden;
   height: 520px;
@@ -69,8 +71,8 @@
 
 .bottomNav {
   flex-shrink: 0;
-  background: #ffffff;
-  border-top: 1px solid #e2e4e8;
+  background: var(--sketch-paper);
+  border-top: 2px solid var(--sketch-line);
   border-radius: 0 0 22px 22px;
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mergeScenarioConfig } from '../src/services/scenarioService'
+import { mergeScenarioConfig, SCENARIO_CONTENT_VERSION } from '../src/services/scenarioService'
 import { SCENARIO_CONFIG_REGISTRY } from '../src/features/scenario/configs'
 import { SCENE_REGISTRY } from '../src/features/scenario/scenes/sceneRegistry'
 
@@ -33,6 +33,7 @@ describe('mergeScenarioConfig', () => {
 
   it('applies stored edits to student-visible copy', () => {
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [
         {
           scenarioId: authored.scenarios[0].scenarioId,
@@ -48,8 +49,23 @@ describe('mergeScenarioConfig', () => {
     expect(result.scenarios[0].posterCaption).toBe('Rewritten caption.')
   })
 
+  it('ignores a stored document written against an older authored config', () => {
+    // Older stored text names controls the current scenes no longer
+    // have, so authored content wins outright rather than being layered
+    // over — see SCENARIO_CONTENT_VERSION.
+    const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION - 1,
+      scenarios: [
+        { scenarioId: authored.scenarios[0].scenarioId, scenarioTitle: 'Text from an older version' },
+      ],
+    }
+    const result = mergeScenarioConfig(stored, moduleId)
+    expect(result.scenarios[0].scenarioTitle).toBe(authored.scenarios[0].scenarioTitle)
+  })
+
   it('ignores a stored attempt to change which scene renders a scenario', () => {
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [{ scenarioId: authored.scenarios[0].scenarioId, scene: 'SomeOtherScene' }],
     }
     const result = mergeScenarioConfig(stored, moduleId)
@@ -59,6 +75,7 @@ describe('mergeScenarioConfig', () => {
   it('ignores a stored attempt to change which choice is safe', () => {
     const authoredChoice = authored.scenarios[0].choices[0]
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [
         {
           scenarioId: authored.scenarios[0].scenarioId,
@@ -81,6 +98,7 @@ describe('mergeScenarioConfig', () => {
   it('applies stored edits to choice feedback while keeping its wiring', () => {
     const authoredChoice = authored.scenarios[0].choices[0]
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [
         {
           scenarioId: authored.scenarios[0].scenarioId,
@@ -102,6 +120,7 @@ describe('mergeScenarioConfig', () => {
 
   it('keeps the authored value for a field the stored document omits', () => {
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [{ scenarioId: authored.scenarios[0].scenarioId, scenarioTitle: 'Only a title' }],
     }
     const merged = mergeScenarioConfig(stored, moduleId).scenarios[0]
@@ -113,6 +132,7 @@ describe('mergeScenarioConfig', () => {
     // The case that matters after a code change renames or removes a
     // scenario: stale stored entries must not resurrect it.
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [{ scenarioId: 'removed-in-a-later-refactor', scenarioTitle: 'Ghost' }],
     }
     const result = mergeScenarioConfig(stored, moduleId)
@@ -122,6 +142,7 @@ describe('mergeScenarioConfig', () => {
 
   it('never loses a choice the scene still expects, even if storage omits it', () => {
     const stored = {
+      contentVersion: SCENARIO_CONTENT_VERSION,
       scenarios: [{ scenarioId: authored.scenarios[0].scenarioId, choices: [] }],
     }
     const result = mergeScenarioConfig(stored, moduleId)

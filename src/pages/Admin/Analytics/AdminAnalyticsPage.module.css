@@ -611,3 +611,71 @@
     gap: 2px;
   }
 }
+
+/* ---- Badge distribution ---- */
+
+.badgeStatList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.badgeStatRow {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) minmax(80px, 2fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.badgeStatName {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.badgeStatBarTrack {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.badgeStatBarFill {
+  display: block;
+  height: 100%;
+  background: var(--color-gold);
+}
+
+.badgeStatValue {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.badgeStatTotal {
+  font-weight: 500;
+  color: var(--color-text-light);
+}
+
+.badgeStatPct {
+  margin-left: var(--space-2);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .badgeStatRow {
+    grid-template-columns: 1fr auto;
+  }
+
+  .badgeStatBarTrack {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}

@@ -72,3 +72,13 @@
   letter-spacing: 0;
   color: var(--color-text-light);
 }
+
+/* Says what the Clip Status above actually does to a student's run, so
+   the difference between "Poster only" and "Available" isn't something
+   an admin has to learn by testing it. */
+.statusNote {
+  margin-top: var(--space-2);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}

@@ -1,6 +1,6 @@
 .scene {
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sketch-font);
 }
 
 .decorative {
@@ -13,8 +13,8 @@
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  background: #ffffff;
-  border-bottom: 1px solid #eceef1;
+  background: var(--sketch-paper);
+  border-bottom: 2px solid var(--sketch-line);
 }
 
 .backBtn {
@@ -24,13 +24,13 @@
   width: 100%;
   height: 100%;
   font-size: 16px;
-  color: #26282c;
+  color: var(--sketch-ink);
 }
 
 .headerTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #26282c;
+  color: var(--sketch-ink);
 }
 
 .form {
@@ -41,7 +41,7 @@
 
 .intro {
   font-size: 12.5px;
-  color: #4a4e56;
+  color: var(--sketch-ink);
   line-height: 1.5;
   margin-bottom: var(--space-4);
 }
@@ -49,7 +49,7 @@
 .fieldLabel {
   font-size: 11px;
   font-weight: 600;
-  color: #7a7f88;
+  color: var(--sketch-ink-soft);
   margin-bottom: 4px;
   margin-top: var(--space-3);
 }
@@ -57,12 +57,12 @@
 .input {
   width: 100%;
   font-size: 13.5px;
-  color: #26282c;
-  background: #ffffff;
-  border: 1px solid #c9ccd1;
-  border-radius: 6px;
+  color: var(--sketch-ink);
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-b);
   padding: 9px 10px;
-  font-family: inherit;
+  font-family: var(--sketch-font);
 }
 
 .input:focus {
@@ -72,7 +72,7 @@
 .warning {
   display: block;
   font-size: 11px;
-  color: #c0392b;
+  color: var(--sketch-red);
   margin-top: var(--space-2);
 }
 
@@ -88,8 +88,9 @@
   text-align: center;
   font-size: 13.5px;
   font-weight: 700;
-  color: #fff;
-  background: #2e5fa3;
+  color: var(--sketch-paper);
+  background: var(--sketch-blue);
   padding: 11px 0;
-  border-radius: 6px;
+  border-radius: var(--sketch-radius-b);
+  border: 2px solid var(--sketch-line);
 }

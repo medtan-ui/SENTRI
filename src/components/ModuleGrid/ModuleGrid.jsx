@@ -66,6 +66,14 @@ export default function ModuleGrid({ modules }) {
         const meta = MODULE_STATUS_META[m.status]
         const destination = moduleDestination(m)
 
+        // The card's main button always points at the next step, which
+        // for a student mid-module is the simulation or the quiz. That
+        // left no way back to the reading they are being quizzed on, so
+        // a module whose lesson is done and whose button points
+        // elsewhere gets a second, quieter way in.
+        const lessonPath = `/student/modules/${m.moduleId}`
+        const canRereadLesson = !locked && Boolean(m.progress?.lessonCompleted) && destination !== lessonPath
+
         return (
           <div key={m.moduleId} className={styles.moduleCard} data-locked={locked}>
             <div className={styles.moduleCardHeader}>
@@ -115,6 +123,16 @@ export default function ModuleGrid({ modules }) {
                 )}
               </button>
             </Tooltip>
+
+            {canRereadLesson && (
+              <button
+                type="button"
+                className={styles.moduleSecondary}
+                onClick={() => navigate(lessonPath)}
+              >
+                Read the lesson again
+              </button>
+            )}
           </div>
         )
       })}

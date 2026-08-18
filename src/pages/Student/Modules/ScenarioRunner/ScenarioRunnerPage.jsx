@@ -31,7 +31,12 @@ const STAGE_MS = 550
 export default function ScenarioRunnerPage() {
   const { moduleId } = useParams()
   const navigate = useNavigate()
-  const { actions } = useModuleProgress(moduleId)
+  const { actions, progress } = useModuleProgress(moduleId)
+
+  // A student who has already finished this simulation is replaying it.
+  // Captured from their progress, so re-entering after finishing (or
+  // coming back weeks later to review) reads as the second run it is.
+  const isReplay = Boolean(progress?.simulationCompleted)
 
   // undefined = still loading, null = not found, object = loaded
   const [config, setConfig] = useState(undefined)
@@ -95,12 +100,24 @@ export default function ScenarioRunnerPage() {
     simulationTimerRef.current = startTimedEvent('simulation_completed', moduleId)
   }, [phase, moduleId])
 
-  function handleContinueToQuiz() {
-    actions.completeSimulation()
+  /**
+   * Recorded the moment the last scenario resolves, so a student who
+   * finishes and then leaves still has a finished simulation waiting for
+   * them on the dashboard instead of being sent back through it.
+   *
+   * `flawless` is the run's own scoreline, not a stored analytic: it is
+   * what lets a clean replay still earn the badge that asks for one,
+   * while the decision records stay the first run's measurement.
+   */
+  function handleSimulationComplete(summary) {
+    actions.completeSimulation({ flawless: Boolean(summary?.flawless) })
     if (simulationTimerRef.current) {
       simulationTimerRef.current({ scenarios: config?.scenario?.scenarios?.length ?? null })
       simulationTimerRef.current = null
     }
+  }
+
+  function handleContinueToQuiz() {
     setMessageIndex(0)
     setPhase('exiting')
   }
@@ -157,7 +174,9 @@ export default function ScenarioRunnerPage() {
         <ModuleAccessGuard moduleId={moduleId} require="simulation">
           <ScenarioEngine
             config={config.scenario}
+            isReplay={isReplay}
             onBackToLesson={handleBackToLesson}
+            onSimulationComplete={handleSimulationComplete}
             onContinueToQuiz={handleContinueToQuiz}
           />
         </ModuleAccessGuard>

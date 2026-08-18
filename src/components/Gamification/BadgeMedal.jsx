@@ -15,11 +15,22 @@ import styles from './BadgeMedal.module.css'
  * than an image, so there is nothing to load, nothing to keep in sync
  * with the server's badge catalog, and it recolours by tier for free.
  *
+ * `earnedPct` is how much of the cohort holds this badge, the way a game
+ * library shows "12% of players have this". It is shown for locked and
+ * earned badges alike: on a locked one it says how hard the thing is, on
+ * an earned one it says what you did that others have not. Null when the
+ * cohort rollup has not been built yet, in which case the line is simply
+ * absent rather than reading as zero.
+ *
  * @param {{ badge: { id: string, name: string, description: string,
- *   icon: string, tier: 'bronze'|'silver'|'gold' }, earned?: boolean,
+ *   icon: string, tier: 'bronze'|'silver'|'gold',
+ *   earnedPct?: number|null }, earned?: boolean,
  *   size?: 'sm'|'md' }} props
  */
 export default function BadgeMedal({ badge, earned = false, size = 'md' }) {
+  const pct = typeof badge.earnedPct === 'number' ? badge.earnedPct : null
+  const rarityLabel =
+    pct === null ? null : pct > 0 && pct < 1 ? 'Under 1% have this' : `${pct}% have this`
   return (
     <div className={styles.badge} data-earned={earned || undefined} data-size={size}>
       {/* Stroke, never filled. These are outline icons drawn on a
@@ -32,6 +43,11 @@ export default function BadgeMedal({ badge, earned = false, size = 'md' }) {
       <div className={styles.text}>
         <p className={styles.name}>{badge.name}</p>
         <p className={styles.description}>{badge.description}</p>
+        {rarityLabel && (
+          <p className={styles.rarity} data-rare={pct > 0 && pct <= 25 ? 'true' : undefined}>
+            {rarityLabel}
+          </p>
+        )}
       </div>
       {!earned && <span className={styles.lockTag}>Locked</span>}
     </div>

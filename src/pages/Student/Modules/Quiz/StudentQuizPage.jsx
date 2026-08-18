@@ -28,6 +28,11 @@ import styles from './StudentQuizPage.module.css'
  * simply lets them back into the form — the server is what enforces the
  * allowance, this is only the matching UI.
  *
+ * Opening the quiz is not a commitment: nothing is recorded until Submit,
+ * so the form carries a way back to the lesson. A student who realises
+ * they want to re-read something should not have to guess whether
+ * leaving costs them their attempt.
+ *
  * Per-question time is measured here (first interaction → submit) and
  * sent alongside the answers. It is what the time-to-answer and item
  * analysis metrics are built from; a question never touched sends no
@@ -134,7 +139,7 @@ export default function StudentQuizPage() {
     if (quiz === null) {
       return (
         <Card className={styles.stateCard}>
-          <h1 className={styles.stateTitle}>Quiz Unavailable</h1>
+          <h1 className={styles.stateTitle}>{quizError ? "Quiz Couldn't Load" : 'Quiz Unavailable'}</h1>
           <p className={styles.stateText}>
             {quizError || "This module's quiz hasn't been configured yet."}
           </p>
@@ -282,15 +287,23 @@ export default function StudentQuizPage() {
 
         <div className={styles.submitRow}>
           <span className={styles.progressText}>{answeredCount} of {totalQuestions} answered</span>
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={!allAnswered || submitting}
-            loading={submitting}
-            onClick={handleSubmit}
-          >
-            Submit Quiz
-          </Button>
+          <div className={styles.submitActions}>
+            {/* Opening the quiz should not be a one-way door. Nothing is
+                recorded until Submit, so going back to re-read costs the
+                student nothing and loses nothing. */}
+            <Button variant="ghost" onClick={() => navigate(`/student/modules/${moduleId}`)}>
+              Read the lesson again
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={!allAnswered || submitting}
+              loading={submitting}
+              onClick={handleSubmit}
+            >
+              Submit Quiz
+            </Button>
+          </div>
         </div>
       </>
     )

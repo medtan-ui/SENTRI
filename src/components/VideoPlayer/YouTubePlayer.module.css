@@ -40,3 +40,14 @@
   font-weight: 600;
   color: var(--color-text-muted);
 }
+
+/* The IFrame Player API builds its own iframe in place of the host node,
+   so it never carries .iframe above. Sizing it by descendant instead
+   keeps the tracked and untracked embeds identical on screen. */
+.frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

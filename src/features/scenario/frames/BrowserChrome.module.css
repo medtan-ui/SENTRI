@@ -5,12 +5,12 @@
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
-  border-radius: 8px;
+  border-radius: var(--sketch-radius-a);
   overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-  border: 1px solid #d4d7dc;
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--sketch-paper);
+  box-shadow: var(--sketch-shadow-sm);
+  border: 2px solid var(--sketch-line);
+  font-family: var(--sketch-font);
 }
 
 .titleBar {
@@ -18,32 +18,32 @@
   align-items: center;
   gap: 7px;
   padding: 9px 12px;
-  background: #e9eaec;
-  border-bottom: 1px solid #d4d7dc;
+  background: var(--sketch-paper-alt);
+  border-bottom: 2px solid var(--sketch-line);
 }
 
 .dot {
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: #c7c9cd;
+  background: var(--sketch-paper-dim);
 }
-.dot[data-color='red'] { background: #ec6a5e; }
-.dot[data-color='yellow'] { background: #f4bf4f; }
-.dot[data-color='green'] { background: #61c554; }
+.dot[data-color='red'] { background: var(--sketch-red); }
+.dot[data-color='yellow'] { background: var(--sketch-gold); }
+.dot[data-color='green'] { background: var(--sketch-green); }
 
 .addressRow {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
-  background: #f4f5f6;
-  border-bottom: 1px solid #d4d7dc;
+  background: var(--sketch-paper-alt);
+  border-bottom: 2px solid var(--sketch-line);
 }
 
 .navIcon {
   font-size: 13px;
-  color: #8a8f98;
+  color: var(--sketch-ink-soft);
   width: 20px;
   text-align: center;
   flex-shrink: 0;
@@ -54,9 +54,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #ffffff;
-  border: 1px solid #d4d7dc;
-  border-radius: 14px;
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-a);
   padding: 5px 12px;
   min-width: 0;
 }
@@ -68,7 +68,7 @@
 
 .url {
   font-size: 12.5px;
-  color: #3c3f44;
+  color: var(--sketch-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -76,6 +76,6 @@
 
 .viewport {
   position: relative;
-  background: #f9f9fa;
+  background: var(--sketch-paper);
   min-height: 320px;
 }

@@ -14,6 +14,11 @@ import styles from './VideoSection.module.css'
  *
  * `videoAvailable` is derived from whether a URL is present rather than
  * being a separate switch an admin can leave out of sync with reality.
+ * That one field also decides how the scenario opens for a student:
+ * with no URL the engine shows the poster for a beat and walks straight
+ * into the scene (which is what keeps a module testable before anything
+ * has been filmed), and with a URL the clip is held on screen until the
+ * student presses Start Scenario. No separate setting to remember.
  */
 export default function VideoSection({ scenario, errors, onUpdate }) {
   const materialUrl = scenario.materialUrl || ''
@@ -63,6 +68,11 @@ export default function VideoSection({ scenario, errors, onUpdate }) {
             className={`${badges.pill} ${scenario.videoAvailable ? badges.available : badges.placeholderStatus}`}
           >
             {scenario.videoAvailable ? 'Available' : 'Poster only'}
+          </span>
+          <span className={styles.statusNote}>
+            {scenario.videoAvailable
+              ? 'Students watch this, then press Start Scenario to go in.'
+              : 'Students go straight into the scene after a short beat.'}
           </span>
         </div>
       </div>

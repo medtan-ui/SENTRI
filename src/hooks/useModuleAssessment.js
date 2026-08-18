@@ -46,11 +46,29 @@ export function useModuleAssessment(moduleId, assessmentType = 'pretest') {
     setStatus('loading')
     setErrorMessage('')
 
-    Promise.all([getAssessmentForStudent(moduleId), getModuleProgress(userId, moduleId)])
-      .then(([assessmentDoc, progress]) => {
+    // Progress first, item bank second, and deliberately not as one
+    // Promise.all: a student who has already sat this pre-test never sees
+    // the gate again (the Lesson Viewer reads `completed` and skips
+    // straight past it), so failing to load the questions must not lock
+    // them out of a module they came back to review. A first-timer
+    // genuinely needs those questions, so for them the same failure is
+    // still a real error.
+    getModuleProgress(userId, moduleId)
+      .then(async (progress) => {
+        const alreadyCompleted = Boolean(progress?.preTestCompleted)
+        let assessmentDoc = null
+        try {
+          assessmentDoc = await getAssessmentForStudent(moduleId)
+        } catch (err) {
+          if (!alreadyCompleted) throw err
+          console.error(
+            '[useModuleAssessment] pre-test items failed to load — already completed, letting the lesson through:',
+            err,
+          )
+        }
         if (cancelled) return
         setAssessment(assessmentDoc)
-        setCompleted(Boolean(progress?.preTestCompleted))
+        setCompleted(alreadyCompleted)
         // The pre-test has no precondition beyond the module being open.
         setEligible(true)
         setStatus('success')

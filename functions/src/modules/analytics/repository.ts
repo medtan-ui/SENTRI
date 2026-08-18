@@ -84,6 +84,17 @@ export async function getAllScenarioDecisions(): Promise<FirebaseFirestore.Docum
   return snap.docs.map((d) => d.data())
 }
 
+/**
+ * Every student's reward document. Read whole because the cohort rollup
+ * needs the badge lists themselves, not a count — "how many people have
+ * this badge" cannot be answered by a where clause over an array of ids
+ * without one query per badge.
+ */
+export async function getAllGamification(): Promise<FirebaseFirestore.DocumentData[]> {
+  const snap = await db.collection(COLLECTIONS.GAMIFICATION).get()
+  return snap.docs.map((doc) => doc.data())
+}
+
 export async function getAllModules(): Promise<FirebaseFirestore.DocumentData[]> {
   const snap = await db.collection(COLLECTIONS.MODULES).get()
   return snap.docs.map((d) => d.data())

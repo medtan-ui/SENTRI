@@ -145,6 +145,13 @@ vi.mock('../src/services/finalAssessmentService', () => ({
     settings: { passingScore: 75, instructions: '', available: true, attemptsAllowed: 2 },
     questions: [],
   })),
+  // useFinalAssessment reads through the sanitized Cloud Function path
+  // (getFinalAssessmentForStudent), not the raw document read above.
+  getFinalAssessmentForStudent: vi.fn(async () => ({
+    title: 'SENTRI Final Assessment',
+    settings: { passingScore: 75, instructions: '', available: true, attemptsAllowed: 2 },
+    questions: [],
+  })),
   getFinalAssessmentProgress: vi.fn(async () => null),
   submitFinalAssessment: vi.fn(),
   saveFinalAssessment: vi.fn(),
@@ -185,9 +192,9 @@ describe('StudentDashboard', () => {
 
     expect(screen.getByText('Analyst')).toBeInTheDocument()
     expect(screen.getByText('Lv 3')).toBeInTheDocument()
-    // Twice on this page by design: the navbar chip is persistent across
-    // every page, and the hero meter is the dashboard's own display.
-    expect(screen.getAllByText('400 XP').length).toBe(2)
+    // Once: the hero meter is the only place XP is shown now — the old
+    // persistent navbar chip that used to repeat it is gone.
+    expect(screen.getAllByText('400 XP').length).toBe(1)
     // 550 - 400
     expect(screen.getByText(/150 XP to Specialist/)).toBeInTheDocument()
     expect(screen.getByText(/Best run so far: 9 days/)).toBeInTheDocument()
@@ -250,7 +257,7 @@ describe('StudentDashboard', () => {
     expect(screen.getByText('Trainee')).toBeInTheDocument()
     // No rankFloor / nextRankAt on the document: the meter falls back to
     // a full bar and the top-rank caption instead of throwing.
-    expect(screen.getAllByText('0 XP').length).toBe(2)
+    expect(screen.getAllByText('0 XP').length).toBe(1)
     expect(screen.getByText(/Top rank reached/)).toBeInTheDocument()
   })
 })

@@ -22,7 +22,6 @@ export const SCENE_LABELS = {
   FakePortalScene: 'Login Page',
   SearchResultsScene: 'Search Results',
   DownloadScene: 'Download Prompt',
-  FakeAlertScene: 'Pop-up Alert',
   ResearchSearchScene: 'Search Results',
   CertWarningScene: 'Browser Warning',
   FakeUpdateScene: 'Software Update',

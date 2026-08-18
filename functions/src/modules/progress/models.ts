@@ -6,6 +6,11 @@ export interface ModuleProgressDoc {
   lessonStarted: boolean
   lessonCompleted: boolean
   simulationCompleted: boolean
+  /** Set the first time a run through this module's simulation finishes
+   * with no risky choice, replays included. Replays record no decisions
+   * (so the safe/risky measurement stays the first run's), which is
+   * exactly why the badge rule needs this flag as well as the counters. */
+  simulationFlawless?: boolean
   quizCompleted: boolean
   moduleCompleted: boolean
   score: number | null

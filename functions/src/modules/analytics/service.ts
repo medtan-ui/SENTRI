@@ -19,6 +19,7 @@ import { getModuleOrThrow } from '../../shared/moduleGuards'
 import * as assessmentRepo from '../assessment/repository'
 import * as quizRepo from '../quiz/repository'
 import * as finalAssessmentRepo from '../finalAssessment/repository'
+import { BADGES } from '../gamification/catalog'
 import * as repo from './repository'
 import {
   ChoiceTextLookup,
@@ -30,6 +31,7 @@ import {
   transferAnalysis,
 } from './metrics'
 import {
+  BadgeDistributionPoint,
   CohortAnalyticsDoc,
   CohortModulePoint,
   ModuleAnalyticsDoc,
@@ -286,6 +288,7 @@ export interface CohortSources {
   responses: FirebaseFirestore.DocumentData[]
   modules: FirebaseFirestore.DocumentData[]
   roster: repo.StudentRoster
+  gamification: FirebaseFirestore.DocumentData[]
 }
 
 /**
@@ -301,15 +304,16 @@ export interface CohortSources {
  * worth of students.
  */
 export async function readCohortSources(): Promise<CohortSources> {
-  const [progress, attempts, decisions, responses, modules, roster] = await Promise.all([
+  const [progress, attempts, decisions, responses, modules, roster, gamification] = await Promise.all([
     repo.getAllModuleProgress(),
     repo.getAllQuizAttempts(),
     repo.getAllScenarioDecisions(),
     assessmentRepo.getAllResponses(),
     repo.getAllModules(),
     repo.getStudentRoster(),
+    repo.getAllGamification(),
   ])
-  return { progress, attempts, decisions, responses, modules, roster }
+  return { progress, attempts, decisions, responses, modules, roster, gamification }
 }
 
 /**
@@ -323,6 +327,43 @@ export async function readCohortSources(): Promise<CohortSources> {
  * No IO — it takes already-read documents and returns the document to
  * write, which keeps the arithmetic directly testable.
  */
+
+/**
+ * buildBadgeDistribution
+ * How many students hold each badge, and what share of the cohort that
+ * is — the "12% of players have this" line a badge shelf reads better
+ * with. Every badge in the catalog appears, including ones nobody has
+ * earned yet: a rarity list with the hard badges missing tells a student
+ * nothing about how hard they are.
+ *
+ * The denominator is the whole student roster, not the number of reward
+ * documents, so a student who has not earned anything yet still counts
+ * as someone who does not have the badge.
+ */
+export function buildBadgeDistribution(
+  gamificationDocs: FirebaseFirestore.DocumentData[],
+  totalStudents: number,
+): BadgeDistributionPoint[] {
+  const counts = new Map<string, number>()
+  gamificationDocs.forEach((doc) => {
+    const badges = Array.isArray(doc.badges) ? doc.badges : []
+    new Set(badges.filter((id: unknown): id is string => typeof id === 'string')).forEach((id) => {
+      counts.set(id, (counts.get(id) ?? 0) + 1)
+    })
+  })
+
+  return BADGES.map((badge) => {
+    const earnedCount = counts.get(badge.id) ?? 0
+    return {
+      badgeId: badge.id,
+      name: badge.name,
+      tier: badge.tier,
+      earnedCount,
+      earnedPct: totalStudents > 0 ? Math.round((earnedCount / totalStudents) * 1000) / 10 : 0,
+    }
+  })
+}
+
 export function buildCohortDoc(sources: CohortSources): CohortAnalyticsDoc {
   const { roster, modules } = sources
 
@@ -423,6 +464,7 @@ export function buildCohortDoc(sources: CohortSources): CohortAnalyticsDoc {
     topicMastery: topicMastery(responses),
     moduleBreakdown,
     completionTrend: buildCompletionTrend(progressDocs, attempts),
+    badgeDistribution: buildBadgeDistribution(sources.gamification, studentCount),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   }
 }

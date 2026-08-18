@@ -1,6 +1,6 @@
 .scene {
   width: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sketch-font);
 }
 
 .decorative {
@@ -24,9 +24,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #fdecea;
-  border: 1px solid #f0b4ac;
-  border-radius: 14px;
+  background: var(--sketch-paper-alt);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-a);
   padding: 5px 12px;
 }
 
@@ -36,7 +36,7 @@
 
 .addressText {
   font-size: 12.5px;
-  color: #9a1c0f;
+  color: var(--sketch-red);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -48,7 +48,7 @@
   left: 0;
   right: 0;
   z-index: 20;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--sketch-shadow-sm);
 }
 
 /* ── Interstitial page ── */
@@ -69,13 +69,13 @@
 .title {
   font-size: 19px;
   font-weight: 700;
-  color: #26282c;
+  color: var(--sketch-ink);
   margin-bottom: var(--space-3);
 }
 
 .body {
   font-size: 13px;
-  color: #4a4e56;
+  color: var(--sketch-ink);
   line-height: 1.6;
   max-width: 380px;
   margin-bottom: var(--space-5);
@@ -84,9 +84,9 @@
 .errorCode {
   display: inline-block;
   margin-top: 6px;
-  font-family: 'Courier New', monospace;
+  font-family: var(--sketch-font);
   font-size: 11.5px;
-  color: #8a8f98;
+  color: var(--sketch-ink-soft);
 }
 
 .backBtnWrap {
@@ -102,17 +102,18 @@
   text-align: center;
   font-size: 13.5px;
   font-weight: 700;
-  color: #fff;
-  background: #2e5fa3;
+  color: var(--sketch-paper);
+  background: var(--sketch-blue);
   padding: 10px 0;
-  border-radius: 6px;
+  border-radius: var(--sketch-radius-b);
+  border: 2px solid var(--sketch-line);
 }
 
 .plainToggle {
   border: none;
   background: none;
   font-size: 12.5px;
-  color: #5a5f68;
+  color: var(--sketch-ink);
   padding: 4px;
 }
 
@@ -128,14 +129,14 @@
 .advancedLink {
   display: inline-block;
   font-size: 12.5px;
-  color: #2e5fa3;
+  color: var(--sketch-blue);
   text-decoration: underline;
 }
 
 .certDetails {
-  background: #f7f8f9;
-  border: 1px solid #e2e4e8;
-  border-radius: 6px;
+  background: var(--sketch-paper);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-b);
   padding: var(--space-3);
   text-align: left;
 }
@@ -143,14 +144,14 @@
 .certTitle {
   font-size: 12px;
   font-weight: 700;
-  color: #c0392b;
+  color: var(--sketch-red);
   margin-bottom: 4px;
 }
 
 .certText {
   font-size: 11.5px;
-  color: #4a4e56;
-  font-family: 'Courier New', monospace;
+  color: var(--sketch-ink);
+  font-family: var(--sketch-font);
   line-height: 1.5;
 }
 
