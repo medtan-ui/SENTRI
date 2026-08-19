@@ -1,6 +1,56 @@
 # SENTRI: Capstone Paper vs Built System, Alignment Review
 
-*Written from direct inspection of the code at commit `bdd539b` (branch `main`) against MergedSentri.pdf, Chapters 1 to 3. Adviser-style review: what a panelist will catch, and what to do about it.*
+*Adviser-style review: what a panelist will catch, and what to do about it.*
+
+*Revision 1 written against commit `bdd539b`. **Revision 2 (2026-08-19) re-verified against commit `09ce937`**, three commits later, with the frontend and backend unit suites re-run. Compared against MergedSentri.pdf, Chapters 1 to 3, as reviewed in Revision 1; if the paper has been revised since, re-check the items marked STANDING against the current draft.*
+
+---
+
+## Revision 2 delta, 2026-08-19
+
+Three commits landed since Revision 1 (`cd80adf`, `49df8a8`, `09ce937`). Re-verified by reading the diffs and re-running the suites: **frontend 97 passed, backend unit 138 passed, Cloud Functions typecheck clean.** Backend integration was 66 at the last recorded run; emulators were not started for this pass, so treat roughly 301 as the working total and re-run all three before printing a number.
+
+Note that `SENTRI_Progress_Report.md` was last updated on 2026-08-07 and **predates commit `09ce937`**. Its scenario table still lists a malware "fake alert pop-up" scenario that no longer exists. Do not paste that table into the paper.
+
+### What got better for the paper
+
+**R2-1. Answer keys no longer reach a student's item-bank read.** This is the single largest change since Revision 1, and it closes a hole the old rules file documented as an accepted tradeoff. Three new callables (`getQuizForStudent`, `getAssessmentForStudent`, `getFinalAssessmentForStudent`) return questions and choices with `correctChoiceId` and `explanation` stripped, and `firestore.rules` now denies students a direct read of `moduleQuizzes`, `modulePretests`, and `finalAssessment`. Add this to Chapter 3 and to your ISO Security discussion.
+
+**State the caveat yourself, because it is findable.** The default seed content for all three banks still ships inside the client JavaScript bundle. Verified in the current build: `dist/assets/quizService-*.js` carries the quiz items and their keys, and `dist/assets/modulePretestContent-*.js` carries the pre-test bank. So the defensible claim is that grading is authoritative server-side and a score cannot be forged, and that the live item bank is never served to a student. It is not that a student cannot see an answer key. The seeded key also stops being the live key the moment an admin edits an item. If you want the stronger claim, the seed content has to move server-side.
+
+**R2-2. Replays record nothing, which protects your Kirkpatrick Level 3 measurement.** A student who re-enters a simulation they already finished runs it as practice: no decision records are written, so first-attempt safe rate, consequence trigger rate and time-to-decide stay the measurement of the first real attempt. The "First try" ribbon is suppressed and the closing card says the run was practice. A clean replay still earns its badge, through a separate `simulationFlawless` flag on the progress document rather than through the analytics. This is the answer to "what stops a student replaying until their safe rate looks good", and it deserves a sentence in 3.6.
+
+**R2-3. Distractor analysis was added to item analysis.** Every item now reports how answers distributed across its choices, commonest first, with the choice text a student actually read, and the key marked. The key is taken from the response rows rather than from the bank, so an item edited after students answered it still reports against the key that was in force at answer time. There is a sixth CSV export for it. This is standard educational-measurement practice and gives you another defensible table in 3.6: a distractor nobody picks is dead weight in the item, and one that outdraws the key is usually a wording problem rather than a knowledge gap.
+
+**R2-4. Simulation completion is recorded on reaching the end**, not on pressing Continue to Quiz. A student who finished every scene and then navigated away previously had no record of finishing and was sent back through it.
+
+**R2-5. Badge rarity** (how many students hold each badge, and what share of the roster that is) is now computed in the cohort rollup and shown on a student's own badge shelf.
+
+**R2-6. Consequence video slots per risky choice**, plus a rule that the Try Again button stays locked until a configured clip finishes rather than unlocking after five seconds. That is a third video slot type alongside the lesson video and the scenario opening clip, so the video production list is longer than Chapter 3 currently implies.
+
+**R2-7. The live item banks were backfilled with topic tags.** Sixty questions across twelve live documents had no `topic` field, which silently disabled per-topic mastery and item-level transfer analysis entirely. Fixed on 2026-08-07 and verified, so `public-wifi` now genuinely spans safe-browsing and online-safety. One residual: `quizResponses` rows written before the backfill stay untagged, so any response data collected before 2026-08-07 cannot contribute to topic mastery.
+
+### New problems the paper has to absorb
+
+**R2-8. The scenario count changed. There are 16 scenes, not 17.** Malware Awareness went from three scenarios to two: `FakeAlertScene`, the scareware pop-up, was deleted outright, and Scenario 1 gained a second safe choice (run a site safety check). Current counts: password-security 3, phishing-awareness 2, malware-awareness 2, safe-browsing 3, data-privacy 3, online-safety 3. **If any Chapter 3 storyboard depicts the malware fake-alert scene, that figure no longer matches the system.**
+
+**R2-9. A live content defect: the malware lesson promises a scenario that was deleted.** `src/data/moduleContent/malwareAwareness.js` still reads "Scareware is the trap embedded in the next scenario." There is no next scenario for it. A student reads a promise the system does not keep, and a panelist clicking through will hit it. This is a code and content fix rather than a paper fix, and it should be done before the defense. Either restore the scene or rewrite that paragraph so it teaches scareware without forward-referencing a simulation.
+
+**R2-10. The phishing storyboard changed pedagogy and naming.** Scenario 1's safe path moved from "inspect the sender, then report the email" to "message the instructor on Campus Chat to check whether they posted it", which is out-of-band verification through a channel the attacker does not control. The fictional platform is now "ClassDeck" rather than a generic student portal. This is a better lesson, but any figure, storyboard, or narrative in Chapter 3 describing the old flow is now stale. Check the phishing storyboards specifically.
+
+**R2-11. Stored scenario edits from before this change were discarded.** `SCENARIO_CONTENT_VERSION` went from 2 to 3, and a stored document at the old version is now ignored and overwritten rather than layered over the new config. Any admin edits made to the phishing or malware scenario text before commit `09ce937` are gone. Worth knowing if someone remembers editing something that has since reverted.
+
+**R2-12. The replay-suppression path and `simulationFlawless` have no test coverage.** Checked: zero occurrences in `functions/test/unit/gamification.rewards.test.ts` and `test/scenarioService.test.js`. Everything else on that seam is tested; these two are not, and they are precisely the mechanism that protects your Level 3 numbers. If a technical panelist asks how you know replays do not contaminate the behavioural data, the honest answer today is that it is implemented and untested. One unit test on `totalsFrom` with `simulationFlawless` set, and one asserting the engine writes no decision on a replay, would close it.
+
+**R2-13. Field names in the ERD may be stale.** The camelCase migration renamed `quiz_responses` to `quizResponses`, `scenario_decision_records` to `scenarioDecisionRecords`, and every snake_case attribute on scenario configs, decision records and progress documents (`is_safe_choice` to `isSafeChoice`, `pretestScore` to `preTestScore`). If Figure 3.12 or its narrative shows any snake_case attribute, it no longer matches the database.
+
+**R2-14. B8 is now settled, not open.** Section segmentation is definitively removed and recorded as a deliberate reversal. Delete "section assignment" from the ERD narrative, and do not describe it as future work either, unless you intend to rebuild it.
+
+### Prompts to add to the Part E set
+
+11. *"Here is my Chapter 3 section on system security. Rewrite it to include the server-side answer-key stripping described in SYSTEM FACTS: three callables that return questions without the correct answer or explanation, and Firestore rules that deny students a direct read of the three item-bank collections. Include, as a stated limitation, that the default seeded item content still ships in the client JavaScript bundle, so the claim is server-side grading integrity rather than an unreachable answer key."*
+
+12. *"Add a paragraph to Section 3.6 Data Analysis explaining two safeguards on the behavioural data: first, that only a student's initial run through each simulation is recorded, because replays deliberately write no decision records, so first-attempt safe rate measures the first real attempt; and second, that every decision record carries an attempt number, so an eventual-success rate cannot be mistaken for a first-attempt rate. Then add distractor analysis to the item-analysis discussion: how answers distributed across each item's choices, with the key marked, used to identify dead distractors and items whose wording draws students away from the key."*
 
 ---
 
@@ -38,7 +88,7 @@ Paper says otherwise in at least five places:
 Meanwhile Chapter 3 says the opposite, correctly. Fix Chapters 1 and 2 to match Chapter 3. Correct phrasing: completion and unlocking are triggered by submitting the module quiz, and the recorded score is used for analytics and the student's own record rather than as a gate. The only pass threshold in the system is on the final assessment (75 percent).
 
 **B2. The post-test is one end-of-curriculum final assessment, not a per-module or external post-test.**
-Code: `modules/finalAssessment`. Eighteen items, three drawn from each module's five-item pre-test bank, `passingScore: 75`, `attemptsAllowed: 2`, `timeLimitMinutes: 30` (not enforced, see B11), unlocks only when all six modules are complete, re-checked inside the transaction. Six per-module post-tests were deliberately removed.
+Code: `modules/finalAssessment`. Eighteen items, three drawn from each module's five-item pre-test bank, `passingScore: 75`, `attemptsAllowed: 2`, no time limit (see B11), unlocks only when all six modules are complete, re-checked inside the transaction. Six per-module post-tests were deliberately removed.
 Paper: 1.6 Post-test, 3.3 Research Instruments, 3.5 steps 7 and 9, and 3.6 all describe a post-test administered by the researchers after module completion. Rewrite all four to describe the in-system final assessment. Chapter 3's ERD narrative and activity diagram already have it right.
 
 **B3. There are six per-module pre-tests, not one pre-test before system use.**
@@ -69,7 +119,7 @@ Every lesson has `videoId: ''` and every scenario has `videoAvailable: false, ma
 
 **B10. Self-registration vs system-provided accounts.** The use case narrative says students "log in using a system-provided account", but `registerStudentAccount` is a deliberately public callable, `/register` exists, and 1.5 says students can register. Both paths are real (admin-created accounts get `mustChangePassword: true`). Say so in one place and make 1.5, the use case, and the IPO diagram agree.
 
-**B11. Time limits are configured but never enforced.** `timeLimitMinutes` exists on quiz settings (default 15) and the final assessment (30), but there is no countdown component and no server-side cutoff. Do not describe a timed assessment.
+**B11. RESOLVED in code (2026-08-07).** `timeLimitMinutes` was removed entirely from both zod schemas, both TypeScript models, the quiz and final assessment seeds, the JSDoc typedef, and both admin editors. Nothing in the system counts down and no setting implies otherwise. The paper must simply not mention a time limit. The Quiz Summary card's "Estimated Completion Time" survives as an authoring aid and is not a limit.
 
 **B12. Figure 3.4 (DFD) is stale relative to the ERD.** Four processes and one "System DB" cannot represent scenario decision capture, the gamification layer, the final assessment, or the nightly aggregation, all of which the ERD does represent. Either redraw the Level 1 with those processes and data stores, or state its abstraction level explicitly so the mismatch reads as deliberate.
 
@@ -254,7 +304,8 @@ CURRICULUM
 - Per module: one 5-item pre-test (once, ungraded, gates the lesson), lesson
   content with required reading sections, an interactive branching scenario
   simulation, and a graded quiz.
-- 17 scenarios total across the six modules (3 each except phishing, which has 2).
+- 16 scenarios total: password-security 3, phishing-awareness 2, malware-awareness 2,
+  safe-browsing 3, data-privacy 3, online-safety 3.
 - Scenario engine is video-pause-interact-branch: students act on realistic
   interface elements rather than picking from a menu, get an in-context
   consequence for a risky choice, and always eventually reach the safe outcome.
@@ -279,10 +330,18 @@ ASSESSMENTS
   the same instrument items), passing score 75, 2 attempts allowed, unlocks
   only when all six modules are complete. Its per-question rows are written
   under the 'posttest' type so pre/post item analysis compares identical items.
-- Time limits are configurable but NOT enforced. There is no countdown and no
-  server-side cutoff. Do not describe any assessment as timed.
+- There are NO time limits anywhere. The setting was removed entirely on
+  2026-08-07. Nothing counts down. Do not describe any assessment as timed.
 - All grading is server-side. The client sends question-to-choice answers only,
-  never a score, and the correct answer never leaves the server.
+  never a score.
+- Answer keys are stripped server-side for student reads. Three callables
+  (getQuizForStudent, getAssessmentForStudent, getFinalAssessmentForStudent)
+  return questions and choices without correctChoiceId or explanation, and the
+  Firestore rules now deny students a direct read of moduleQuizzes,
+  modulePretests, and finalAssessment. Precise caveat: the DEFAULT SEED content
+  for all three banks still ships inside the client JavaScript bundle, so the
+  seeded answer key is technically discoverable there until an admin edits an
+  item. Claim server-side grading integrity, not that the key is unreachable.
 
 LEARNING ANALYTICS (all computed server-side, never in the browser)
 - Hake's normalized gain g = (post - pre) / (100 - pre), computed against the
@@ -294,6 +353,15 @@ LEARNING ANALYTICS (all computed server-side, never in the browser)
 - Classical item analysis: difficulty (p-value) and discrimination D on a 27%
   upper/lower split. D is suppressed below 10 whole attempts and displayed as
   "pending (n/10)" rather than as 0 or n/a.
+- Distractor analysis: how answers distributed across each item choices,
+  commonest first, with the choice text a student read and the key marked. The
+  key comes from the response rows, not the bank, so an item edited later still
+  reports against the key in force at answer time. Sixth CSV export.
+- Replays are not recorded. A student re-entering a simulation they already
+  finished writes no decision records, so first-attempt safe rate, consequence
+  trigger rate and time-to-decide all measure the first real attempt only. A
+  clean replay still earns its badge, through a simulationFlawless flag on the
+  progress document rather than through the analytics.
 - Kirkpatrick Level 3 behaviour: first-attempt safe rate (the engine always
   eventually lets a student through, so eventual success would read 100%
   forever; attempt_number is what makes this measurable), consequence trigger
@@ -344,12 +412,14 @@ REMOVED OR NOT BUILT (do not describe these as present)
 - Class/section segmentation was built and then removed. cohortAnalytics is now
   a single whole-cohort rollup. The users document has no section field.
 - Firebase Cloud Storage.
-- Enforced assessment time limits.
+- Assessment time limits of any kind. The setting was deleted on 2026-08-07.
 - App Check enforcement (the code path is complete but ships disabled, by
   decision, because no reCAPTCHA site key exists).
-- Video assets are not present in the code seed (every lesson videoId is empty
-  and every scenario has videoAvailable: false). VERIFY against live Firestore
-  before writing about them either way.
+- Video assets are not present in the code seed (every lesson videoId is empty,
+  every scenario has videoAvailable: false, every consequenceVideoUrl is null).
+  VERIFY against live Firestore before writing about them either way.
+- A scareware / fake security pop-up simulation. It existed and was deleted; the
+  malware lesson text still forward-references it (see R2-9).
 
 TESTING
 - Automated suite on both ends: unit tests over pure logic, integration tests
@@ -390,8 +460,9 @@ The code cannot answer these; only the live project can.
 
 1. **Are the lesson and scenario videos pasted into Module Configuration on `capstone-c0628`?** The code seeds are empty. This determines how you phrase the "animated" claim in the title and Objective 3.
 2. **How many quiz items exist per module in live Firestore?** Quiz content is authored in the admin UI, not seeded from code, so the code cannot tell you. The last written figure was 5 per module, 30 total.
-3. **Current automated test count.** Re-run both suites before citing 243.
-4. **Is Figure 3.12 (ERD) drawing the finalAssessment and finalAssessmentProgress entities** that its own narrative names?
+3. **Current automated test count.** Verified 2026-08-19 at commit 09ce937: frontend 97, backend unit 138, typecheck clean. Backend integration last recorded at 66 and not re-run in that pass. Re-run all three before citing a total.
+4. **Is Figure 3.12 (ERD) drawing the finalAssessment and finalAssessmentProgress entities** that its own narrative names, and are all its attribute names camelCase? See R2-13.
+5. **Do any Chapter 3 storyboards depict the deleted malware fake-alert scene, or the old phishing inspect-the-sender-then-report flow?** See R2-8 and R2-10.
 5. **Which ISO/IEC 25010 edition does your program require**, 2011 or 2023.
 6. **Is the app actually deployed to a public URL?** `firebase.json` has no hosting block, so `firebase deploy` currently ships functions and Firestore rules only. If Chapter 3 or the defense implies a live hosted web app, confirm where it is hosted.
 7. **Did the panel ask for class or section segmentation?** That feature was built and then removed. If they asked for it, decide now whether to restore it or to defend its removal.
