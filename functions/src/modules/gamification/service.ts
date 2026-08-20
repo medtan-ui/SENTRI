@@ -92,7 +92,14 @@ export function pointsForModule(progress: ModuleProgressDoc): number {
   let points = 0
   if (progress.preTestCompleted) points += POINTS.PRETEST
   if (progress.lessonCompleted) points += POINTS.LESSON
-  if (progress.simulationCompleted) points += POINTS.SIMULATION
+  if (progress.simulationCompleted) {
+    points += POINTS.SIMULATION
+    // Same "recompute, never increment" rule as the rest of this file:
+    // simulationFlawless is stored on the progress row itself (set once,
+    // survives a replay), so this bonus is exactly as idempotent as
+    // everything else pointsForModule reads.
+    if (progress.simulationFlawless) points += POINTS.SIMULATION_FLAWLESS_BONUS
+  }
   if (progress.quizCompleted || typeof progress.score === 'number') {
     const score = typeof progress.score === 'number' ? progress.score : 0
     points += POINTS.QUIZ_BASE + Math.round(score * POINTS.QUIZ_SCORE_MULTIPLIER)

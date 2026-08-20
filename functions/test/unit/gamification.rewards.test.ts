@@ -113,6 +113,23 @@ describe('pointsForModule', () => {
     // curriculum, scored separately by pointsForFinalAssessment.
     expect(pointsForModule(perfect)).toBe(230)
   })
+
+  it('adds the flawless-simulation bonus only when simulationFlawless is set', () => {
+    const clean = makeProgress({ simulationCompleted: true, simulationFlawless: true })
+    const messy = makeProgress({ simulationCompleted: true, simulationFlawless: false })
+    expect(pointsForModule(clean)).toBe(POINTS.SIMULATION + POINTS.SIMULATION_FLAWLESS_BONUS)
+    expect(pointsForModule(messy)).toBe(POINTS.SIMULATION)
+  })
+
+  it('never awards the flawless bonus on its own — it rides on simulationCompleted', () => {
+    // A row that somehow carries simulationFlawless without
+    // simulationCompleted (should never happen — the client only ever
+    // sets the flag alongside completion) must not pay out on the flag
+    // alone. Guards the `if (progress.simulationCompleted) { ... }` nesting
+    // rather than a flat `if (progress.simulationFlawless)` check.
+    const impossible = makeProgress({ simulationCompleted: false, simulationFlawless: true })
+    expect(pointsForModule(impossible)).toBe(0)
+  })
 })
 
 describe('pointsFrom', () => {

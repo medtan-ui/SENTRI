@@ -383,6 +383,14 @@ GAMIFICATION
 - Points derived from progress state and recomputed from scratch, never
   incremented, so a retried trigger, a granted retry, or an admin reset cannot
   inflate or strand a score.
+- Points reward both knowledge and behaviour, not just participation: the quiz
+  score contributes directly (base + up to half the percentage scored + a
+  perfect-score bonus), and finishing a module's simulation with zero risky
+  choices (simulationFlawless) now also carries its own bonus, added
+  2026-08-19. This is the answer to "why does gamification matter
+  pedagogically, not just as a retention gimmick" — the two things being
+  rewarded map onto the same Kirkpatrick Level 2 (knowledge) and Level 3
+  (behaviour) split the analytics framework already uses.
 - 7 ranks: Trainee, Cadet, Analyst, Specialist, Sentinel, Guardian, Vanguard.
 - 15 badges, unioned and never revoked once earned.
 - Daily activity streaks on Asia/Manila day boundaries.

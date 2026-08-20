@@ -24,6 +24,13 @@ export const POINTS = {
   PRETEST: 10,
   LESSON: 20,
   SIMULATION: 40,
+  /** On top of SIMULATION, for a run with zero risky choices (see
+   * ModuleProgressDoc.simulationFlawless). Leaderboard weight only — kept
+   * to half of SIMULATION, the same proportion QUIZ_PERFECT_BONUS holds
+   * against the quiz's variable component, so one flawless run moves a
+   * student roughly as much as one strong lesson does, not as much as
+   * finishing a whole module. */
+  SIMULATION_FLAWLESS_BONUS: 20,
   /** Every submitted quiz earns this much before the score bonus. */
   QUIZ_BASE: 25,
   /** Plus half the percentage scored, so a 100% quiz is worth 75. */
@@ -39,9 +46,12 @@ export const POINTS = {
 
 /**
  * Ranks, lowest first. The top threshold is deliberately just under what
- * a perfect run of all six modules yields (6 x 245 = 1470), so the last
- * rank is reachable by finishing the curriculum well rather than being
- * permanently out of reach.
+ * a perfect, flawless run of all six modules yields (6 x 250 = 1500,
+ * including the flawless-simulation bonus above), so the last rank is
+ * reachable by finishing the curriculum well rather than being
+ * permanently out of reach — and the final assessment's points still push
+ * a student past it, rather than the ladder capping out before the
+ * curriculum even ends.
  */
 export interface Rank {
   level: number
