@@ -3,7 +3,7 @@
  */
 .window {
   width: 100%;
-  max-width: 720px;
+  max-width: 1100px;
   margin: 0 auto;
   border-radius: var(--sketch-radius-a);
   overflow: hidden;
@@ -42,7 +42,7 @@
 }
 
 .navIcon {
-  font-size: 13px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
   width: 20px;
   text-align: center;
@@ -62,12 +62,12 @@
 }
 
 .lock {
-  font-size: 11px;
+  font-size: 0.9375rem;
   flex-shrink: 0;
 }
 
 .url {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   overflow: hidden;
   text-overflow: ellipsis;

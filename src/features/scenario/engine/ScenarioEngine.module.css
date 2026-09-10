@@ -1,5 +1,7 @@
 .wrap {
-  max-width: 900px;
+  width: 100%;
+  max-width: 1200px;
+  min-width: 0;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -19,7 +21,7 @@
   align-items: center;
   gap: var(--space-3);
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: clamp(22px, 2.4vw, 28px);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -28,7 +30,7 @@
    wonder whether a second pass is being written down. */
 .replayChip {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -50,7 +52,9 @@
      that corner — on the signup trio, the first card. Reserving the band
      lets the label stay a HUD chip over the stage without ever covering
      the interface it is labelling. */
-  padding-top: 38px;
+  padding: 60px 24px 24px;
+  border: 1px solid var(--color-border);
+  min-width: 0;
   transition: opacity 320ms var(--ease-out-soft);
 }
 
@@ -83,10 +87,10 @@
 
 .sceneLabel {
   position: absolute;
-  top: 0;
-  left: var(--space-3);
+  top: 14px;
+  left: 24px;
   z-index: 2;
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -131,7 +135,7 @@
 }
 
 .completeText {
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text-muted);
   line-height: 1.55;
 }
@@ -166,18 +170,19 @@
 }
 
 .scorelineLabel {
-  font-size: 12px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
 }
 
 .completeNote {
   margin-top: var(--space-3);
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--color-text-muted);
 }
 
 .actionBar {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -186,11 +191,25 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* A phone remains recognisable without leaving a full desktop-sized
+   paper field around it. Browser and multi-card scenes use the full stage. */
+.stage:has([data-device='phone']) {
+  width: min(100%, 600px);
+  align-self: center;
+}
+
+@media (max-width: 600px) {
+  .stage { padding: 56px 10px 16px; }
+  .sceneLabel { left: 12px; max-width: calc(100% - 24px); }
+  .actionBar > button { flex: 1 1 200px; min-height: 48px; }
+  .moduleTitle { flex-wrap: wrap; }
+}
+
 .backBtn {
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 13.5px;
+  font-size: 1rem;
   font-weight: 600;
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
@@ -203,9 +222,9 @@
 
 .continueBtn {
   border: none;
-  background: var(--color-gold);
+  background: var(--color-gold-dark);
   color: #fff;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 700;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-md);

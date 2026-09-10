@@ -31,11 +31,11 @@
 }
 
 .lock {
-  font-size: 11px;
+  font-size: 0.9375rem;
 }
 
 .addressText {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
 }
 
@@ -57,7 +57,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
 }
 
@@ -67,7 +67,7 @@
 }
 
 .suggestionTag {
-  font-size: 10px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-green);
   background: var(--sketch-paper-alt);
@@ -92,7 +92,7 @@
 .composeBtn {
   background: var(--sketch-blue);
   color: var(--sketch-paper);
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 700;
   text-align: center;
   padding: 8px;
@@ -110,7 +110,7 @@
 
 .folder,
 .folderActive {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   padding: 6px 8px;
   border-radius: var(--sketch-radius-b);
   color: var(--sketch-ink);
@@ -139,13 +139,13 @@
 }
 
 .toolbarIcon {
-  font-size: 15px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
 }
 
 .toolbarBtn {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--sketch-ink);
   padding: 5px 10px;
@@ -169,7 +169,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -181,24 +181,24 @@
 }
 
 .senderName {
-  font-size: 13.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
 
 .senderEmail {
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
 .subject {
-  font-size: 15px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
 
 .emailBody {
-  font-size: 13px;
+  font-size: 1.125rem;
   line-height: 1.6;
   color: var(--sketch-ink);
   display: flex;
@@ -220,7 +220,7 @@
   display: inline-block;
   background: var(--sketch-blue);
   color: var(--sketch-paper);
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   padding: 9px 20px;
   border-radius: var(--sketch-radius-b);
@@ -231,7 +231,7 @@
 .callout {
   display: inline-block;
   margin-top: 4px;
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-red);
   background: var(--sketch-paper-alt);
@@ -245,4 +245,13 @@
   top: calc(100% + 6px);
   left: 0;
   white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .mailApp { flex-direction: column; }
+  .sidebar { width: 100%; border-right: 0; border-bottom: 2px solid var(--sketch-line); }
+  .folderList { display: flex; flex-direction: row; flex-wrap: wrap; }
+  .composeBtn { display: none; }
+  .addressText, .suggestionUrl { min-width: 0; overflow-wrap: anywhere; }
+  .suggestionRow { flex-wrap: wrap; }
 }

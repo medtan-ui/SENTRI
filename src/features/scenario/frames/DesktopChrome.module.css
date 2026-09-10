@@ -3,7 +3,7 @@
  */
 .desktop {
   width: 100%;
-  max-width: 780px;
+  max-width: 1100px;
   margin: 0 auto;
   border-radius: var(--sketch-radius-a);
   overflow: hidden;
@@ -78,7 +78,7 @@
 
 .clock {
   color: var(--sketch-paper-dim);
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-variant-numeric: tabular-nums;
 }
 

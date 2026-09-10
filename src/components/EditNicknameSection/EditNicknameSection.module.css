@@ -11,14 +11,14 @@
 
 .cardTitle {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text);
 }
 
 .body {
   margin-top: var(--space-2);
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
   line-height: 1.5;
 }
@@ -40,7 +40,7 @@
   border-left: 3px solid var(--color-error);
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-error);
   width: 100%;
 }
@@ -54,7 +54,7 @@
   border-left: 3px solid var(--color-success);
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-success);
   margin-top: var(--space-3);
 }

@@ -23,14 +23,14 @@
 
 .subtitle {
   margin-top: var(--space-1);
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 
 .description {
   margin-top: var(--space-2);
   max-width: 640px;
-  font-size: 14.5px;
+  font-size: 1rem;
   line-height: 1.55;
   color: var(--color-text-muted);
 }
@@ -44,7 +44,7 @@
 }
 
 .difficultyBadge {
-  font-size: 11.5px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -56,7 +56,7 @@
 .difficultyBadge[data-difficulty="advanced"]     { background: var(--color-error-bg); color: var(--color-error); }
 
 .timeBadge {
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
@@ -82,7 +82,7 @@
 }
 
 .progressLabel {
-  font-size: 12px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-success);
   text-align: right;
@@ -113,7 +113,7 @@
 
 .blockHeading {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--space-4);
@@ -126,7 +126,7 @@
   flex-direction: column;
   gap: var(--space-2);
   padding-left: var(--space-5);
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--color-text);
   line-height: 1.55;
 }
@@ -148,13 +148,13 @@
 }
 
 .referenceTitle {
-  font-size: 13.5px;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--color-text);
 }
 
 .referenceLink {
-  font-size: 12px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
   word-break: break-all;
   margin-top: 2px;
@@ -178,7 +178,7 @@
 
 .sectionCount {
   display: inline-block;
-  font-size: 11.5px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -190,7 +190,7 @@
 
 .requiredBadge {
   display: inline-block;
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -210,7 +210,7 @@
 }
 
 .sectionContent {
-  font-size: 15px;
+  font-size: 1rem;
   line-height: 1.85;
   color: var(--color-text);
   white-space: pre-wrap;
@@ -231,7 +231,7 @@
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
-  font-size: 13px;
+  font-size: 0.9375rem;
   line-height: 1.5;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-sm);
@@ -273,7 +273,7 @@
 
 .sidebarHeading {
   font-family: var(--font-display);
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -298,7 +298,7 @@
   border: none;
   background: transparent;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
@@ -324,7 +324,7 @@
   justify-content: center;
   border-radius: 50%;
   background: var(--color-border);
-  font-size: 10px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-text-muted);
 }
@@ -335,7 +335,7 @@
 }
 
 .currentSectionText {
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text);
   line-height: 1.5;
 }
@@ -349,7 +349,7 @@
   border-radius: 50%;
   background: var(--color-gold);
   color: var(--color-white);
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   margin-right: 4px;
 }
@@ -372,7 +372,7 @@
 }
 
 .loadingLabel {
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 

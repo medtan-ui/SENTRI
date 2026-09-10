@@ -31,7 +31,7 @@
 }
 
 .body {
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text-muted);
   line-height: 1.55;
   margin-bottom: var(--space-5);
@@ -42,7 +42,7 @@
   text-align: left;
   border-radius: var(--radius-sm);
   padding: var(--space-3) var(--space-4);
-  font-size: 13.5px;
+  font-size: 1rem;
   margin-bottom: var(--space-5);
 }
 
@@ -69,7 +69,7 @@
 .signOutLink {
   background: none;
   border: none;
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
   cursor: pointer;
   padding: var(--space-2);

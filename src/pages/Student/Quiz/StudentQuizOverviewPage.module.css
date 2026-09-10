@@ -17,7 +17,7 @@
 
 .subtitle {
   margin-top: var(--space-1);
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 
@@ -59,19 +59,19 @@
 
 .rowTitle {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text);
 }
 
 .rowMeta {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
 .badgeDone {
-  font-size: 12px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-success);
   background: var(--color-success-bg);
@@ -81,7 +81,7 @@
 }
 
 .badgeLocked {
-  font-size: 12px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-text-muted);
   background: var(--color-bg);

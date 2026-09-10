@@ -1,4 +1,6 @@
 .btn {
+  min-height: 44px;
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -9,7 +11,7 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   transition: background var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
-  white-space: nowrap;
+  white-space: normal;
   cursor: pointer;
 }
 
@@ -21,7 +23,7 @@
 
 /* ── Variants ── */
 .primary {
-  background: var(--color-gold);
+  background: var(--color-gold-dark);
   color: var(--color-white);
   box-shadow: var(--shadow-button);
 }
@@ -53,9 +55,9 @@
 }
 
 /* ── Sizes ── */
-.sm  { padding: 6px 14px;  font-size: 13px; }
-.md  { padding: 10px 20px; font-size: 14px; }
-.lg  { padding: 13px 28px; font-size: 15px; }
+.sm  { padding: 6px 14px;  font-size: 0.9375rem; }
+.md  { padding: 10px 20px; font-size: 1rem; }
+.lg  { padding: 13px 28px; font-size: 1rem; }
 
 /* ── Modifiers ── */
 .fullWidth { width: 100%; }

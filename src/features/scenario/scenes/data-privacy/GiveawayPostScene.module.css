@@ -10,7 +10,7 @@
 
 .feedHeader {
   padding: 12px 14px;
-  font-size: 14px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
   border-bottom: 2px solid var(--sketch-line);
@@ -40,20 +40,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 
 .accountName {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
 
 .postTime {
-  font-size: 11px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
   margin-left: -2px;
 }
@@ -68,7 +68,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 15px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
 }
 
@@ -87,12 +87,12 @@
 .moreMenuItem {
   display: block;
   padding: 10px 14px;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
 }
 
 .postText {
-  font-size: 13px;
+  font-size: 1.125rem;
   line-height: 1.5;
   color: var(--sketch-ink);
   margin-bottom: 10px;
@@ -121,7 +121,7 @@
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-blue);
@@ -135,7 +135,7 @@
   justify-content: space-around;
   padding-top: 8px;
   border-top: 2px solid var(--sketch-line);
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
@@ -147,7 +147,7 @@
 .backBtn {
   border: none;
   background: none;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--sketch-blue);
   padding: 6px 0;
@@ -176,13 +176,13 @@
 }
 
 .profileName {
-  font-size: 14px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
 
 .noBadge {
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-red);
   background: var(--sketch-paper-alt);
@@ -195,7 +195,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
 }
 
@@ -204,4 +204,9 @@
   border: 2px solid var(--sketch-line);
   border-radius: var(--sketch-radius-b);
   padding: 10px 12px;
+}
+
+@media (max-width: 480px) {
+  .postHeader { flex-wrap: wrap; }
+  .accountName { overflow-wrap: anywhere; }
 }

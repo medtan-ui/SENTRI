@@ -14,8 +14,9 @@
 
 .main {
   flex: 1;
+  min-width: 0;
   margin-top: var(--navbar-height);
-  padding: var(--space-8);
+  padding: clamp(20px, 2.5vw, 40px);
   /* On desktop, push content right of the sidebar */
   margin-left: var(--sidebar-width);
   min-height: calc(100vh - var(--navbar-height));
@@ -26,6 +27,6 @@
   .main {
     /* On mobile the sidebar overlays, so no left margin */
     margin-left: 0;
-    padding: var(--space-5);
+    padding: 20px 16px;
   }
 }

@@ -17,7 +17,7 @@
 
 .subtitle {
   margin-top: var(--space-1);
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 
@@ -57,13 +57,13 @@
 
 .fullName {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
 .email {
   margin-top: 2px;
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 
@@ -74,7 +74,7 @@
 }
 
 .roleBadge {
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -86,7 +86,7 @@
 }
 
 .verifiedBadge, .unverifiedBadge {
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   padding: 4px 12px;
   border-radius: var(--radius-full);
@@ -124,7 +124,7 @@
 
 .statLabel {
   margin-top: var(--space-2);
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
@@ -134,7 +134,7 @@
 
 .cardTitle {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: var(--space-4);
@@ -165,13 +165,13 @@
 }
 
 .countTag {
-  font-size: 12px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-muted);
 }
 
 .emptyText {
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
@@ -189,7 +189,7 @@
   background: var(--color-bg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
-  font-size: 13px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--color-text);
   cursor: pointer;

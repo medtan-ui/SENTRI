@@ -28,7 +28,7 @@
 }
 
 .headerTitle {
-  font-size: 14px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
@@ -40,14 +40,14 @@
 }
 
 .intro {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   line-height: 1.5;
   margin-bottom: var(--space-4);
 }
 
 .fieldLabel {
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--sketch-ink-soft);
   margin-bottom: 4px;
@@ -56,7 +56,7 @@
 
 .input {
   width: 100%;
-  font-size: 13.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   background: var(--sketch-paper);
   border: 2px solid var(--sketch-line);
@@ -71,7 +71,7 @@
 
 .warning {
   display: block;
-  font-size: 11px;
+  font-size: 0.9375rem;
   color: var(--sketch-red);
   margin-top: var(--space-2);
 }
@@ -86,7 +86,7 @@
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 13.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-blue);

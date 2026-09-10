@@ -33,7 +33,7 @@
 }
 
 .threadTitle {
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
@@ -58,7 +58,7 @@
 .bubbleReceived,
 .bubbleSent {
   max-width: 78%;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   line-height: 1.5;
   padding: 9px 12px;
   border-radius: var(--sketch-radius-a);
@@ -88,7 +88,7 @@
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--sketch-blue);
   background: var(--sketch-paper);
@@ -106,7 +106,7 @@
 
 .inputPlaceholder {
   flex: 1;
-  font-size: 12px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
   background: var(--sketch-paper-alt);
   border: 2px solid var(--sketch-line);
@@ -115,6 +115,6 @@
 }
 
 .sendIcon {
-  font-size: 15px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
 }

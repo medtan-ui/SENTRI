@@ -101,6 +101,9 @@ export default function ScenarioEngine({
             edge of the stage so the rest of SENTRI keeps its own look.
             See features/scenario/styles/sketch.css. */}
         <div className={`${styles.stage} sketchStage`} data-phase={state}>
+          {showScene && SceneComponent && (
+            <span className={styles.sceneLabel}>{sceneLabelFor(currentScenario.scene)}</span>
+          )}
           {(state === 'loading' || state === 'playing') && (
             <div className={styles.layer} key={`player-${scenarioIndex}`}>
               {/* onStart is what turns the clip into a held beat: passed
@@ -122,7 +125,6 @@ export default function ScenarioEngine({
                animation. Without the key the element persists and the
                new scene simply pops into the old box. */
             <div className={styles.layer} key={`scene-${scenarioIndex}`}>
-              <span className={styles.sceneLabel}>{sceneLabelFor(currentScenario.scene)}</span>
               <SceneComponent
                 scenario={currentScenario}
                 interactive={state === 'paused_interactive'}

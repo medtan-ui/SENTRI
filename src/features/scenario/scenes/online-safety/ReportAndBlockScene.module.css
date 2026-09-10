@@ -16,7 +16,7 @@
 
 .screenshotPill {
   display: block;
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--sketch-ink);
   background: var(--sketch-paper-alt);
@@ -48,7 +48,7 @@
 
 .headerTitle {
   flex: 1;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
@@ -63,7 +63,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 15px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
 }
 
@@ -82,14 +82,14 @@
 .moreMenuItem {
   display: block;
   padding: 10px 14px;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   white-space: nowrap;
 }
 
 .warningBanner {
   margin: 10px 14px 0;
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   color: var(--sketch-red);
   background: var(--sketch-paper-alt);
   border: 2px solid var(--sketch-line);
@@ -126,12 +126,12 @@
 }
 
 .profileMeta {
-  font-size: 11px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
 .sectionLabel {
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-ink-soft);
   text-transform: uppercase;
@@ -142,7 +142,7 @@
 
 .unavailableBox,
 .conversationPreview {
-  font-size: 12px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink);
   background: var(--sketch-paper);
   border: 2px solid var(--sketch-line);
@@ -158,7 +158,7 @@
 
 .commentInput {
   width: 100%;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   background: var(--sketch-paper);
   border: 2px solid var(--sketch-line);
@@ -175,11 +175,15 @@
 
 .postBtn {
   display: block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-blue);
   padding: 8px 18px;
   border-radius: var(--sketch-radius-b);
   border: 2px solid var(--sketch-line);
+}
+
+@media (max-width: 480px) {
+  .header { flex-wrap: wrap; gap: 8px; }
 }
