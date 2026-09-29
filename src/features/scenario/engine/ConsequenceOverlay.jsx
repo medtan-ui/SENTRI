@@ -29,6 +29,7 @@ const CONSEQUENCE_ICON = {
 export default function ConsequenceOverlay({ choice, onContinue }) {
   const icon = CONSEQUENCE_ICON[choice.consequenceType] || CONSEQUENCE_ICON.none
   const btnRef = React.useRef(null)
+  const videoUrl = choice.failVideoUrl || ''
 
   React.useEffect(() => {
     btnRef.current?.focus()
@@ -37,7 +38,18 @@ export default function ConsequenceOverlay({ choice, onContinue }) {
   return (
     <div className={styles.overlay} role="alertdialog" aria-modal="true" aria-live="assertive">
       <div className={styles.panel}>
-        {choice.feedbackMediaUrl ? (
+        {videoUrl ? (
+          <div className={styles.videoWrap}>
+            <video
+              className={styles.video}
+              src={videoUrl}
+              autoPlay
+              controls
+              playsInline
+              onEnded={onContinue}
+            />
+          </div>
+        ) : choice.feedbackMediaUrl ? (
           <img className={styles.media} src={choice.feedbackMediaUrl} alt="" />
         ) : (
           <span className={styles.icon} aria-hidden="true">{icon}</span>
@@ -45,7 +57,7 @@ export default function ConsequenceOverlay({ choice, onContinue }) {
         <h3 className={styles.title}>{choice.outcomeTitle}</h3>
         <p className={styles.text}>{choice.feedbackText}</p>
         <button ref={btnRef} type="button" className={styles.continueBtn} onClick={onContinue}>
-          Continue →
+          Continue to Feedback →
         </button>
       </div>
     </div>

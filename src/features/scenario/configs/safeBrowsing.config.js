@@ -44,7 +44,8 @@ export const safeBrowsingConfig = {
           feedbackText:
             'A mass "10,000 papers, no sign-up" download from an unfamiliar .xyz domain is a common way to distribute malware or harvest whatever information you enter — a paid placement in search results says nothing about whether a site is legitimate.',
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          failVideoUrl: '/videos/module-4/module-4-fail-video.mp4',
+          consequenceVideoUrl: '/videos/module-4/module-4-after-fail-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'sb-01-b',

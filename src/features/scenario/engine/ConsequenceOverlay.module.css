@@ -15,13 +15,31 @@
    behind the backdrop by 90ms is what makes it read as arriving. */
 .panel {
   width: 100%;
-  max-width: 420px;
+  max-width: 540px;
   animation: sentriRise 380ms var(--ease-out-soft) 90ms both;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
+}
+
+.videoWrap {
+  width: 100%;
+  max-width: 520px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  background: #000;
+  margin-bottom: var(--space-2);
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 320px;
+  object-fit: contain;
 }
 
 .icon {

@@ -192,15 +192,25 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     [state, currentScenario, userId, config.moduleId, attemptCount, isReplay],
   )
 
-  // ── resolving -> feedback (both safe and risky go straight there) ──
+  // ── resolving -> consequence (if failVideoUrl exists) or feedback ──
   useEffect(() => {
     if (state !== 'resolving' || !selectedChoice) return undefined
     const t = setTimeout(() => {
-      if (!selectedChoice.isSafeChoice) setAttemptCount((n) => n + 1)
+      if (!selectedChoice.isSafeChoice) {
+        setAttemptCount((n) => n + 1)
+        if (selectedChoice.failVideoUrl) {
+          setState('consequence')
+          return
+        }
+      }
       setState('feedback')
     }, RESOLVING_MS)
     return () => clearTimeout(t)
   }, [state, selectedChoice])
+
+  const acknowledgeConsequence = useCallback(() => {
+    setState('feedback')
+  }, [])
 
   const retry = useCallback(() => {
     if (!isReplay) markFeedbackViewed(currentDecisionIdRef.current)
@@ -266,6 +276,7 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     actions: {
       startScenario,
       selectChoice,
+      acknowledgeConsequence,
       retry,
       continueToNext,
     },

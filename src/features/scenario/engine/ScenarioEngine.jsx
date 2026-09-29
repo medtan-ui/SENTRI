@@ -6,6 +6,7 @@ import { ScenarioInteractionProvider } from './ScenarioInteractionContext'
 import { SCENE_REGISTRY } from '../scenes/sceneRegistry'
 import ScenarioProgress from './ScenarioProgress'
 import ScenarioPlayer from './ScenarioPlayer'
+import ConsequenceOverlay from './ConsequenceOverlay'
 import FeedbackPanel from './FeedbackPanel'
 import { sceneLabelFor } from './sceneLabels'
 import '../styles/sketch.css'
@@ -75,7 +76,7 @@ export default function ScenarioEngine({
   }, [state, cleanCalls, totalScenarios, onSimulationComplete])
 
   const SceneComponent = SCENE_REGISTRY[currentScenario.scene]
-  const showScene = ['paused_interactive', 'resolving', 'feedback'].includes(state)
+  const showScene = ['paused_interactive', 'resolving', 'consequence', 'feedback'].includes(state)
 
   return (
     <ScenarioInteractionProvider value={interaction}>
@@ -131,6 +132,13 @@ export default function ScenarioEngine({
                 onResolve={actions.selectChoice}
               />
             </div>
+          )}
+
+          {state === 'consequence' && selectedChoice && (
+            <ConsequenceOverlay
+              choice={selectedChoice}
+              onContinue={actions.acknowledgeConsequence}
+            />
           )}
 
           {state === 'feedback' && selectedChoice && (

@@ -36,13 +36,9 @@ const COLLECTION = 'moduleScenarios'
 
 /** Bumped whenever the persisted scenario shape changes incompatibly.
  *
- * v3: the phishing module's safe path moved from reporting the email to
- * verifying with the instructor, and the malware module lost a scenario
- * and gained a site-check choice. Stored text written against v2 names
- * elements those scenes no longer have, so a v2 document has to be
- * treated as stale rather than layered over the new config — see
- * mergeScenarioConfig. */
-export const SCENARIO_CONTENT_VERSION = 3
+ * v4: Module videos wired to per-module folders in public/videos/ (module-1, module-3, module-4).
+ * Stored v3 documents with null consequenceVideoUrl are refreshed to authored videos. */
+export const SCENARIO_CONTENT_VERSION = 4
 
 /** Scenario-level fields an admin may edit. Everything else is structural. */
 export const EDITABLE_SCENARIO_FIELDS = [
@@ -62,6 +58,8 @@ export const EDITABLE_CHOICE_FIELDS = [
   'feedbackText',
   'feedbackMediaUrl',
   'consequenceVideoUrl',
+  'failVideoUrl',
+  'tutorialVideoUrl',
 ]
 
 /** The consequence types ConsequenceOverlay knows how to illustrate. */
@@ -100,7 +98,9 @@ function overlay(base, stored, fields) {
   const result = { ...base }
   fields.forEach((field) => {
     const value = stored[field]
-    if (value !== undefined) result[field] = value
+    if (value !== undefined && ((value !== null && value !== '') || !base[field])) {
+      result[field] = value
+    }
   })
   return result
 }
