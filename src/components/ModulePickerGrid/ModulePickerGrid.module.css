@@ -17,13 +17,13 @@
 
 .subtitle {
   margin-top: var(--space-1);
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--color-text-muted);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: var(--space-5);
 }
 
@@ -57,7 +57,7 @@
 }
 
 .moduleDescription {
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text-muted);
   line-height: 1.55;
   margin-bottom: var(--space-4);

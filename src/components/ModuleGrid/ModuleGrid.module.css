@@ -1,20 +1,22 @@
 .moduleGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: var(--space-5);
 }
 
 .moduleCard {
+  min-width: 0;
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-illustrated);
+  box-shadow: var(--shadow-outline);
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
 }
 
 .moduleCard[data-locked='true'] {
-  opacity: 0.6;
+  background: #F2F0E9;
 }
 
 .moduleCardHeader {
@@ -25,8 +27,9 @@
 }
 
 .moduleIconTile {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
+  border: 1px solid currentColor;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -40,7 +43,7 @@
 }
 
 .moduleStatusBadge {
-  font-size: 10.5px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -72,14 +75,14 @@
 
 .moduleCardTitle {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-text);
 }
 
 .moduleCardDescription {
   margin-top: var(--space-1);
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--color-text-muted);
   flex: 1;
@@ -102,7 +105,7 @@
 .moduleCardPct {
   display: block;
   margin-top: 6px;
-  font-size: 11px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
 }
 
@@ -115,9 +118,9 @@
   width: 100%;
   border: none;
   border-radius: var(--radius-md);
-  background: var(--color-gold);
+  background: var(--color-gold-dark);
   color: #fff;
-  font-size: 13px;
+  font-size: 0.9375rem;
   font-weight: 700;
   padding: var(--space-3);
   box-shadow: var(--shadow-button);
@@ -147,12 +150,13 @@
    step is still the thing to do, this is only the way back to the
    reading it came from. */
 .moduleSecondary {
+  min-height: 44px;
   margin-top: var(--space-2);
   align-self: center;
   background: none;
   border: none;
   padding: 4px 6px;
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-decoration: underline;

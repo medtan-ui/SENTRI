@@ -29,7 +29,7 @@
 }
 
 .unit {
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
@@ -65,13 +65,13 @@
 }
 
 .dayLabel {
-  font-size: 10px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-light);
 }
 
 .caption {
-  font-size: 12px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
 }
 

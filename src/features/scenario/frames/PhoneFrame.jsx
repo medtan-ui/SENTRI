@@ -34,7 +34,7 @@ export default function PhoneFrame({ statusLabel = '', bottomNavSlot, children }
   }, [])
 
   return (
-    <div className={styles.bezel}>
+    <div className={styles.bezel} data-device="phone">
       <div className={styles.notch} aria-hidden="true" />
 
       <div className={styles.statusBar}>

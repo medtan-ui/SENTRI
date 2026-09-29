@@ -25,7 +25,7 @@
 .composeBtn {
   background: var(--sketch-blue);
   color: var(--sketch-paper);
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 700;
   text-align: center;
   padding: 8px;
@@ -43,7 +43,7 @@
 
 .folder,
 .folderActive {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   padding: 6px 8px;
   border-radius: var(--sketch-radius-b);
   color: var(--sketch-ink);
@@ -72,13 +72,13 @@
 }
 
 .toolbarIcon {
-  font-size: 15px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
 }
 
 .toolbarBtn {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--sketch-ink);
   padding: 5px 10px;
@@ -88,7 +88,7 @@
 
 .reportBtn {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-red);
   background: var(--sketch-paper-alt);
@@ -113,7 +113,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -127,25 +127,25 @@
 
 .senderName {
   display: inline-block;
-  font-size: 13.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-blue);
   text-decoration: underline dotted;
 }
 
 .senderFullAddress {
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
 .subject {
-  font-size: 15px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
 
 .emailBody {
-  font-size: 13px;
+  font-size: 1.125rem;
   line-height: 1.6;
   color: var(--sketch-ink);
   display: flex;
@@ -172,7 +172,7 @@
   display: inline-block;
   background: var(--sketch-blue);
   color: var(--sketch-paper);
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   padding: 9px 20px;
   border-radius: var(--sketch-radius-b);
@@ -193,7 +193,7 @@
   gap: var(--space-3);
   padding: 8px 0;
   border-bottom: 2px solid var(--sketch-line);
-  font-size: 12px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
@@ -230,7 +230,7 @@
   border-left: none;
   border-top-right-radius: 4px;
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink);
   box-shadow: var(--sketch-shadow-sm);
 }
@@ -240,7 +240,7 @@
   display: inline-block;
   margin-top: 4px;
   margin-left: 6px;
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-red);
   background: var(--sketch-paper-alt);
@@ -288,7 +288,7 @@
   border-radius: var(--radius-full);
   background: var(--sketch-paper-alt);
   color: var(--sketch-gold);
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 700;
 }
 
@@ -310,12 +310,12 @@
   height: 24px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.18);
-  font-size: 10px;
+  font-size: 0.9375rem;
   font-weight: 700;
 }
 
 .chatName {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 700;
 }
 
@@ -331,7 +331,7 @@
   max-width: 90%;
   padding: 7px 10px;
   border-radius: var(--sketch-radius-b);
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   line-height: 1.45;
 }
 
@@ -358,7 +358,7 @@
 
 .chatDraft {
   flex: 1;
-  font-size: 11px;
+  font-size: 0.9375rem;
   line-height: 1.4;
   color: var(--sketch-ink-soft);
 }
@@ -368,13 +368,13 @@
   border-radius: var(--sketch-radius-b);
   background: var(--sketch-gold);
   color: var(--sketch-paper);
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   font-weight: 700;
   border: 2px solid var(--sketch-line);
 }
 
 .onBehalf {
-  font-size: 11px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
@@ -387,4 +387,17 @@
 @keyframes inboxChatRise {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
+}
+
+/* The folder rail is decorative; on a phone it becomes a compact header
+   so the message and its actions retain the available reading width. */
+@media (max-width: 600px) {
+  .mailApp { flex-direction: column; }
+  .sidebar { width: 100%; border-right: 0; border-bottom: 2px solid var(--sketch-line); }
+  .folderList { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .composeBtn { display: none; }
+  .mailMain { padding: 14px 12px; }
+  .toolbar { flex-wrap: wrap; gap: 8px; }
+  .senderMeta { min-width: 0; overflow-wrap: anywhere; }
+  .otherEmailRow { flex-wrap: wrap; gap: 4px 10px; }
 }

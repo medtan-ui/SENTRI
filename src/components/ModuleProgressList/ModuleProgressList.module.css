@@ -12,12 +12,12 @@
 }
 
 .progressName {
-  font-size: 13px;
+  font-size: 0.9375rem;
   color: var(--color-text);
 }
 
 .progressPct {
-  font-size: 12px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-muted);
 }

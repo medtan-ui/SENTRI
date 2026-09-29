@@ -39,14 +39,14 @@
 .brandName {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 1rem;
   color: var(--color-white);
   letter-spacing: 0.06em;
   line-height: 1;
 }
 
 .brandSub {
-  font-size: 10px;
+  font-size: 0.875rem;
   color: var(--color-sidebar-text);
   letter-spacing: 0.02em;
   margin-top: 2px;
@@ -68,11 +68,11 @@
 }
 
 .navGroupTitle {
-  font-size: 10px;
+  font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: rgba(176,184,204,0.55);
+  color: #B0B8CC;
   padding: 0 12px var(--space-2);
 }
 
@@ -84,6 +84,7 @@
 }
 
 .navLink {
+  min-height: 48px;
   position: relative;
   display: flex;
   align-items: center;
@@ -91,7 +92,7 @@
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   color: var(--color-sidebar-text);
-  font-size: 13.5px;
+  font-size: 1rem;
   font-weight: 500;
   text-decoration: none;
   transition: background var(--transition-fast), color var(--transition-fast);
@@ -157,7 +158,7 @@
   border: none;
   border-radius: var(--radius-sm);
   color: var(--color-sidebar-text);
-  font-size: 13.5px;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);

@@ -37,7 +37,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -92,7 +92,7 @@
 }
 
 .text {
-  font-size: 13.5px;
+  font-size: 1rem;
   color: var(--color-text-muted);
   line-height: 1.55;
   margin-bottom: var(--space-4);
@@ -102,7 +102,7 @@
    explanation above it, since it's a different kind of note (a nudge to
    think back on what you just did, not what happens next). */
 .reflection {
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   color: var(--color-gold-dark);
   background: var(--color-gold-muted);
   border-radius: var(--radius-sm);
@@ -118,7 +118,7 @@
   gap: var(--space-2);
   background: var(--color-gold-muted);
   color: var(--color-gold-dark);
-  font-size: 12.5px;
+  font-size: 0.9375rem;
   font-weight: 600;
   padding: var(--space-3);
   border-radius: var(--radius-sm);
@@ -133,7 +133,7 @@
   border-radius: var(--radius-md);
   background: var(--color-gold);
   color: #fff;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 700;
   box-shadow: var(--shadow-button);
   transition: background var(--transition-fast);
@@ -170,4 +170,12 @@
   0%   { opacity: 0; transform: scale(0.94); }
   60%  { opacity: 1; transform: scale(1.02); }
   100% { opacity: 1; transform: scale(1); }
+}
+
+/* Feedback stays readable and scrollable, including short landscape screens. */
+.overlay { overflow-y: auto; border-radius: inherit; }
+.panel { max-width: 520px; margin-block: auto; font-family: var(--font-body); }
+@media (max-width: 600px) {
+  .overlay { padding: 24px 12px; }
+  .panel { padding: 24px 16px; }
 }

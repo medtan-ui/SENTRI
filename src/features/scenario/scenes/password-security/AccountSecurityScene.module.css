@@ -33,7 +33,7 @@
 }
 
 .panelSubtitle {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
   margin-top: 4px;
   line-height: 1.5;
@@ -69,7 +69,7 @@
 }
 
 .accountName {
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--sketch-ink);
   overflow: hidden;
@@ -79,7 +79,7 @@
 
 .changeBtn {
   display: inline-block;
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-blue);
   border: 2px solid var(--sketch-line);
@@ -113,13 +113,13 @@
 }
 
 .twoStepTitle {
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--sketch-ink);
 }
 
 .twoStepSubtitle {
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
 }
 
@@ -163,7 +163,7 @@
 
 .remindLink {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink-soft);
   text-decoration: underline;
   padding: 8px 4px;
@@ -171,11 +171,20 @@
 
 .confirmBtn {
   display: inline-block;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-blue);
   padding: 9px 20px;
   border-radius: var(--sketch-radius-b);
   border: 2px solid var(--sketch-line);
+}
+
+.panel { max-width: 680px; }
+.panelTitle { font-size: 1.375rem; }
+.accountRow, .footerRow { flex-wrap: wrap; }
+.accountName { white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .accountRow { align-items: flex-start; flex-direction: column; }
+  .panel { padding: 16px; }
 }

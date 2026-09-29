@@ -10,7 +10,7 @@
 
 .notifHeader {
   padding: 12px 14px;
-  font-size: 14px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
   border-bottom: 2px solid var(--sketch-line);
@@ -50,13 +50,13 @@
 
 .requestName {
   display: inline-block;
-  font-size: 13.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
 
 .requestMeta {
-  font-size: 11.5px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
   margin-bottom: 4px;
 }
@@ -68,7 +68,7 @@
 
 .confirmBtn {
   display: block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-blue);
@@ -85,7 +85,7 @@
 
 .backBtn {
   display: block;
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--sketch-blue);
   padding: 6px 0;
@@ -114,7 +114,7 @@
 }
 
 .profileName {
-  font-size: 14px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
 }
@@ -124,7 +124,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   margin-bottom: var(--space-5);
 }
@@ -145,7 +145,7 @@
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-red);
   background: var(--sketch-paper-alt);

@@ -42,8 +42,8 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: none;
   color: var(--color-text);
@@ -115,7 +115,7 @@
   background: var(--color-gold);
   color: var(--color-white);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,13 +123,13 @@
 }
 
 .userName {
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--color-text);
 }
 
 .roleTag {
-  font-size: 11px;
+  font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -142,4 +142,13 @@
 @media (max-width: 700px) {
   .userName { display: none; }
   .roleTag { display: none; }
+}
+
+/* Wrap long account names without pushing the page beyond its viewport. */
+.right { min-width: 0; }
+.userBadge { min-width: 0; }
+.userName { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 600px) {
+  .navbar { padding-inline: 12px; }
+  .left { gap: 8px; }
 }

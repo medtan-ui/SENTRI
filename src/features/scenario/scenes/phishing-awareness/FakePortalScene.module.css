@@ -31,11 +31,11 @@
 }
 
 .lock {
-  font-size: 11px;
+  font-size: 0.9375rem;
 }
 
 .addressText {
-  font-size: 12.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -69,14 +69,14 @@
   box-shadow: var(--sketch-shadow-sm);
   z-index: 20;
   padding: 10px 12px;
-  font-size: 12px;
+  font-size: 0.9375rem;
   color: var(--sketch-ink);
 }
 
 .backToSafetyBtn {
   display: inline-block;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 0.9375rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-green);
@@ -125,7 +125,7 @@
 }
 
 .loginTitle {
-  font-size: 14.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-ink);
   margin-bottom: var(--space-4);
@@ -134,7 +134,7 @@
 
 .fieldLabel {
   display: block;
-  font-size: 11px;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--sketch-ink-soft);
   margin-bottom: 4px;
@@ -144,7 +144,7 @@
 .emailInput,
 .passwordInput {
   width: 100%;
-  font-size: 13.5px;
+  font-size: 1.125rem;
   color: var(--sketch-ink);
   background: var(--sketch-paper);
   border: 2px solid var(--sketch-line);
@@ -164,7 +164,7 @@
 
 .emptyWarning {
   display: block;
-  font-size: 11px;
+  font-size: 0.9375rem;
   color: var(--sketch-red);
   margin-top: 4px;
 }
@@ -179,7 +179,7 @@
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 13px;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--sketch-paper);
   background: var(--sketch-blue);
@@ -197,7 +197,7 @@
 
 .forgotLink {
   display: inline-block;
-  font-size: 12px;
+  font-size: 0.9375rem;
   color: var(--sketch-blue);
   text-decoration: underline;
 }
@@ -218,7 +218,7 @@
   border-radius: var(--sketch-radius-b);
   background: var(--sketch-red);
   color: var(--sketch-paper);
-  font-size: 12.5px;
+  font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   box-shadow: var(--sketch-shadow-sm);
