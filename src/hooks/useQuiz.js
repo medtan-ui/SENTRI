@@ -27,9 +27,13 @@ export function useQuiz(moduleId) {
   const isValid = validations.length > 0 && validations.every((v) => v.isValid)
 
   const updateSettings = useCallback((patch) => {
-    setDraft((prev) => ({ ...prev, settings: { ...prev.settings, ...patch } }))
+    setDraft((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, ...patch, available: true },
+    }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
 
   const updateQuestion = useCallback((questionId, patch) => {
     setDraft((prev) => ({

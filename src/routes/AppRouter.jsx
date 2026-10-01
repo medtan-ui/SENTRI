@@ -30,8 +30,10 @@ const StudentQuizPage        = React.lazy(() => import('../pages/Student/Modules
 const StudentFinalAssessmentPage = React.lazy(() => import('../pages/Student/FinalAssessment/StudentFinalAssessmentPage'))
 const StudentQuizOverviewPage= React.lazy(() => import('../pages/Student/Quiz/StudentQuizOverviewPage'))
 const StudentProgressPage    = React.lazy(() => import('../pages/Student/Progress/StudentProgressPage'))
+const StudentLeaderboardPage = React.lazy(() => import('../pages/Student/Leaderboard/StudentLeaderboardPage'))
 const StudentProfilePage     = React.lazy(() => import('../pages/Student/Profile/StudentProfilePage'))
 const NotFound               = React.lazy(() => import('../pages/NotFound'))
+
 
 /**
  * ProtectedRoute
@@ -196,6 +198,14 @@ export default function AppRouter() {
           element={
             <ProtectedRoute requiredRole="student">
               <StudentProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/leaderboard"
+          element={
+            <ProtectedRoute requiredRole="student">
+              <StudentLeaderboardPage />
             </ProtectedRoute>
           }
         />

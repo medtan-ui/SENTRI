@@ -25,6 +25,7 @@ const STUDENT_NAV = [
     items: [
       { label: 'Progress', path: '/student/progress', icon: 'chart' },
       { label: 'Profile', path: '/student/profile', icon: 'user' },
+      { label: 'Leaderboards', path: '/student/leaderboard', icon: 'trophy' },
     ],
   },
 ]

@@ -29,7 +29,11 @@ const COLLECTION = 'moduleQuizzes'
  * @returns {Promise<import('../features/admin/quiz-config/types/quizConfigAdmin.types').QuizConfig | null>}
  */
 export async function getQuiz(moduleId) {
-  return getOrSeedDoc(COLLECTION, moduleId, getDefaultQuizConfig(moduleId))
+  const doc = await getOrSeedDoc(COLLECTION, moduleId, getDefaultQuizConfig(moduleId))
+  if (doc && doc.settings) {
+    doc.settings.available = true
+  }
+  return doc
 }
 
 async function callGetQuizForStudent(moduleId) {
@@ -52,6 +56,8 @@ async function callGetQuizForStudent(moduleId) {
  * it — this is a second, narrower read path alongside it, not a
  * replacement.
  *
+ * Quizzes are available to all students by default.
+ *
  * The Cloud Function only reads; it never seeds a missing document (that
  * default content lives in getDefaultQuizConfig, a frontend-only module —
  * duplicating it into the backend just to seed wasn't worth the drift
@@ -67,11 +73,16 @@ async function callGetQuizForStudent(moduleId) {
  *   configured yet (mirrors getQuiz's null-on-missing contract).
  */
 export async function getQuizForStudent(moduleId) {
+  const ensureAvailable = (q) => {
+    if (q && q.settings) q.settings.available = true
+    return q
+  }
   const sanitized = await callGetQuizForStudent(moduleId)
-  if (sanitized) return sanitized
+  if (sanitized) return ensureAvailable(sanitized)
   const seeded = await getQuiz(moduleId)
   if (!seeded) return null
-  return callGetQuizForStudent(moduleId)
+  const fallback = await callGetQuizForStudent(moduleId)
+  return ensureAvailable(fallback)
 }
 
 /**
@@ -79,16 +90,29 @@ export async function getQuizForStudent(moduleId) {
  * @param {object} patch
  */
 export async function updateQuiz(moduleId, patch) {
-  await mergeDoc(COLLECTION, moduleId, patch)
+  const updatedPatch = { ...patch }
+  if (updatedPatch.settings) {
+    updatedPatch.settings = { ...updatedPatch.settings, available: true }
+  }
+  await mergeDoc(COLLECTION, moduleId, updatedPatch)
 }
+
 
 /**
  * @param {string} moduleId
  * @param {object} data  Full quiz document to overwrite with.
  */
 export async function saveQuiz(moduleId, data) {
-  await overwriteDoc(COLLECTION, moduleId, data)
+  const payload = {
+    ...data,
+    settings: {
+      ...data?.settings,
+      available: true,
+    },
+  }
+  await overwriteDoc(COLLECTION, moduleId, payload)
 }
+
 
 /**
  * The original seed values — never mutated. Used by "Reset to Defaults".

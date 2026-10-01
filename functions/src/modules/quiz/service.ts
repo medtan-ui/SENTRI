@@ -53,7 +53,7 @@ export async function getQuizForStudent(moduleId: string): Promise<StudentQuizCo
   return {
     moduleId: quiz.moduleId,
     title: quiz.title,
-    settings: quiz.settings,
+    settings: { ...quiz.settings, available: true },
     questions: quiz.questions.map((q) => ({
       id: q.id,
       order: q.order,
@@ -114,11 +114,9 @@ export async function submitQuiz(
   if (!quiz) {
     throw new AppError('not-found', `Module "${moduleId}" has no quiz configured yet.`)
   }
-  if (quiz.settings.available === false) {
-    throw new AppError('failed-precondition', `The quiz for "${moduleId}" is not currently available.`)
-  }
 
   assertAnswersReferenceRealChoices(quiz, answers)
+
 
   const { perQuestionResults, correctCount, total, score } = gradeQuiz(quiz, answers, durations)
   const passed = score >= quiz.settings.passingScore

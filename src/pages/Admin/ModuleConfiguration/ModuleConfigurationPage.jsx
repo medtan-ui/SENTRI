@@ -6,13 +6,11 @@ import Button from '../../../components/Button/Button'
 import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../components/ErrorState/ErrorState'
 import { useModule } from '../../../hooks/useModule'
-import { useAssignments } from '../../../hooks/useAssignments'
 import { MODULE_CONFIG } from './mockConfigData'
 import OverviewTab from './OverviewTab'
 import LessonContentTab from './LessonEditor/LessonContentTab'
 import ScenarioTab from './ScenarioTab'
 import QuizTab from './QuizTab'
-import AssignmentsTab from './AssignmentsTab'
 import styles from './ModuleConfigurationPage.module.css'
 
 const TABS = [
@@ -20,7 +18,6 @@ const TABS = [
   { key: 'lesson', label: 'Lesson Content' },
   { key: 'scenario', label: 'Scenario' },
   { key: 'quiz', label: 'Quiz' },
-  { key: 'assignments', label: 'Assignments' },
 ]
 
 /**
@@ -29,13 +26,9 @@ const TABS = [
  * or via a module-picker page deep-linking straight to a tab
  * (?tab=scenario / ?tab=quiz — see ScenarioManagerPage/QuizManagerPage).
  * Configures one of the six fixed modules' content and settings — no
- * create/delete, and no curriculum ordering (that lives on the Modules
- * list page — see ModulesPage's reorder controls). Overview is backed by
- * useModule(), Assignments by useAssignments() (both Firestore, via
- * moduleService / assignmentService); Lesson Content, Scenario, and Quiz
- * each manage their own Firestore-backed data independently inside their
- * own tabs. This page's Save/Discard buttons cover Overview + Assignments
- * together.
+ * create/delete. Overview is backed by useModule() (Firestore, via moduleService);
+ * Lesson Content, Scenario, and Quiz each manage their own Firestore-backed data
+ * independently inside their own tabs. This page's Save/Discard buttons cover Overview.
  */
 export default function ModuleConfigurationPage() {
   const { moduleId } = useParams()
@@ -47,18 +40,17 @@ export default function ModuleConfigurationPage() {
   })
 
   const moduleHook = useModule(moduleId)
-  const assignmentsHook = useAssignments(moduleId)
 
   const config = MODULE_CONFIG[moduleId]
 
-  const dirty = moduleHook.dirty || assignmentsHook.dirty
-  const saving = moduleHook.saveState === 'saving' || assignmentsHook.saveState === 'saving'
-  const notice = moduleHook.notice || assignmentsHook.notice
+  const dirty = moduleHook.dirty
+  const saving = moduleHook.saveState === 'saving'
+  const notice = moduleHook.notice
 
   const pageStatus =
-    moduleHook.status === 'error' || assignmentsHook.status === 'error'
+    moduleHook.status === 'error'
       ? 'error'
-      : moduleHook.status === 'loading' || assignmentsHook.status === 'loading'
+      : moduleHook.status === 'loading'
         ? 'loading'
         : moduleHook.status === 'not-found'
           ? 'not-found'
@@ -79,10 +71,9 @@ export default function ModuleConfigurationPage() {
       <DashboardLayout role="admin">
         <div className={styles.page}>
           <ErrorState
-            message={moduleHook.errorMessage || assignmentsHook.errorMessage}
+            message={moduleHook.errorMessage}
             onRetry={() => {
               moduleHook.retry()
-              assignmentsHook.retry()
             }}
           />
         </div>
@@ -109,18 +100,15 @@ export default function ModuleConfigurationPage() {
   }
 
   const module = moduleHook.module
-  const assignments = assignmentsHook.assignments
 
   async function handleSave() {
-    await Promise.all([
-      moduleHook.dirty ? moduleHook.actions.save() : Promise.resolve(true),
-      assignmentsHook.dirty ? assignmentsHook.actions.save() : Promise.resolve(true),
-    ])
+    if (moduleHook.dirty) {
+      await moduleHook.actions.save()
+    }
   }
 
   function handleDiscard() {
     moduleHook.actions.cancel()
-    assignmentsHook.actions.cancel()
   }
 
   function handleBackToCurriculum() {
@@ -198,21 +186,9 @@ export default function ModuleConfigurationPage() {
           {activeTab === 'quiz' && (
             <QuizTab moduleId={module.moduleId} moduleName={module.title} quiz={config.quiz} />
           )}
-
-          {activeTab === 'assignments' && assignments && (
-            <AssignmentsTab
-              assignmentType={assignments.assignmentType}
-              selectedStudentIds={assignments.assignedStudentIds}
-              onChange={(patch) => {
-                const mapped = {}
-                if ('assignmentType' in patch) mapped.assignmentType = patch.assignmentType
-                if ('selectedStudentIds' in patch) mapped.assignedStudentIds = patch.selectedStudentIds
-                assignmentsHook.actions.updateField(mapped)
-              }}
-            />
-          )}
         </Card>
       </div>
     </DashboardLayout>
   )
 }
+

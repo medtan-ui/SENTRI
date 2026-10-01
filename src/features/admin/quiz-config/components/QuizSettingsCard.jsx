@@ -5,10 +5,10 @@ import styles from './QuizSettingsCard.module.css'
 
 /**
  * QuizSettingsCard
- * The one dedicated card for this quiz's settings — passing score,
- * instructions, and availability. There is exactly one quiz per module and
- * exactly one attempt per student, so there is nothing here to select or
- * switch between.
+ * The one dedicated card for this quiz's settings — passing score and
+ * instructions. Quizzes are available to all students by default.
+ * There is exactly one quiz per module and exactly one attempt per student,
+ * so there is nothing here to select or switch between.
  *
  * There is deliberately no time limit field. One used to sit here and be
  * saved to the quiz document, but nothing ever read it: no countdown, no
@@ -47,25 +47,7 @@ export default function QuizSettingsCard({ settings, onChange }) {
           onChange={(e) => onChange({ instructions: e.target.value })}
         />
       </div>
-
-      <div className={forms.fieldGroup}>
-        <span className={forms.fieldLabel}>Quiz Availability</span>
-        <div className={forms.toggleRow}>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={settings.available}
-            className={forms.toggleSwitch}
-            data-on={settings.available}
-            onClick={() => onChange({ available: !settings.available })}
-          >
-            <span className={forms.toggleKnob} />
-          </button>
-          <span className={forms.toggleLabel}>
-            {settings.available ? 'Available to students' : 'Not available to students'}
-          </span>
-        </div>
-      </div>
     </Card>
   )
 }
+
