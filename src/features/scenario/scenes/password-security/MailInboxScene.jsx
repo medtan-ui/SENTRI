@@ -5,8 +5,8 @@ import styles from './MailInboxScene.module.css'
 
 const FOLDERS = ['Inbox', 'Starred', 'Sent', 'Drafts', 'Trash']
 const OFFICIAL_URL = 'https://portal.university.edu.ph'
-const FAKE_SENDER = 'verification@univ-registrar-secure.com'
-const FAKE_LINK_DESTINATION = 'univ-registrar-secure.com/confirm?id=88213'
+const FAKE_SENDER = 'ver1f1cat1on@univ-registrar.com'
+const FAKE_LINK_DESTINATION = 'univ-reg1strar.com/confirm?id=88213'
 
 function findChoiceId(scenario, targetName) {
   return scenario.choices.find((c) => c.target === targetName)?.scenarioChoiceId
@@ -14,20 +14,28 @@ function findChoiceId(scenario, targetName) {
 
 /**
  * MailInboxScene — Scenario 2
- * A fake webmail client with one open email. The three real elements
- * that map to choices: the email's Verify Account button (risky), the
- * Reply button in the mail toolbar (risky), and the browser's address
- * bar — focusing it reveals a suggestion for the real portal, clicking
- * that suggestion is the safe path. No option ever describes itself in
- * a sentence; the student acts on the interface directly.
+ * A webmail client with one email.
+ * - Address bar has a red notification dot. Clicking it toggles the dropdown to reveal the official site portal.
+ * - Email body is clean and natural; only the sender email address has subtle obfuscation (ver1f1cat1on@univ-registrar.com).
+ * - Hints callouts only appear after failing once when the student manually clicks "Show Hints".
  */
-export default function MailInboxScene({ scenario, interactive, phase, onResolve }) {
+export default function MailInboxScene({ scenario, interactive, phase, guidedHintActive, onResolve }) {
   const [suggestionOpen, setSuggestionOpen] = useState(false)
-  const showCallouts = phase === 'feedback'
+  const [showHints, setShowHints] = useState(false)
+  const [hasFailedOnce, setHasFailedOnce] = useState(false)
+
+  // Track if user has failed at least once so the hints button stays permanently
+  React.useEffect(() => {
+    if (phase === 'feedback' || guidedHintActive) {
+      setHasFailedOnce(true)
+    }
+  }, [phase, guidedHintActive])
+
+  const showCallouts = hasFailedOnce && showHints
 
   function handleAddressBarActivate() {
     if (!interactive) return
-    setSuggestionOpen(true)
+    setSuggestionOpen((prev) => !prev)
   }
 
   function handleChoice(targetName) {
@@ -48,6 +56,7 @@ export default function MailInboxScene({ scenario, interactive, phase, onResolve
         <div className={styles.addressBarInner}>
           <span className={styles.lock} aria-hidden="true">🔒</span>
           <span className={styles.addressText}>campus-mail.edu.ph/inbox</span>
+          <span className={styles.redNotificationDot} title="New notification available — click to expand" />
         </div>
       </InteractiveTarget>
 
@@ -95,22 +104,39 @@ export default function MailInboxScene({ scenario, interactive, phase, onResolve
               >
                 <span className={styles.toolbarBtn}>↩ Reply</span>
               </InteractiveTarget>
+
+              {/* Show Hints button remains permanently available once failed at least once */}
+              {hasFailedOnce && (
+                <button
+                  type="button"
+                  className={styles.toggleHintsBtn}
+                  onClick={() => setShowHints((prev) => !prev)}
+                >
+                  {showHints ? 'Hide Hints 🙈' : 'Show Hints 💡'}
+                </button>
+              )}
             </div>
 
             <div className={styles.emailHeader}>
               <div className={styles.senderRow}>
                 <span className={`${styles.avatar} ${styles.decorative}`} aria-hidden="true">U</span>
                 <div className={styles.senderMeta}>
-                  <span className={`${styles.senderName} ${styles.decorative}`}>University Registrar</span>
-                  <span className={styles.senderEmail}>{FAKE_SENDER}</span>
+                  <span className={`${styles.senderName} ${styles.decorative}`}>
+                    University Registrar
+                  </span>
+                  <span className={styles.senderEmail}>
+                    {FAKE_SENDER}
+                  </span>
                   {showCallouts && (
                     <span className={styles.callout} data-pos="sender">
-                      This domain isn't the university's real domain
+                      Subtle domain mismatch: ver1f1cat1on@univ-registrar.com (not university.edu.ph)
                     </span>
                   )}
                 </div>
               </div>
-              <h3 className={`${styles.subject} ${styles.decorative}`}>University — Verification of Application</h3>
+              <h3 className={`${styles.subject} ${styles.decorative}`}>
+                University — Verification of Application
+              </h3>
             </div>
 
             <div className={`${styles.emailBody} ${styles.decorative}`}>
@@ -120,7 +146,7 @@ export default function MailInboxScene({ scenario, interactive, phase, onResolve
                 <strong>24 hours</strong> will result in suspension of your student portal access.
                 {showCallouts && (
                   <span className={styles.callout} data-pos="urgency">
-                    Urgent deadlines pressure you into acting without checking
+                    Urgent deadlines pressure you into acting without checking!
                   </span>
                 )}
               </p>
@@ -138,7 +164,7 @@ export default function MailInboxScene({ scenario, interactive, phase, onResolve
               </InteractiveTarget>
               {showCallouts && (
                 <span className={styles.callout} data-pos="link">
-                  Actually links to {FAKE_LINK_DESTINATION} — not the university
+                  Actually links to {FAKE_LINK_DESTINATION} — fake domain!
                 </span>
               )}
             </div>

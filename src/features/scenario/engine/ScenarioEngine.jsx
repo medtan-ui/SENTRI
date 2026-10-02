@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Icon from '../../../components/Icon/Icon'
 import { useAuth } from '../../../context/AuthContext'
 import { useScenarioEngine } from './useScenarioEngine'
@@ -6,6 +6,7 @@ import { ScenarioInteractionProvider } from './ScenarioInteractionContext'
 import { SCENE_REGISTRY } from '../scenes/sceneRegistry'
 import ScenarioProgress from './ScenarioProgress'
 import ScenarioPlayer from './ScenarioPlayer'
+import ScenarioContextPopup from './ScenarioContextPopup'
 import ConsequenceOverlay from './ConsequenceOverlay'
 import FeedbackPanel from './FeedbackPanel'
 import { sceneLabelFor } from './sceneLabels'
@@ -50,6 +51,7 @@ export default function ScenarioEngine({
 }) {
   const { user } = useAuth()
   const engine = useScenarioEngine(config, user?.uid || null, { isReplay })
+  const [dismissedPopupScenarioId, setDismissedPopupScenarioId] = useState(null)
 
   const {
     state,
@@ -134,6 +136,17 @@ export default function ScenarioEngine({
                 onResolve={actions.selectChoice}
               />
             </div>
+          )}
+
+          {/* Context Popup modal giving narrative background and hints after video start */}
+          {state === 'paused_interactive' && currentScenario?.contextPopup && (
+            <ScenarioContextPopup
+              open={dismissedPopupScenarioId !== currentScenario.scenarioId}
+              onClose={() => setDismissedPopupScenarioId(currentScenario.scenarioId)}
+              title={currentScenario.contextPopup.title}
+              narrative={currentScenario.contextPopup.narrative}
+              hints={currentScenario.contextPopup.hints}
+            />
           )}
 
           {state === 'consequence' && selectedChoice && (

@@ -28,6 +28,8 @@
   border: 2px solid var(--sketch-line);
   border-radius: var(--sketch-radius-a);
   padding: 5px 12px;
+  position: relative;
+  cursor: pointer;
 }
 
 .lock {
@@ -37,6 +39,22 @@
 .addressText {
   font-size: 1.125rem;
   color: var(--sketch-ink);
+  flex: 1;
+}
+
+.redNotificationDot {
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 2px var(--sketch-paper);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.85; }
 }
 
 .suggestionDropdown {
@@ -59,6 +77,7 @@
   padding: 10px 12px;
   font-size: 1.125rem;
   color: var(--sketch-ink);
+  cursor: pointer;
 }
 
 .suggestionUrl {
@@ -153,6 +172,25 @@
   border-radius: var(--sketch-radius-b);
 }
 
+.toggleHintsBtn {
+  margin-left: auto;
+  font-family: var(--sketch-font);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--sketch-paper);
+  background: #ea580c;
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-b);
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background 150ms ease, transform 100ms ease;
+}
+
+.toggleHintsBtn:hover {
+  background: #c2410c;
+  transform: translateY(-1px);
+}
+
 .senderRow {
   display: flex;
   align-items: flex-start;
@@ -189,6 +227,7 @@
 .senderEmail {
   font-size: 0.9375rem;
   color: var(--sketch-ink-soft);
+  font-family: monospace;
 }
 
 .subject {
@@ -213,7 +252,10 @@
 
 .verifyRow {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .verifyBtn {
@@ -227,7 +269,7 @@
   border: 2px solid var(--sketch-line);
 }
 
-/* ── Feedback callouts (pedagogical layer, SENTRI accent) ── */
+/* ── Feedback callouts ── */
 .callout {
   display: inline-block;
   margin-top: 4px;
@@ -238,13 +280,16 @@
   border: 2px solid var(--sketch-line);
   padding: 3px 9px;
   border-radius: 999px;
+  animation: fadeIn 200ms ease-in-out;
 }
 
 .callout[data-pos='link'] {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  white-space: nowrap;
+  margin-top: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 600px) {

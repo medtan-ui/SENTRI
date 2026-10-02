@@ -1,0 +1,156 @@
+/* ── ScenarioContextPopup — sketch-styled narrative popup ── */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 24, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  z-index: 100;
+  animation: ctxFadeIn 280ms ease-out both;
+}
+
+.popup {
+  font-family: var(--sketch-font);
+  background: var(--sketch-paper);
+  border: 3px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-a);
+  box-shadow: var(--sketch-shadow);
+  width: 100%;
+  max-width: 520px;
+  max-height: min(85vh, 640px);
+  display: flex;
+  flex-direction: column;
+  animation: ctxSlideUp 340ms ease-out both;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 2px solid var(--sketch-line);
+  background: var(--sketch-paper-alt);
+  border-radius: var(--sketch-radius-a);
+}
+
+.icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--sketch-font);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--sketch-ink);
+  line-height: 1.3;
+}
+
+.body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.narrative {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--sketch-ink);
+}
+
+/* ── Hints section ── */
+.hintsSection {
+  background: var(--sketch-paper-alt);
+  border: 2px dashed var(--sketch-ink-soft);
+  border-radius: var(--sketch-radius-b);
+  padding: var(--space-4);
+}
+
+.hintsTitle {
+  font-family: var(--sketch-font);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--sketch-ink);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hintsList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.hintItem {
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--sketch-ink);
+  padding-left: 18px;
+  position: relative;
+}
+
+.hintItem::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--sketch-blue);
+  font-weight: 700;
+}
+
+/* ── Footer / button ── */
+.footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 2px solid var(--sketch-line);
+  display: flex;
+  justify-content: center;
+}
+
+.gotItBtn {
+  font-family: var(--sketch-font);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sketch-paper);
+  background: var(--sketch-ink);
+  border: 2px solid var(--sketch-line);
+  border-radius: var(--sketch-radius-b);
+  padding: 10px 28px;
+  cursor: pointer;
+  box-shadow: var(--sketch-shadow-sm);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.gotItBtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgba(30, 27, 24, 0.85);
+}
+
+.gotItBtn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(30, 27, 24, 0.7);
+}
+
+@keyframes ctxFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ctxSlideUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 600px) {
+  .backdrop { padding: var(--space-3); }
+  .popup { max-width: 100%; }
+}

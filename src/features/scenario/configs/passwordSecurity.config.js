@@ -122,6 +122,11 @@ export const passwordSecurityConfig = {
       posterCaption: 'Something in your inbox needs a decision.',
       scene: 'MailInboxScene',
       coachTarget: 'email-verify-btn',
+      contextPopup: {
+        title: 'Warning',
+        narrative: 'Be careful, double check everything.',
+        hints: [],
+      },
       choices: [
         {
           scenarioChoiceId: 'ps-02-a',
