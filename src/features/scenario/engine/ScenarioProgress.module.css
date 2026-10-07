@@ -28,11 +28,14 @@
 }
 
 .step {
-  height: 5px;
+  height: 6px;
   width: 22px;
   border-radius: var(--radius-full);
   background: var(--color-border);
-  transition: background var(--transition-med), width var(--transition-med);
+  border: none;
+  padding: 0;
+  outline: none;
+  transition: background var(--transition-med), width var(--transition-med), transform var(--transition-fast);
 }
 
 .step[data-state='done'] {
@@ -42,6 +45,14 @@
 .step[data-state='current'] {
   width: 34px;
   background: var(--color-gold);
+}
+
+.step[data-clickable='true'] {
+  cursor: pointer;
+}
+
+.step[data-clickable='true']:hover {
+  transform: scaleY(1.4);
 }
 
 .cleanCalls {

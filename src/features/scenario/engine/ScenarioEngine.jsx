@@ -51,11 +51,12 @@ export default function ScenarioEngine({
 }) {
   const { user } = useAuth()
   const engine = useScenarioEngine(config, user?.uid || null, { isReplay })
-  const [dismissedPopupScenarioId, setDismissedPopupScenarioId] = useState(null)
+  const [dismissedPopupIds, setDismissedPopupIds] = useState([])
 
   const {
     state,
     currentScenario,
+    hasIntroClip,
     scenarioIndex,
     totalScenarios,
     completedScenarioIds,
@@ -65,6 +66,8 @@ export default function ScenarioEngine({
     guidedHintActive,
     selectedChoice,
     interaction,
+    canGoBack,
+    canGoNext,
     actions,
   } = engine
 
@@ -93,6 +96,7 @@ export default function ScenarioEngine({
             currentIndex={scenarioIndex}
             completedCount={completedScenarioIds.length}
             cleanCalls={cleanCalls}
+            onSelectScene={actions.goToScene}
           />
         </div>
 
@@ -118,6 +122,7 @@ export default function ScenarioEngine({
                 posterCaption={currentScenario.posterCaption}
                 scenarioTitle={currentScenario.scenarioTitle}
                 onStart={awaitingStart ? actions.startScenario : null}
+                isReview={completedScenarioIds.includes(currentScenario.scenarioId)}
               />
             </div>
           )}
@@ -141,8 +146,12 @@ export default function ScenarioEngine({
           {/* Context Popup modal giving narrative background and hints after video start */}
           {state === 'paused_interactive' && currentScenario?.contextPopup && (
             <ScenarioContextPopup
-              open={dismissedPopupScenarioId !== currentScenario.scenarioId}
-              onClose={() => setDismissedPopupScenarioId(currentScenario.scenarioId)}
+              open={!dismissedPopupIds.includes(currentScenario.scenarioId)}
+              onClose={() =>
+                setDismissedPopupIds((prev) =>
+                  prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
+                )
+              }
               title={currentScenario.contextPopup.title}
               narrative={currentScenario.contextPopup.narrative}
               hints={currentScenario.contextPopup.hints}
@@ -205,17 +214,56 @@ export default function ScenarioEngine({
         </div>
 
         <div className={styles.actionBar}>
-          <button type="button" className={styles.backBtn} onClick={onBackToLesson}>
-            ← Back to Lesson
-          </button>
-          <button
-            type="button"
-            className={styles.continueBtn}
-            onClick={() => onContinueToQuiz?.()}
-            disabled={state !== 'complete'}
-          >
-            Continue to Quiz →
-          </button>
+          <div className={styles.actionLeft}>
+            <button
+              type="button"
+              className={styles.backBtn}
+              onClick={onBackToLesson}
+              title="Return to lesson reading (restarts scenario progress)"
+            >
+              ← Back to Lesson
+            </button>
+            <button
+              type="button"
+              className={styles.stepBackBtn}
+              onClick={actions.goToPrevious}
+              disabled={!canGoBack}
+              title={canGoBack ? 'Go back to previous scene' : 'Already at first scene'}
+            >
+              ← Previous Scene
+            </button>
+            {hasIntroClip && showScene && (
+              <button
+                type="button"
+                className={styles.replayVideoBtn}
+                onClick={actions.replayVideo}
+                title="Watch scenario intro video again"
+              >
+                🎬 Replay Video
+              </button>
+            )}
+          </div>
+
+          <div className={styles.actionRight}>
+            {state !== 'complete' && canGoNext && (
+              <button
+                type="button"
+                className={styles.stepForwardBtn}
+                onClick={actions.goToNext}
+                title="Move forward to next completed scene"
+              >
+                Next Scene →
+              </button>
+            )}
+            <button
+              type="button"
+              className={styles.continueBtn}
+              onClick={() => onContinueToQuiz?.()}
+              disabled={state !== 'complete'}
+            >
+              Continue to Quiz →
+            </button>
+          </div>
         </div>
       </div>
     </ScenarioInteractionProvider>

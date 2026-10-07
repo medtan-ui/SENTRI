@@ -22,24 +22,37 @@ import styles from './ScenarioProgress.module.css'
  * isn't handed a zero to stare at.
  *
  * @param {{ total: number, currentIndex: number, completedCount?: number,
- *   cleanCalls?: number }} props
+ *   cleanCalls?: number, onSelectScene?: (index: number) => void }} props
  */
-export default function ScenarioProgress({ total, currentIndex, completedCount = 0, cleanCalls = 0 }) {
+export default function ScenarioProgress({
+  total,
+  currentIndex,
+  completedCount = 0,
+  cleanCalls = 0,
+  onSelectScene,
+}) {
   return (
     <div className={styles.wrap}>
       <span className={styles.label}>
         Scene <strong>{Math.min(currentIndex + 1, total)}</strong> of {total}
       </span>
 
-      <div className={styles.steps} aria-hidden="true">
+      <div className={styles.steps} aria-label="Scenario scenes">
         {Array.from({ length: total }).map((_, i) => {
           const isCompleted = i < completedCount
           const isCurrent = i === currentIndex && !isCompleted
+          const isClickable = Boolean(onSelectScene && (isCompleted || i <= completedCount))
           return (
-            <span
+            <button
               key={i}
+              type="button"
               className={styles.step}
               data-state={isCompleted ? 'done' : isCurrent ? 'current' : 'upcoming'}
+              data-clickable={isClickable}
+              onClick={isClickable ? () => onSelectScene(i) : undefined}
+              disabled={!isClickable}
+              aria-label={`Scene ${i + 1}${isCurrent ? ' (current)' : isCompleted ? ' (completed)' : ''}`}
+              title={isClickable ? `Go to Scene ${i + 1}` : `Scene ${i + 1}`}
             />
           )
         })}

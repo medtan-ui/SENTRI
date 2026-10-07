@@ -94,10 +94,21 @@ export default function FeedbackPanel({
           <div className={styles.videoWrap}>
             {videoUrl && !youTubeId ? (
               <video
+                ref={(el) => {
+                  if (el) {
+                    el.defaultMuted = false
+                    el.muted = false
+                    const playPromise = el.play()
+                    if (playPromise !== undefined) {
+                      playPromise.catch((err) => {
+                        console.warn('[FeedbackPanel] Unmuted play waiting on user interaction:', err)
+                      })
+                    }
+                  }
+                }}
                 className={styles.video}
                 src={videoUrl}
                 autoPlay
-                muted
                 playsInline
                 controls
                 onEnded={() => setClipEnded(true)}

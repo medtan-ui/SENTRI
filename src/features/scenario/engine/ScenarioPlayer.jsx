@@ -32,10 +32,26 @@ export default function ScenarioPlayer({
   posterCaption,
   scenarioTitle,
   onStart,
+  isReview = false,
 }) {
   const [clipEnded, setClipEnded] = useState(false)
   const [trackingUnavailable, setTrackingUnavailable] = useState(false)
-  const canStart = clipEnded || trackingUnavailable
+  const canStart = clipEnded || trackingUnavailable || isReview
+  const videoRef = React.useRef(null)
+
+  React.useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    video.defaultMuted = false
+    video.muted = false
+    const playPromise = video.play()
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        // If unmuted autoplay without gesture is blocked, it stays unmuted with controls available
+        console.warn('[ScenarioPlayer] Autoplay with audio waiting on user interaction:', err)
+      })
+    }
+  }, [materialUrl])
 
   if (videoAvailable && materialUrl) {
     const youTubeId = parseYouTubeId(materialUrl)
@@ -55,13 +71,11 @@ export default function ScenarioPlayer({
               onTrackingUnavailable={() => setTrackingUnavailable(true)}
             />
           ) : (
-            /* A direct file can autoplay reliably where YouTube can't,
-               but only muted — controls are what let a student hear it. */
             <video
+              ref={videoRef}
               className={styles.video}
               src={materialUrl}
               autoPlay
-              muted
               playsInline
               controls
               onEnded={() => setClipEnded(true)}
@@ -73,9 +87,11 @@ export default function ScenarioPlayer({
         {onStart && (
           <div className={styles.startRow}>
             <p className={styles.startNote}>
-              {canStart
-                ? "That's the setup. Go in when you're ready."
-                : "Watch the clip through first. It sets up what you're walking into."}
+              {isReview
+                ? "Reviewing scene setup. Watch through or proceed when you're ready."
+                : canStart
+                  ? "That's the setup. Go in when you're ready."
+                  : "Watch the clip through first. It sets up what you're walking into."}
             </p>
             <button
               type="button"
@@ -83,7 +99,7 @@ export default function ScenarioPlayer({
               onClick={onStart}
               disabled={!canStart}
             >
-              Start Scenario →
+              {isReview && !clipEnded ? 'Skip to Scenario →' : 'Start Scenario →'}
             </button>
           </div>
         )}

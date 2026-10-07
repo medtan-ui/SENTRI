@@ -8,6 +8,33 @@ const ADVANCING_MS = 600
 
 const PULSE_IDLE_MS = 15000
 
+// States that are safe to restore directly after a page refresh.
+// Mid-transition states (loading, resolving, advancing) are normalised
+// to paused_interactive so the student never wakes up in a half-baked
+// machine transition.
+const RESTORABLE_STATES = new Set(['paused_interactive', 'feedback', 'playing', 'complete'])
+
+function makeStorageKey(moduleId, userId) {
+  return `sentri:scenario:${moduleId}:${userId ?? 'anon'}`
+}
+
+function readSnapshot(key) {
+  try {
+    const raw = sessionStorage.getItem(key)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function writeSnapshot(key, snapshot) {
+  try {
+    sessionStorage.setItem(key, JSON.stringify(snapshot))
+  } catch {
+    // storage quota exceeded or private mode — silently ignore
+  }
+}
+
 /**
  * useScenarioEngine
  * The Video-Pause-Interact-Branch state machine:
@@ -36,23 +63,45 @@ const PULSE_IDLE_MS = 15000
  * clean replay still counts for the badge that asks for one (reported
  * through onRunComplete, not through the decision records).
  *
+ * ── Page-refresh persistence ─────────────────────────────────────────
+ * Progress is written to sessionStorage on every meaningful state change
+ * and restored on mount so a browser refresh doesn't send the student
+ * back to scene 1. The key is scoped to moduleId + userId, so separate
+ * users and modules never share a slot. sessionStorage (not localStorage)
+ * is intentional: a brand-new browser session starts fresh, but a tab
+ * reload within the same session picks up exactly where the student left.
+ *
  * @param {import('../configs/passwordSecurity.config').ModuleScenarioConfig} config
  * @param {string|null} userId
  * @param {{ isReplay?: boolean }} [options]
  */
 export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
-  const [state, setState] = useState('loading')
-  const [scenarioIndex, setScenarioIndex] = useState(0)
-  const [attemptCount, setAttemptCount] = useState(0)
-  const [selectedChoice, setSelectedChoice] = useState(null)
-  const [completedScenarioIds, setCompletedScenarioIds] = useState([])
+  const storageKey = makeStorageKey(config.moduleId, userId)
 
-  // How many scenarios were resolved safely without a single risky
-  // attempt. Purely for the run's own feedback — a student who needed
-  // three goes still finishes, and the engine still records every
-  // attempt to scenarioDecisionRecords exactly as before. This is the
-  // number that makes a second playthrough worth doing.
-  const [cleanCalls, setCleanCalls] = useState(0)
+  // ── Restore from sessionStorage on first render ──────────────────────
+  const snapshot = useMemo(() => readSnapshot(storageKey), [storageKey])
+
+  const [state, setState] = useState(() => {
+    if (!snapshot) return 'loading'
+    // Never restore a mid-transition state — map to the nearest safe one.
+    return RESTORABLE_STATES.has(snapshot.state) ? snapshot.state : 'paused_interactive'
+  })
+  const [scenarioIndex, setScenarioIndex] = useState(() => snapshot?.scenarioIndex ?? 0)
+  const [attemptCount, setAttemptCount] = useState(() => snapshot?.attemptCount ?? 0)
+  const [selectedChoice, setSelectedChoice] = useState(null) // transient — not persisted
+  const [completedScenarioIds, setCompletedScenarioIds] = useState(
+    () => snapshot?.completedScenarioIds ?? [],
+  )
+
+  // Track scenarios resolved cleanly (first try, no risky choices)
+  // using an array of scenario IDs to avoid double-counting on reviews.
+  const [cleanScenarioIds, setCleanScenarioIds] = useState(
+    () => snapshot?.cleanScenarioIds ?? [],
+  )
+  const [failedScenarioIds, setFailedScenarioIds] = useState(
+    () => snapshot?.failedScenarioIds ?? [],
+  )
+  const cleanCalls = cleanScenarioIds.length
 
   const [pulseIdleActive, setPulseIdleActive] = useState(false)
   const hasInteractedRef = useRef(false)
@@ -77,6 +126,20 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
   const isLastScenario = scenarioIndex === totalScenarios - 1
   const coachLevel = config.coachLevel || 'full'
   const guidedHintActive = !selectedChoice && attemptCount >= 3
+
+  // ── Persist progress to sessionStorage whenever meaningful state changes ─
+  useEffect(() => {
+    // Don't persist mid-transition states — wait for the machine to settle.
+    if (!RESTORABLE_STATES.has(state)) return
+    writeSnapshot(storageKey, {
+      state,
+      scenarioIndex,
+      attemptCount,
+      completedScenarioIds,
+      cleanScenarioIds,
+      failedScenarioIds,
+    })
+  }, [state, scenarioIndex, attemptCount, completedScenarioIds, cleanScenarioIds, failedScenarioIds, storageKey])
 
   // ── Target registry (for AffordanceCoach to find a target's DOM node) ──
   const registerTarget = useCallback((id, node) => {
@@ -198,6 +261,9 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     const t = setTimeout(() => {
       if (!selectedChoice.isSafeChoice) {
         setAttemptCount((n) => n + 1)
+        setFailedScenarioIds((prev) =>
+          prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
+        )
         if (selectedChoice.failVideoUrl) {
           setState('consequence')
           return
@@ -206,7 +272,7 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
       setState('feedback')
     }, RESOLVING_MS)
     return () => clearTimeout(t)
-  }, [state, selectedChoice])
+  }, [state, selectedChoice, currentScenario.scenarioId])
 
   const acknowledgeConsequence = useCallback(() => {
     setState('feedback')
@@ -222,15 +288,74 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
   const continueToNext = useCallback(() => {
     if (!isReplay) markFeedbackViewed(currentDecisionIdRef.current)
     currentDecisionIdRef.current = null
+    const scenarioId = currentScenario.scenarioId
     // Only reachable from a safe resolution (the feedback panel offers
     // Continue for safe choices and Try Again for risky ones), so
     // attemptCount === 0 here means the student got it right first go.
-    if (attemptCount === 0) setCleanCalls((n) => n + 1)
+    if (attemptCount === 0 && !failedScenarioIds.includes(scenarioId)) {
+      setCleanScenarioIds((prev) => (prev.includes(scenarioId) ? prev : [...prev, scenarioId]))
+    }
     setCompletedScenarioIds((prev) =>
-      prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
+      prev.includes(scenarioId) ? prev : [...prev, scenarioId],
     )
     setState('advancing')
-  }, [currentScenario, attemptCount, isReplay])
+  }, [currentScenario, attemptCount, isReplay, failedScenarioIds])
+
+  // ── Incremental navigation actions (reviewing previous/next scenes) ──
+  // All nav actions go straight to paused_interactive — the video is
+  // skipped so the student lands on the interactive scene immediately.
+  // The "Replay Video" button is the explicit way to re-watch an intro.
+  const goToPrevious = useCallback(() => {
+    if (state === 'complete') {
+      setScenarioIndex(totalScenarios - 1)
+      setSelectedChoice(null)
+      setAttemptCount(0)
+      setState('paused_interactive')
+      return
+    }
+    if (scenarioIndex > 0) {
+      setScenarioIndex((i) => i - 1)
+      setSelectedChoice(null)
+      setAttemptCount(0)
+      setState('paused_interactive')
+    }
+  }, [state, scenarioIndex, totalScenarios])
+
+  const goToNext = useCallback(() => {
+    if (scenarioIndex < totalScenarios - 1) {
+      setScenarioIndex((i) => i + 1)
+      setSelectedChoice(null)
+      setAttemptCount(0)
+      setState('paused_interactive')
+    } else if (completedScenarioIds.length >= totalScenarios) {
+      setState('complete')
+    }
+  }, [scenarioIndex, totalScenarios, completedScenarioIds.length])
+
+  const goToScene = useCallback(
+    (targetIndex) => {
+      if (targetIndex >= 0 && targetIndex < totalScenarios) {
+        setScenarioIndex(targetIndex)
+        setSelectedChoice(null)
+        setAttemptCount(0)
+        setState('paused_interactive')
+      }
+    },
+    [totalScenarios],
+  )
+
+  const replayVideo = useCallback(() => {
+    if (hasIntroClip) {
+      setSelectedChoice(null)
+      setState('playing')
+    }
+  }, [hasIntroClip])
+
+  const canGoBack = scenarioIndex > 0 || state === 'complete'
+  const canGoNext =
+    state !== 'complete' &&
+    (scenarioIndex < completedScenarioIds.length ||
+      (scenarioIndex === totalScenarios - 1 && completedScenarioIds.length >= totalScenarios))
 
   // ── advancing -> next scenario's loading, or complete ──
   useEffect(() => {
@@ -266,6 +391,8 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     coachLevel,
     pulseIdleActive,
     hasInteractedBefore,
+    canGoBack,
+    canGoNext,
     interaction: {
       registerTarget,
       unregisterTarget,
@@ -279,6 +406,11 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
       acknowledgeConsequence,
       retry,
       continueToNext,
+      goToPrevious,
+      goToNext,
+      goToScene,
+      replayVideo,
     },
   }
 }
+
