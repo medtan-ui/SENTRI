@@ -6,6 +6,13 @@ import LoadingSkeleton from '../../../components/LoadingSkeleton/LoadingSkeleton
 import ErrorState from '../../../components/ErrorState/ErrorState'
 import { getLeaderboard } from '../../../services/gamificationService'
 import { useGamification } from '../../../hooks/useGamification'
+import { useGamificationState } from '../../../context/GamificationContext'
+import { useAuth } from '../../../context/AuthContext'
+import LeaderboardCustomizationModal from '../../../components/Gamification/LeaderboardCustomizationModal'
+import {
+  getLeaderboardCustomization,
+  resolveBadge,
+} from '../../../services/showcaseBadgeService'
 import styles from './StudentLeaderboardPage.module.css'
 
 /**
@@ -13,6 +20,8 @@ import styles from './StudentLeaderboardPage.module.css'
  * A dedicated standings and ranking page for students.
  * Displays overall student rankings, top-performer podium,
  * personalized XP standing, and point-earning mechanics.
+ * Includes trainee self-customization for featuring up to 3 showcase badges
+ * and a personalized title/motto.
  */
 export default function StudentLeaderboardPage() {
   const [status, setStatus] = useState('loading')
@@ -20,8 +29,33 @@ export default function StudentLeaderboardPage() {
   const [board, setBoard] = useState(null)
   const [sliceFilter, setSliceFilter] = useState('all') // '10' | '25' | 'all'
   const [searchQuery, setSearchQuery] = useState('')
+  const [isCustomizing, setIsCustomizing] = useState(false)
 
-  const { gamification } = useGamification()
+  const { user } = useAuth()
+  const userId = user?.uid ?? null
+
+  const gamificationCtx = useGamificationState()
+  const gamificationHook = useGamification()
+  const gamification = gamificationCtx?.gamification ?? gamificationHook?.gamification
+  const catalog = gamificationCtx?.catalog?.length ? gamificationCtx.catalog : gamificationHook?.catalog ?? []
+
+  const earnedBadgeIds = useMemo(() => gamification?.badges ?? [], [gamification?.badges])
+
+  const [customization, setCustomization] = useState(() =>
+    getLeaderboardCustomization(userId, earnedBadgeIds, catalog),
+  )
+
+  useEffect(() => {
+    if (userId) {
+      setCustomization(getLeaderboardCustomization(userId, earnedBadgeIds, catalog))
+    }
+  }, [userId, earnedBadgeIds, catalog])
+
+  // Up to 3 showcase badge objects
+  const showcaseBadges = useMemo(() => {
+    const ids = customization?.badgeIds || []
+    return ids.map((id) => resolveBadge(id, catalog))
+  }, [customization?.badgeIds, catalog])
 
   const loadData = useCallback(() => {
     let cancelled = false
@@ -93,60 +127,133 @@ export default function StudentLeaderboardPage() {
             {/* ── Personal Standing Highlight ── */}
             {youEntry && (
               <div className={styles.personalCard}>
-                <div className={styles.personalLeft}>
-                  <div className={styles.rankCircle}>
-                    <span className={styles.rankLabel}>Rank</span>
-                    <span className={styles.rankNumber}>#{youEntry.rank}</span>
-                  </div>
-                  <div className={styles.personalMeta}>
-                    <span className={styles.personalGreeting}>Your Current Standing</span>
-                    <div className={styles.personalNameRow}>
-                      <span className={styles.personalName}>{youEntry.displayName}</span>
-                      <span className={styles.tierTag}>{youEntry.rankName}</span>
+                <div className={styles.personalTopRow}>
+                  <div className={styles.personalLeft}>
+                    <div className={styles.rankCircle}>
+                      <span className={styles.rankLabel}>Rank</span>
+                      <span className={styles.rankNumber}>#{youEntry.rank}</span>
                     </div>
-                    <div className={styles.personalPills}>
-                      {youEntry.currentStreak > 0 && (
-                        <span className={`${styles.pillItem} ${styles.flameItem}`}>
-                          <Icon name="flame" size={14} filled />
-                          {youEntry.currentStreak} Day Streak
+                    <div className={styles.personalMeta}>
+                      <span className={styles.personalGreeting}>Your Current Standing</span>
+                      <div className={styles.personalNameRow}>
+                        <span className={styles.personalName}>{youEntry.displayName}</span>
+                        <span className={styles.tierTag}>{youEntry.rankName}</span>
+                      </div>
+                      <div className={styles.personalPills}>
+                        {youEntry.currentStreak > 0 && (
+                          <span className={`${styles.pillItem} ${styles.flameItem}`}>
+                            <Icon name="flame" size={14} filled />
+                            {youEntry.currentStreak} Day Streak
+                          </span>
+                        )}
+                        <span className={styles.pillItem}>
+                          <Icon name="star" size={14} />
+                          {youEntry.badgeCount ?? gamification?.badges?.length ?? 0} Badges
                         </span>
-                      )}
-                      <span className={styles.pillItem}>
-                        <Icon name="star" size={14} />
-                        {youEntry.badgeCount ?? gamification?.badges?.length ?? 0} Badges
-                      </span>
-                      <span className={styles.pillItem}>
-                        Rank {youEntry.rank} of {board.totalRanked} students
-                      </span>
+                        <span className={styles.pillItem}>
+                          Rank {youEntry.rank} of {board.totalRanked} students
+                        </span>
+                      </div>
                     </div>
+                  </div>
+
+                  <div className={styles.personalRight}>
+                    <span className={styles.xpTotal}>{youEntry.points.toLocaleString()}</span>
+                    <span className={styles.xpSub}>Total XP Points</span>
+                    {gamification?.nextRankAt && (
+                      <div className={styles.nextRankProgress}>
+                        <div className={styles.progressBar}>
+                          <div
+                            className={styles.progressFill}
+                            style={{
+                              width: `${Math.min(
+                                100,
+                                Math.round(
+                                  ((gamification.points - gamification.rankFloor) /
+                                    (gamification.nextRankAt - gamification.rankFloor)) *
+                                    100,
+                                ),
+                              )}%`,
+                            }}
+                          />
+                        </div>
+                        <p className={styles.progressText}>
+                          {gamification.nextRankAt - gamification.points} XP to {gamification.nextRankName}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className={styles.personalRight}>
-                  <span className={styles.xpTotal}>{youEntry.points.toLocaleString()}</span>
-                  <span className={styles.xpSub}>Total XP Points</span>
-                  {gamification?.nextRankAt && (
-                    <div className={styles.nextRankProgress}>
-                      <div className={styles.progressBar}>
-                        <div
-                          className={styles.progressFill}
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              Math.round(
-                                ((gamification.points - gamification.rankFloor) /
-                                  (gamification.nextRankAt - gamification.rankFloor)) *
-                                  100,
-                              ),
-                            )}%`,
-                          }}
-                        />
-                      </div>
-                      <p className={styles.progressText}>
-                        {gamification.nextRankAt - gamification.points} XP to {gamification.nextRankName}
-                      </p>
+                {/* ── Badge Showcase Bar ── */}
+                <div className={styles.showcaseSection}>
+                  <div className={styles.showcaseHeaderRow}>
+                    <div className={styles.showcaseTitleGroup}>
+                      <span className={styles.showcaseLabel}>
+                        <Icon name="star" size={14} /> Featured Badges
+                      </span>
+                      <span className={styles.showcaseCountTag}>
+                        {showcaseBadges.length} of 3 equipped
+                      </span>
+                      {customization.title && (
+                        <span className={styles.mottoFlair}>"{customization.title}"</span>
+                      )}
                     </div>
-                  )}
+                    <button
+                      type="button"
+                      className={styles.customizeBtn}
+                      onClick={() => setIsCustomizing(true)}
+                      aria-label="Customize badge showcase"
+                    >
+                      <Icon name="target" size={13} />
+                      <span>Customize Badges</span>
+                    </button>
+                  </div>
+
+                  <div className={styles.showcaseSlotsRow}>
+                    {Array.from({ length: 3 }).map((_, idx) => {
+                      const badge = showcaseBadges[idx]
+                      if (badge) {
+                        return (
+                          <div
+                            key={badge.id}
+                            className={styles.showcaseSlotFilled}
+                            data-tier={badge.tier}
+                            onClick={() => setIsCustomizing(true)}
+                            role="button"
+                            tabIndex={0}
+                            title={`${badge.name} (${badge.tier}) — Click to change badge`}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                setIsCustomizing(true)
+                              }
+                            }}
+                          >
+                            <span className={styles.showcaseDisc} data-tier={badge.tier}>
+                              <Icon name={badge.icon} size={15} />
+                            </span>
+                            <div className={styles.showcaseSlotMeta}>
+                              <span className={styles.showcaseSlotName}>{badge.name}</span>
+                              <span className={styles.showcaseSlotTier}>{badge.tier}</span>
+                            </div>
+                          </div>
+                        )
+                      }
+                      return (
+                        <button
+                          key={`slot-empty-${idx}`}
+                          type="button"
+                          className={styles.showcaseSlotEmpty}
+                          onClick={() => setIsCustomizing(true)}
+                          title={`Slot ${idx + 1} empty — Click to select badge`}
+                        >
+                          <span className={styles.slotEmptyPlus}>+</span>
+                          <span>Slot {idx + 1} (Empty)</span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -167,6 +274,20 @@ export default function StudentLeaderboardPage() {
                       {topThree[1].isYou && <span className={styles.podiumYouBadge}>You</span>}
                       <span className={styles.podiumRankName}>{topThree[1].rankName}</span>
                       <span className={styles.podiumPoints}>{topThree[1].points.toLocaleString()} XP</span>
+                      {topThree[1].isYou && showcaseBadges.length > 0 && (
+                        <div className={styles.podiumShowcaseRow} title={`Your Showcase: ${showcaseBadges.map((b) => b.name).join(', ')}`}>
+                          {showcaseBadges.map((badge) => (
+                            <span
+                              key={badge.id}
+                              className={styles.podiumBadgeDisc}
+                              data-tier={badge.tier}
+                              title={`${badge.name} (${badge.tier})`}
+                            >
+                              <Icon name={badge.icon} size={12} />
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       {topThree[1].currentStreak > 0 && (
                         <span className={styles.podiumStreak}>
                           <Icon name="flame" size={12} filled /> {topThree[1].currentStreak}d
@@ -186,6 +307,20 @@ export default function StudentLeaderboardPage() {
                       {topThree[0].isYou && <span className={styles.podiumYouBadge}>You</span>}
                       <span className={styles.podiumRankName}>{topThree[0].rankName}</span>
                       <span className={styles.podiumPoints}>{topThree[0].points.toLocaleString()} XP</span>
+                      {topThree[0].isYou && showcaseBadges.length > 0 && (
+                        <div className={styles.podiumShowcaseRow} title={`Your Showcase: ${showcaseBadges.map((b) => b.name).join(', ')}`}>
+                          {showcaseBadges.map((badge) => (
+                            <span
+                              key={badge.id}
+                              className={styles.podiumBadgeDisc}
+                              data-tier={badge.tier}
+                              title={`${badge.name} (${badge.tier})`}
+                            >
+                              <Icon name={badge.icon} size={12} />
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       {topThree[0].currentStreak > 0 && (
                         <span className={styles.podiumStreak}>
                           <Icon name="flame" size={12} filled /> {topThree[0].currentStreak}d
@@ -205,6 +340,20 @@ export default function StudentLeaderboardPage() {
                       {topThree[2].isYou && <span className={styles.podiumYouBadge}>You</span>}
                       <span className={styles.podiumRankName}>{topThree[2].rankName}</span>
                       <span className={styles.podiumPoints}>{topThree[2].points.toLocaleString()} XP</span>
+                      {topThree[2].isYou && showcaseBadges.length > 0 && (
+                        <div className={styles.podiumShowcaseRow} title={`Your Showcase: ${showcaseBadges.map((b) => b.name).join(', ')}`}>
+                          {showcaseBadges.map((badge) => (
+                            <span
+                              key={badge.id}
+                              className={styles.podiumBadgeDisc}
+                              data-tier={badge.tier}
+                              title={`${badge.name} (${badge.tier})`}
+                            >
+                              <Icon name={badge.icon} size={12} />
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       {topThree[2].currentStreak > 0 && (
                         <span className={styles.podiumStreak}>
                           <Icon name="flame" size={12} filled /> {topThree[2].currentStreak}d
@@ -305,9 +454,14 @@ export default function StudentLeaderboardPage() {
                               <span className={styles.tableAvatar}>
                                 {entry.displayName?.[0]?.toUpperCase() ?? 'U'}
                               </span>
-                              <div>
-                                <span className={styles.traineeName}>{entry.displayName}</span>
-                                {entry.isYou && <span className={styles.youBadge}>You</span>}
+                              <div className={styles.traineeNameCol}>
+                                <div className={styles.traineeNameRow}>
+                                  <span className={styles.traineeName}>{entry.displayName}</span>
+                                  {entry.isYou && <span className={styles.youBadge}>You</span>}
+                                </div>
+                                {entry.isYou && customization.title && (
+                                  <span className={styles.traineeMottoText}>"{customization.title}"</span>
+                                )}
                               </div>
                             </td>
                             <td className={`${styles.tableCell} ${styles.tierCell}`}>
@@ -324,10 +478,34 @@ export default function StudentLeaderboardPage() {
                               )}
                             </td>
                             <td className={styles.tableCell}>
-                              <span className={styles.badgeCountCell}>
-                                <Icon name="star" size={13} />
-                                {entry.badgeCount ?? 0}
-                              </span>
+                              {entry.isYou && showcaseBadges.length > 0 ? (
+                                <div
+                                  className={styles.tableShowcaseCell}
+                                  title={`Showcase: ${showcaseBadges.map((b) => b.name).join(', ')}`}
+                                >
+                                  <div className={styles.tableShowcaseBadges}>
+                                    {showcaseBadges.map((badge) => (
+                                      <span
+                                        key={badge.id}
+                                        className={styles.tableBadgeDisc}
+                                        data-tier={badge.tier}
+                                        title={`${badge.name} (${badge.tier})`}
+                                      >
+                                        <Icon name={badge.icon} size={12} />
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <span className={styles.tableTotalBadgeCount}>
+                                    <Icon name="star" size={11} />
+                                    {entry.badgeCount ?? 0}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className={styles.badgeCountCell}>
+                                  <Icon name="star" size={13} />
+                                  {entry.badgeCount ?? 0}
+                                </span>
+                              )}
                             </td>
                             <td className={`${styles.tableCell} ${styles.pointsCell}`}>
                               {entry.points.toLocaleString()}
@@ -346,6 +524,23 @@ export default function StudentLeaderboardPage() {
                   <div className={styles.pinnedLeft}>
                     <span>Your Standing: Rank #{youEntry.rank} of {board.totalRanked}</span>
                     <span className={styles.tierTag}>{youEntry.rankName}</span>
+                    {customization.title && (
+                      <span className={styles.pinnedMotto}>"{customization.title}"</span>
+                    )}
+                    {showcaseBadges.length > 0 && (
+                      <div className={styles.pinnedShowcaseRow}>
+                        {showcaseBadges.map((badge) => (
+                          <span
+                            key={badge.id}
+                            className={styles.tableBadgeDisc}
+                            data-tier={badge.tier}
+                            title={`${badge.name} (${badge.tier})`}
+                          >
+                            <Icon name={badge.icon} size={11} />
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <span className={styles.pinnedPoints}>{youEntry.points.toLocaleString()} XP</span>
                 </div>
@@ -385,6 +580,17 @@ export default function StudentLeaderboardPage() {
                 </Card>
               </div>
             </div>
+
+            {/* ── Badge & Profile Customization Modal ── */}
+            <LeaderboardCustomizationModal
+              open={isCustomizing}
+              onClose={() => setIsCustomizing(false)}
+              userId={userId}
+              earnedBadgeIds={earnedBadgeIds}
+              catalog={catalog}
+              initialCustomization={customization}
+              onSave={(updated) => setCustomization(updated)}
+            />
           </>
         )}
       </div>

@@ -43,7 +43,7 @@ const MODULE_ORDER = [
 ]
 
 /**
- * How many items each module contributes. The pre-test banks hold 5 items
+ * How many items each module contributes. The pre-test banks hold 8 items
  * each; taking 3 keeps the final assessment at 18 questions — long enough
  * to cover all six modules, short enough that a student actually finishes
  * it in one sitting.

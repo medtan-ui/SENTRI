@@ -1,6 +1,6 @@
 /**
  * modulePretestContent.js
- * Authored seed content for each module's pre-test — 5 baseline
+ * Authored seed content for each module's pre-test — 8 baseline
  * multiple-choice questions a student answers once, before their first
  * lesson, so their prior knowledge can be compared against the same
  * instrument re-administered at the end of the curriculum.
@@ -151,6 +151,27 @@ export const MODULE_PRETESTS = {
         'Changing the password immediately limits how long a possibly-leaked credential stays useful to an attacker.',
         'breach-response',
       ),
+      question(
+        'Why is a multi-word passphrase like "sunset-coffee-bridge-winter" strong against brute-force attacks?',
+        ['It uses dictionary words that are easy to guess', 'Its substantial length creates exponentially more combinations for attackers to test', 'It requires an internet connection to decrypt', 'It expires automatically after 30 days'],
+        1,
+        'Length provides exponential combinatorial strength against automated password-cracking software.',
+        'password-strength',
+      ),
+      question(
+        'Why is using an authenticator app generally more secure than receiving 2FA codes via SMS text message?',
+        ['Authenticator apps do not need phone batteries', 'SMS messages can be intercepted or stolen through SIM swapping attacks', 'SMS text messages cost money to send', 'Authenticator apps can only be used on computers'],
+        1,
+        'SMS-based 2FA is susceptible to SIM-swapping and carrier interception, whereas app-based TOTP tokens remain stored securely on your device.',
+        'mfa',
+      ),
+      question(
+        'What is the main security advantage of using a reputable password manager?',
+        ['It allows you to use one simple password everywhere', 'It generates and securely stores unique, complex passwords for every single service', 'It eliminates the need for two-factor authentication', 'It prevents all phishing websites automatically'],
+        1,
+        'Password managers solve password reuse by creating and remembering distinct, high-entropy passwords for all your accounts.',
+        'password-reuse',
+      ),
     ],
   },
 
@@ -192,6 +213,27 @@ export const MODULE_PRETESTS = {
         1,
         'Urgency pushes victims to act quickly, before they can carefully evaluate the request.',
         'social-engineering-tactics',
+      ),
+      question(
+        'What distinguishes "spear phishing" from ordinary mass phishing emails?',
+        ['Spear phishing only targets government agencies', 'Spear phishing is tailored with specific personal or organizational details to deceive a targeted individual', 'Spear phishing never contains links or attachments', 'Spear phishing is sent exclusively through physical postal mail'],
+        1,
+        'Spear phishing leverages researched personal or job-related information to make fraudulent communications appear genuine.',
+        'social-engineering-tactics',
+      ),
+      question(
+        'How can you safely inspect the true destination of a hyperlink in an email before clicking it?',
+        ['Click it and quickly close the browser tab', 'Hover your cursor over the link to preview the actual destination URL in the status bar or tooltip', 'Right-click and bookmark the link', 'Reply to the sender asking where it leads'],
+        1,
+        'Hovering allows you to inspect the real destination domain without triggering any network requests to the target server.',
+        'link-verification',
+      ),
+      question(
+        'Which attachment file extension typically presents the highest immediate risk of executing malware?',
+        ['A plain text file (.txt)', 'An executable or macro script file (.exe, .scr, or .vbs)', 'An image file (.png)', 'An audio file (.mp3)'],
+        1,
+        'Executable binaries and script extensions can directly run malicious instructions on your operating system upon opening.',
+        'attachment-handling',
       ),
     ],
   },
@@ -235,6 +277,27 @@ export const MODULE_PRETESTS = {
         'Unknown USB drives are a known malware delivery method — IT can inspect them safely.',
         'removable-media',
       ),
+      question(
+        'What is spyware designed to do without the computer owner\'s knowledge?',
+        ['Speed up hard drive performance', 'Quietly monitor keystrokes, browsing habits, and credentials to send to an attacker', 'Display harmless desktop wallpaper notifications', 'Optimize operating system battery health'],
+        1,
+        'Spyware stealthily tracks sensitive user inputs, web sessions, and saved passwords to exfiltrate to malicious operators.',
+        'malware-basics',
+      ),
+      question(
+        'Why is applying operating system and software security patches promptly so critical?',
+        ['Patches always add new graphical themes', 'Patches fix discovered security flaws before attackers can exploit them', 'Software companies disable devices that miss an update', 'Patches clean all temporary browser cookies'],
+        1,
+        'Unpatched software leaves known security holes open to exploitation by automated malware tools.',
+        'patching',
+      ),
+      question(
+        'Why are isolated, offline backups essential for recovering from a ransomware infection?',
+        ['Offline backups load web pages faster', 'Ransomware cannot reach or encrypt storage media physically disconnected from the network', 'Cloud backups are always corrupted by firewalls', 'Offline backups delete the virus automatically'],
+        1,
+        'An offline (air-gapped) backup guarantees a clean, unencrypted copy of your critical data that the malware could not access.',
+        'ransomware',
+      ),
     ],
   },
 
@@ -277,6 +340,27 @@ export const MODULE_PRETESTS = {
         'A VPN or trusted network protects sensitive traffic from others who may share the same public Wi-Fi.',
         'network-protection',
       ),
+      question(
+        'What does a browser certificate error such as "Your connection is not private" typically warn you about?',
+        ['Your monitor display resolution is too low', 'The web server identity cannot be verified or the connection might be intercepted', 'The website has too many animated images', 'Your home Wi-Fi router is turned off'],
+        1,
+        'Certificate errors indicate potential man-in-the-middle attacks, invalid encryption, or expired domain credentials.',
+        'https-misconceptions',
+      ),
+      question(
+        'What is "typosquatting" (URL hijacking)?',
+        ['Registering misspelled variants of popular domain names to mislead visitors to fake sites', 'Typing a search query too quickly in a search engine', 'Purchasing domain names for non-profit organizations', 'A tool used by web designers to test typography'],
+        1,
+        'Attackers register common spelling errors of popular sites (e.g., paypa1.com or examp1e.com) to catch accidental mistypes.',
+        'scam-sites',
+      ),
+      question(
+        'Why should you avoid accessing sensitive accounts on open, password-free public Wi-Fi hotspots without a VPN?',
+        ['Public Wi-Fi networks disconnect every five minutes', 'Unencrypted local network traffic can be monitored or spoofed by other devices on the same access point', 'Public Wi-Fi charges hidden fees per website visited', 'Search engines block all searches on public Wi-Fi'],
+        1,
+        'Open access points allow malicious peers on the same wireless network to analyze broadcast packets or launch spoofing attacks.',
+        'public-wifi',
+      ),
     ],
   },
 
@@ -318,6 +402,27 @@ export const MODULE_PRETESTS = {
         1,
         'Regularly auditing permissions and privacy settings limits what apps and services can collect over time.',
         'privacy-habits',
+      ),
+      question(
+        'Which of the following is categorized as sensitive Personally Identifiable Information (PII)?',
+        ['Your favorite movie genre', 'Your government ID number, banking credentials, and medical history', 'The current weather forecast in your city', 'A public library open hours schedule'],
+        1,
+        'Sensitive PII comprises data that directly identifies an individual and presents serious identity theft or fraud risks if compromised.',
+        'privacy-basics',
+      ),
+      question(
+        'What hidden metadata (EXIF data) is frequently stored in digital photos taken on smartphones?',
+        ['The brand of printer connected to the phone', 'Precise GPS location coordinates and timestamp information', 'The names of everyone appearing in the photo', 'The home Wi-Fi password of the user'],
+        1,
+        'EXIF tags embedded in smartphone photos often store accurate geographic coordinates and device timestamps, revealing where you were.',
+        'oversharing',
+      ),
+      question(
+        'What is the main function of third-party tracking cookies across multiple websites?',
+        ['Storing the website color scheme', 'Constructing detailed behavioral profiles of your browsing habits across different web domains', 'Speeding up internet connection bandwidth', 'Encrypting your computer hard drive'],
+        1,
+        'Third-party tracking cookies follow users across diverse websites to aggregate personal interests and consumer profiles.',
+        'data-brokers',
       ),
     ],
   },
@@ -364,6 +469,27 @@ export const MODULE_PRETESTS = {
         1,
         'Reporting to a trusted adult or moderator gets help involved rather than escalating things alone.',
         'harassment-response',
+      ),
+      question(
+        'What is "catfishing" in the context of online relationships and social platforms?',
+        ['Catching fish using specialized digital sensors', 'Fabricating a false online identity to deceive, exploit, or emotionally manipulate another person', 'Reporting abusive spam comments on social media', 'Setting up multiple email addresses for school'],
+        1,
+        'Catfishing involves adopting a deceptive online persona with stolen photos or false information to manipulate victims.',
+        'stranger-contact',
+      ),
+      question(
+        'Why should you remember that "private" group messages and photos can easily become public?',
+        ['Computers delete all group chats after twenty-four hours', 'Any chat participant can take screenshots, download media, or forward messages to anyone outside the group', 'Messaging apps automatically publish group chats to web search engines', 'Private chats can only be viewed on desktop computers'],
+        1,
+        'Recipients have full capability to copy, screenshot, or distribute content you shared, eliminating any guarantee of secrecy.',
+        'cyberbullying',
+      ),
+      question(
+        'What is an effective way to protect your personal safety on online gaming platforms?',
+        ['Giving out your home address so other players can send gifts', 'Using a pseudonym, keeping voice lobbies friend-only, and never sharing your school or location', 'Allowing all players to view your phone number in your profile', 'Clicking any game credit links posted by unfamiliar players in lobby chats'],
+        1,
+        'Maintaining pseudonymity and withholding identifying details keeps gaming accounts and real-world safety protected.',
+        'stranger-contact',
       ),
     ],
   },

@@ -48,10 +48,17 @@
   padding: var(--space-5) var(--space-6);
   margin-bottom: var(--space-8);
   display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-card);
+}
+
+.personalTopRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-6);
-  box-shadow: var(--shadow-card);
+  width: 100%;
 }
 
 .personalLeft {
@@ -655,6 +662,327 @@
   padding: var(--space-8);
   text-align: center;
   color: var(--color-text-muted);
+}
+
+/* ── Showcase Strip inside Personal Standing ── */
+.showcaseSection {
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.showcaseHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.showcaseTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.showcaseLabel {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.showcaseCountTag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.mottoFlair {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-gold-dark);
+  background: rgba(184, 134, 11, 0.09);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--color-gold);
+}
+
+.customizeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-quiet);
+}
+
+.customizeBtn:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold-dark);
+  background: var(--color-gold-muted);
+}
+
+.showcaseSlotsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.showcaseSlotFilled {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 52px;
+}
+
+.showcaseSlotFilled:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-quiet);
+}
+
+.showcaseSlotFilled[data-tier='gold'] {
+  border-color: rgba(184, 134, 11, 0.4);
+  background: linear-gradient(135deg, #FFFFFF 0%, rgba(184, 134, 11, 0.05) 100%);
+}
+
+.showcaseSlotFilled[data-tier='silver'] {
+  border-color: rgba(110, 123, 139, 0.4);
+  background: linear-gradient(135deg, #FFFFFF 0%, rgba(110, 123, 139, 0.05) 100%);
+}
+
+.showcaseSlotFilled[data-tier='bronze'] {
+  border-color: rgba(169, 113, 59, 0.4);
+  background: linear-gradient(135deg, #FFFFFF 0%, rgba(169, 113, 59, 0.05) 100%);
+}
+
+.showcaseDisc {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1.5px solid transparent;
+}
+
+.showcaseDisc[data-tier='gold'] {
+  background: var(--tier-gold-bg);
+  color: var(--tier-gold);
+  border-color: rgba(184, 134, 11, 0.35);
+}
+
+.showcaseDisc[data-tier='silver'] {
+  background: var(--tier-silver-bg);
+  color: var(--tier-silver);
+  border-color: rgba(110, 123, 139, 0.35);
+}
+
+.showcaseDisc[data-tier='bronze'] {
+  background: var(--tier-bronze-bg);
+  color: var(--tier-bronze);
+  border-color: rgba(169, 113, 59, 0.35);
+}
+
+.showcaseSlotMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.showcaseSlotName {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.showcaseSlotTier {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+
+.showcaseSlotEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: rgba(0, 0, 0, 0.015);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 52px;
+  transition: all var(--transition-fast);
+}
+
+.showcaseSlotEmpty:hover {
+  border-color: var(--color-gold);
+  background: rgba(184, 134, 11, 0.04);
+  color: var(--color-gold-dark);
+}
+
+.slotEmptyPlus {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+/* ── Table Badges Showcase Cell ── */
+.tableShowcaseCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tableShowcaseBadges {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tableBadgeDisc {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+
+.tableBadgeDisc[data-tier='gold'] {
+  background: var(--tier-gold-bg);
+  color: var(--tier-gold);
+  border-color: rgba(184, 134, 11, 0.4);
+}
+
+.tableBadgeDisc[data-tier='silver'] {
+  background: var(--tier-silver-bg);
+  color: var(--tier-silver);
+  border-color: rgba(110, 123, 139, 0.4);
+}
+
+.tableBadgeDisc[data-tier='bronze'] {
+  background: var(--tier-bronze-bg);
+  color: var(--tier-bronze);
+  border-color: rgba(169, 113, 59, 0.4);
+}
+
+.tableTotalBadgeCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--color-text-light);
+  font-weight: 600;
+}
+
+.traineeNameCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.traineeNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.traineeMottoText {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-gold-dark);
+}
+
+/* ── Podium Showcase Badges ── */
+.podiumShowcaseRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.podiumBadgeDisc {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+}
+
+.podiumBadgeDisc[data-tier='gold'] {
+  background: var(--tier-gold-bg);
+  color: var(--tier-gold);
+  border-color: rgba(184, 134, 11, 0.4);
+}
+
+.podiumBadgeDisc[data-tier='silver'] {
+  background: var(--tier-silver-bg);
+  color: var(--tier-silver);
+  border-color: rgba(110, 123, 139, 0.4);
+}
+
+.podiumBadgeDisc[data-tier='bronze'] {
+  background: var(--tier-bronze-bg);
+  color: var(--tier-bronze);
+  border-color: rgba(169, 113, 59, 0.4);
+}
+
+/* ── Pinned Row Additions ── */
+.pinnedMotto {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-gold-dark);
+}
+
+.pinnedShowcaseRow {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
 }
 
 /* ── Responsive ── */

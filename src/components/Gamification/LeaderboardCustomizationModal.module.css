@@ -1,0 +1,440 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Section Styling ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.counterPill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.sectionDesc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── 3 Showcase Slots ── */
+.slotsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.slotCard {
+  position: relative;
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 130px;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.slotCardEmpty {
+  border: 2px dashed var(--color-border);
+  background: rgba(0, 0, 0, 0.015);
+  color: var(--color-text-muted);
+}
+
+.slotCardEmpty:hover {
+  border-color: var(--color-gold);
+  background: rgba(184, 134, 11, 0.03);
+}
+
+.slotEmptyIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-light);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.slotEmptyLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.slotEmptyHint {
+  font-size: 11px;
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+
+.slotCardFilled {
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-quiet);
+}
+
+.slotCardFilled[data-tier='gold'] {
+  border-color: rgba(184, 134, 11, 0.4);
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(184, 134, 11, 0.05) 100%);
+}
+
+.slotCardFilled[data-tier='silver'] {
+  border-color: rgba(110, 123, 139, 0.4);
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(110, 123, 139, 0.05) 100%);
+}
+
+.slotCardFilled[data-tier='bronze'] {
+  border-color: rgba(169, 113, 59, 0.4);
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(169, 113, 59, 0.05) 100%);
+}
+
+.slotBadgeNumber {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  letter-spacing: 0.05em;
+}
+
+.slotRemoveBtn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.slotRemoveBtn:hover {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+/* Badge Medallion Disc */
+.disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  margin-bottom: var(--space-2);
+}
+
+.disc[data-tier='bronze'] {
+  background: var(--tier-bronze-bg);
+  color: var(--tier-bronze);
+  border-color: rgba(169, 113, 59, 0.35);
+}
+
+.disc[data-tier='silver'] {
+  background: var(--tier-silver-bg);
+  color: var(--tier-silver);
+  border-color: rgba(110, 123, 139, 0.35);
+}
+
+.disc[data-tier='gold'] {
+  background: var(--tier-gold-bg);
+  color: var(--tier-gold);
+  border-color: rgba(184, 134, 11, 0.4);
+}
+
+.slotBadgeName {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.tierPill {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+}
+
+.tierPill[data-tier='gold'] {
+  background: var(--color-gold-muted);
+  color: var(--color-gold-dark);
+}
+
+.tierPill[data-tier='silver'] {
+  background: var(--tier-silver-bg);
+  color: var(--tier-silver);
+}
+
+.tierPill[data-tier='bronze'] {
+  background: var(--tier-bronze-bg);
+  color: var(--tier-bronze);
+}
+
+/* ── Custom Tagline / Motto ── */
+.mottoBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mottoInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mottoInput {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.mottoInput:focus {
+  border-color: var(--color-gold);
+}
+
+.mottoCharCount {
+  position: absolute;
+  right: 10px;
+  font-size: 11px;
+  color: var(--color-text-light);
+  pointer-events: none;
+}
+
+.quickPillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.quickPillsLabel {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quickPillBtn {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quickPillBtn:hover {
+  background: var(--color-surface);
+  border-color: var(--color-gold);
+  color: var(--color-gold-dark);
+}
+
+/* ── Badge Selection List ── */
+.searchRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: var(--color-gold);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  color: var(--color-text-light);
+  pointer-events: none;
+}
+
+.badgeCatalogGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+  max-height: 270px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.badgeSelectCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.badgeSelectCard:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-quiet);
+  transform: translateY(-1px);
+}
+
+.badgeSelectCard[data-selected='true'] {
+  border-color: var(--color-gold);
+  background: rgba(184, 134, 11, 0.05);
+}
+
+.badgeCardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.badgeCardTitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badgeCardDesc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.badgeEquippedTag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-gold-dark);
+  background: var(--color-gold-muted);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.emptyBadgesMsg {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Modal Footer Actions ── */
+.footerWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--space-3);
+}
+
+.footerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .slotsGrid {
+    grid-template-columns: 1fr;
+  }
+  .footerWrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .footerLeft,
+  .footerRight {
+    justify-content: flex-end;
+  }
+}
