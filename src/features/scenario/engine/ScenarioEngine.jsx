@@ -82,6 +82,8 @@ export default function ScenarioEngine({
 
   const SceneComponent = SCENE_REGISTRY[currentScenario.scene]
   const showScene = ['paused_interactive', 'resolving', 'consequence', 'feedback'].includes(state)
+  const contextOpen = state === 'paused_interactive' && Boolean(currentScenario.contextPopup)
+    && !dismissedPopupIds.includes(currentScenario.scenarioId)
 
   return (
     <ScenarioInteractionProvider value={interaction}>
@@ -135,18 +137,18 @@ export default function ScenarioEngine({
             <div className={styles.layer} key={`scene-${scenarioIndex}`}>
               <SceneComponent
                 scenario={currentScenario}
-                interactive={state === 'paused_interactive'}
+                interactive={state === 'paused_interactive' && !contextOpen}
                 phase={state}
                 guidedHintActive={guidedHintActive}
-                onResolve={actions.selectChoice}
+                onResolve={(choiceId) => { if (!contextOpen) actions.selectChoice(choiceId) }}
               />
             </div>
           )}
 
-          {/* Context Popup modal giving narrative background and hints after video start */}
+          {/* Context belongs to the interactive, never the opening video. */}
           {state === 'paused_interactive' && currentScenario?.contextPopup && (
             <ScenarioContextPopup
-              open={!dismissedPopupIds.includes(currentScenario.scenarioId)}
+              open={contextOpen}
               onClose={() =>
                 setDismissedPopupIds((prev) =>
                   prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
@@ -154,7 +156,6 @@ export default function ScenarioEngine({
               }
               title={currentScenario.contextPopup.title}
               narrative={currentScenario.contextPopup.narrative}
-              hints={currentScenario.contextPopup.hints}
             />
           )}
 

@@ -40,6 +40,10 @@ export const dataPrivacyConfig = {
       materialUrl: null,
       posterCaption: 'A post in the feed is asking for a decision.',
       scene: 'GiveawayPostScene',
+      contextPopup: {
+        title: "A Giveaway Catches Her Attention",
+        narrative: "A student checks her social feed and spots a post from Reminder-78 advertising a ₱5,000 giveaway. The JOIN NOW link makes entering look quick and easy. You are now viewing the post on her phone. What will you do before deciding whether to join?",
+      },
       choices: [
         {
           scenarioChoiceId: 'dp-01-a',
@@ -86,6 +90,10 @@ export const dataPrivacyConfig = {
       materialUrl: null,
       posterCaption: 'A form wants some information before it continues.',
       scene: 'GiveawayFormScene',
+      contextPopup: {
+        title: "A Prize Form Wants Personal Details",
+        narrative: "In this scene, the giveaway link has opened a form asking for the student's details, including her birthday, home address, and phone number. She is tempted to fill it in to claim the prize. You are taking over before anything is submitted. What, if anything, will you share?",
+      },
       choices: [
         {
           scenarioChoiceId: 'dp-02-a-birthday',
@@ -156,6 +164,10 @@ export const dataPrivacyConfig = {
       materialUrl: null,
       posterCaption: 'Her phone keeps buzzing with messages from unknown numbers.',
       scene: 'SpamFloodScene',
+      contextPopup: {
+        title: "Messages from Unknown Numbers",
+        narrative: "In this scene, a few days have passed since the student shared her details with the giveaway. Her phone now keeps buzzing with messages from unknown numbers. You are taking over in her messages app. How will you respond and deal with the information she shared?",
+      },
       choices: [
         {
           scenarioChoiceId: 'dp-03-a',

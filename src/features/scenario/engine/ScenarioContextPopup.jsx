@@ -1,77 +1,53 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useId, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import Icon from '../../../components/Icon/Icon'
+import feedbackStyles from './FeedbackPanel.module.css'
 import styles from './ScenarioContextPopup.module.css'
 
-/**
- * ScenarioContextPopup
- * A storyboard-styled popup that appears at the start of a scenario to
- * give the student narrative context — what just happened in the video
- * they watched, so they understand the situation they're walking into.
- *
- * Styled to match the sketch treatment: ink borders, paper textures,
- * hand-drawn feel. Closes on the "Got it" button or Escape key.
- *
- * @param {{
- *   open: boolean,
- *   onClose: () => void,
- *   title: string,
- *   narrative: string,
- *   hints?: string[],
- * }} props
- */
-export default function ScenarioContextPopup({ open, onClose, title, narrative, hints }) {
+/** A dismissible setup for the interactive, using the feedback dialog design. */
+export default function ScenarioContextPopup({ open, onClose, title, narrative }) {
+  const dialogRef = useRef(null)
+  const titleId = useId()
+  const narrativeId = useId()
+
   useEffect(() => {
     if (!open) return undefined
-    function handleKey(e) {
-      if (e.key === 'Escape') onClose?.()
+    const dialog = dialogRef.current
+    const previousFocus = document.activeElement
+    // The native modal keeps keyboard focus inside and makes the page inert.
+    dialog.showModal()
+    return () => {
+      dialog.close()
+      if (previousFocus?.isConnected) previousFocus.focus()
     }
-    document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 
-  return (
-    <div className={styles.backdrop} onClick={onClose}>
-      <div
-        className={styles.popup}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={styles.header}>
-          <span className={styles.icon} aria-hidden="true">📋</span>
-          <h3 className={styles.title}>{title}</h3>
-        </div>
-
-        <div className={styles.body}>
-          <p className={styles.narrative}>{narrative}</p>
-
-          {hints && hints.length > 0 && (
-            <div className={styles.hintsSection}>
-              <h4 className={styles.hintsTitle}>
-                <span aria-hidden="true">💡</span> Things to watch for:
-              </h4>
-              <ul className={styles.hintsList}>
-                {hints.map((hint, i) => (
-                  <li key={i} className={styles.hintItem}>{hint}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <div className={styles.footer}>
-          <button
-            type="button"
-            className={styles.gotItBtn}
-            onClick={onClose}
-            autoFocus
-          >
-            Got it — let me in →
-          </button>
-        </div>
+  return createPortal(
+    <dialog
+      ref={dialogRef}
+      className={styles.backdrop}
+      aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={narrativeId}
+      onCancel={(event) => { event.preventDefault(); onClose() }}
+      onClick={(event) => { if (event.target === event.currentTarget) onClose() }}
+    >
+      <div className={`${feedbackStyles.panel} ${styles.panel}`}>
+        <button type="button" className={styles.closeBtn} aria-label="Close scenario context" onClick={onClose}>
+          <span aria-hidden="true">×</span>
+        </button>
+        <span className={`${feedbackStyles.icon} ${styles.icon}`} aria-hidden="true">
+          <Icon name="book" size={26} strokeWidth={1.7} />
+        </span>
+        <h3 id={titleId} className={feedbackStyles.title}>{title}</h3>
+        <p id={narrativeId} className={feedbackStyles.text}>{narrative}</p>
+        <button type="button" className={feedbackStyles.primaryBtn} onClick={onClose} autoFocus>
+          Got it — continue
+        </button>
       </div>
-    </div>
+    </dialog>,
+    document.body,
   )
 }

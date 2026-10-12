@@ -29,6 +29,7 @@
  * @property {string|null} materialUrl
  * @property {string} posterCaption
  * @property {string} scene
+ * @property {{ title: string, narrative: string }} [contextPopup] setup shown when the interactive opens
  * @property {string} [coachTarget]
  * @property {string} [postCompletionReflection] optional closing note shown
  *   in FeedbackPanel only once this scenario is *safely* resolved (not on
@@ -60,6 +61,10 @@ export const passwordSecurityConfig = {
       materialUrl: null,
       posterCaption: 'Three new accounts, three passwords to choose.',
       scene: 'SignupTrioScene',
+      contextPopup: {
+        title: "Three Accounts to Set Up",
+        narrative: "A student is setting up a school portal, Campus Mail, and PeraSend for the semester. Each account needs a password, and using the same one would be easy to remember. You are taking over at the sign-up screens. What passwords will you choose?",
+      },
       coachTarget: 'signup-password-1',
       postCompletionReflection:
         "Real talk: if you just mashed the keyboard for those passwords, there's a good chance you won't remember them next week. 😅",
@@ -121,12 +126,11 @@ export const passwordSecurityConfig = {
       materialUrl: '/videos/module-1/module-1-2nd-scene-start.mp4',
       posterCaption: 'Something in your inbox needs a decision.',
       scene: 'MailInboxScene',
-      coachTarget: 'email-verify-btn',
       contextPopup: {
-        title: 'Warning',
-        narrative: 'Be careful, double check everything.',
-        hints: [],
+        title: "An Unexpected Verification Email",
+        narrative: "A week after setting up his accounts, the student receives an email claiming to be from the registrar. It asks him to verify his application through a button in the message. His Campus Mail inbox is now open. How will you decide whether to trust the request?",
       },
+      coachTarget: 'email-verify-btn',
       choices: [
         {
           scenarioChoiceId: 'ps-02-a',
@@ -174,6 +178,10 @@ export const passwordSecurityConfig = {
       materialUrl: '/videos/module-1/module-1-3rd-scene-start.mp4',
       posterCaption: 'Time to clean up and lock things down.',
       scene: 'AccountSecurityScene',
+      contextPopup: {
+        title: "Time to Review Account Security",
+        narrative: "After the suspicious verification request, the student opens his account security settings to review how his accounts are protected. You can now make changes to those settings. What will you do to help secure his accounts?",
+      },
       coachTarget: 'account-change-1',
       choices: [
         {

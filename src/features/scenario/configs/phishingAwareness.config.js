@@ -27,6 +27,10 @@ export const phishingAwarenessConfig = {
       materialUrl: null,
       posterCaption: 'Something in your inbox needs a decision.',
       scene: 'InboxScene',
+      contextPopup: {
+        title: "An Assignment Email Arrives",
+        narrative: "Alex opens Campus Mail and finds a ClassDeck notification about an activity supposedly posted by his instructor. The message asks him to submit his work through a link, but he is unsure whether the request is genuine. You are now in his inbox. How will you respond?",
+      },
       coachTarget: 'submit-link',
       postCompletionReflection:
         "One message to the person who supposedly sent it settled the whole thing. That habit costs about ten seconds.",
@@ -77,6 +81,10 @@ export const phishingAwarenessConfig = {
       materialUrl: null,
       posterCaption: "Something about this page is worth a second look.",
       scene: 'FakePortalScene',
+      contextPopup: {
+        title: "Before You Sign In",
+        narrative: "In this scene, the activity link has opened a page that looks like the ClassDeck login screen. It asks Alex to sign in before continuing to the submission. You are taking over before he enters his password. What will you do next?",
+      },
       choices: [
         {
           scenarioChoiceId: 'ph-02-a',

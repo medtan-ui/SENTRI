@@ -33,6 +33,10 @@ export const safeBrowsingConfig = {
       materialUrl: null,
       posterCaption: 'A search turns up a few places to look.',
       scene: 'ResearchSearchScene',
+      contextPopup: {
+        title: "Searching for Research Sources",
+        narrative: "A student is looking for articles for a research paper due soon. Her search returns several promising links, including free paper downloads and a university repository. You are now in her browser. Which source will you open?",
+      },
       choices: [
         {
           scenarioChoiceId: 'sb-01-a',
@@ -81,6 +85,10 @@ export const safeBrowsingConfig = {
       materialUrl: null,
       posterCaption: 'Your browser has stopped to warn you about something.',
       scene: 'CertWarningScene',
+      contextPopup: {
+        title: "The Browser Stops the Visit",
+        narrative: "In this scene, a research link has led to a browser warning: the connection is not private. The student still needs the article, but the page has not opened yet. You are now at the warning screen. How will you handle it?",
+      },
       inspectionAction: {
         target: 'view-cert',
         choiceText: 'View certificate details',
@@ -122,6 +130,10 @@ export const safeBrowsingConfig = {
       materialUrl: null,
       posterCaption: 'Something is asking for attention at the top of the page.',
       scene: 'FakeUpdateScene',
+      contextPopup: {
+        title: "An Update Interrupts the Article",
+        narrative: "While the student is reading an article, a banner appears on the page claiming that her browser is out of date. It offers an UPDATE button so she can continue. You are taking over with the banner still visible. How will you respond to the update request?",
+      },
       choices: [
         {
           scenarioChoiceId: 'sb-03-a',

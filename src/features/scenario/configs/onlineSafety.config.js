@@ -43,6 +43,10 @@ export const onlineSafetyConfig = {
       materialUrl: null,
       posterCaption: 'A notification is waiting for a decision.',
       scene: 'FriendRequestScene',
+      contextPopup: {
+        title: "A Request from Someone Unfamiliar",
+        narrative: "A student receives a friend request from someone he does not recognize. The profile suggests they attend the same school, making the request seem familiar. You are now looking at the request on his phone. How will you decide whether to connect?",
+      },
       choices: [
         {
           scenarioChoiceId: 'os-01-a',
@@ -90,6 +94,10 @@ export const onlineSafetyConfig = {
       materialUrl: null,
       posterCaption: 'The conversation is waiting on a reply.',
       scene: 'ChatEscalationScene',
+      contextPopup: {
+        title: "An Online Chat Becomes a Meeting Request",
+        narrative: "In this scene, the student has been chatting with his new online contact for weeks. The contact now suggests meeting today and asks him to share his location. You are taking over in the conversation. How will you respond to the request?",
+      },
       choices: [
         {
           scenarioChoiceId: 'os-02-a',
@@ -137,6 +145,10 @@ export const onlineSafetyConfig = {
       materialUrl: null,
       posterCaption: 'The profile is still there, and so is the conversation.',
       scene: 'ReportAndBlockScene',
+      contextPopup: {
+        title: "Deciding What Happens Next",
+        narrative: "After the contact's request to meet and share a location, the student is unsure whether this person can be trusted. Their profile is open again, with options for handling the account. You are now in control. What will you do about this contact?",
+      },
       choices: [
         {
           scenarioChoiceId: 'os-03-a',
