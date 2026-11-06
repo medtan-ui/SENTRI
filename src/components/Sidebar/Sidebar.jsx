@@ -18,6 +18,13 @@ const STUDENT_NAV = [
       { label: 'Dashboard', path: '/student/dashboard', icon: 'dashboard' },
       { label: 'Modules', path: '/student/modules', icon: 'book' },
       { label: 'Quiz', path: '/student/quiz', icon: 'quiz' },
+<<<<<<< HEAD
+=======
+    ],
+  },
+  {
+    items: [
+>>>>>>> b4441ff2152a3dd1b218aa87826d453e8dfb30e6
       { label: 'Progress', path: '/student/progress', icon: 'chart' },
       { label: 'Profile', path: '/student/profile', icon: 'user' },
       { label: 'Leaderboards', path: '/student/leaderboard', icon: 'trophy' },
@@ -42,7 +49,6 @@ const ADMIN_NAV = [
     ],
   },
   {
-    title: 'People',
     items: [
       { label: 'Accounts', path: '/admin/accounts', icon: 'users' },
       { label: 'Profile', path: '/admin/profile', icon: 'user' },
