@@ -226,8 +226,7 @@ describe('StudentDashboard', () => {
     renderPage(StudentDashboard)
 
     await waitFor(() => expect(screen.getByText('Bea')).toBeInTheDocument())
-    // "Ana" is also the navbar's user badge and "You" is a sidebar group
-    // heading, so find the student's own row through the board itself.
+    // "Ana" is also the navbar's user badge, so find the student's own row through the board itself.
     const myRow = screen.getByText('Bea').closest('ol').querySelectorAll('li')[1]
     expect(myRow).toHaveTextContent('Ana')
     expect(myRow).toHaveTextContent('You')
