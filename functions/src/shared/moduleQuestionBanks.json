@@ -1,0 +1,2858 @@
+{
+  "password-security": {
+    "pretest": [
+      {
+        "id": "pretest-pretest-choice-1",
+        "text": "What generally makes a password stronger?",
+        "choices": [
+          {
+            "id": "pretest-choice-1",
+            "text": "Adding a symbol like \"!\" at the end"
+          },
+          {
+            "id": "pretest-choice-2",
+            "text": "Being long and unique"
+          },
+          {
+            "id": "pretest-choice-3",
+            "text": "Being easy to say out loud"
+          },
+          {
+            "id": "pretest-choice-4",
+            "text": "Using your birth year"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-2",
+        "explanation": "Length and uniqueness matter far more than a single substituted symbol.",
+        "topic": "password-strength"
+      },
+      {
+        "id": "pretest-pretest-choice-5",
+        "text": "Is it safe to reuse the same password across multiple accounts?",
+        "choices": [
+          {
+            "id": "pretest-choice-5",
+            "text": "No — one breach can expose every account that reused it"
+          },
+          {
+            "id": "pretest-choice-6",
+            "text": "Yes, if the accounts are unrelated"
+          },
+          {
+            "id": "pretest-choice-7",
+            "text": "Only for unimportant accounts"
+          },
+          {
+            "id": "pretest-choice-8",
+            "text": "Yes, as long as it is long"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-5",
+        "explanation": "Reusing a password means a single leak can be tried against every other account using it.",
+        "topic": "password-reuse"
+      },
+      {
+        "id": "pretest-pretest-choice-9",
+        "text": "What does multi-factor authentication (MFA) add?",
+        "choices": [
+          {
+            "id": "pretest-choice-9",
+            "text": "Faster login times"
+          },
+          {
+            "id": "pretest-choice-10",
+            "text": "Unlimited password resets"
+          },
+          {
+            "id": "pretest-choice-11",
+            "text": "A stronger password automatically"
+          },
+          {
+            "id": "pretest-choice-12",
+            "text": "A second layer of proof beyond your password"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-12",
+        "explanation": "MFA requires a second factor — like a code on your phone — so a stolen password alone is not enough to log in.",
+        "topic": "mfa"
+      },
+      {
+        "id": "pretest-pretest-choice-13",
+        "text": "What is \"credential stuffing\"?",
+        "choices": [
+          {
+            "id": "pretest-choice-13",
+            "text": "A way to recover a forgotten password"
+          },
+          {
+            "id": "pretest-choice-14",
+            "text": "Guessing passwords one character at a time"
+          },
+          {
+            "id": "pretest-choice-15",
+            "text": "Trying leaked username/password pairs against other sites"
+          },
+          {
+            "id": "pretest-choice-16",
+            "text": "A type of firewall"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-15",
+        "explanation": "Credential stuffing automates trying passwords leaked from one breach against many other services.",
+        "topic": "credential-attacks"
+      },
+      {
+        "id": "pretest-pretest-choice-17",
+        "text": "What should you do first if a service you use reports a data breach?",
+        "choices": [
+          {
+            "id": "pretest-choice-17",
+            "text": "Nothing, breaches are common"
+          },
+          {
+            "id": "pretest-choice-18",
+            "text": "Change your password for that service right away"
+          },
+          {
+            "id": "pretest-choice-19",
+            "text": "Delete the account without changing anything"
+          },
+          {
+            "id": "pretest-choice-20",
+            "text": "Wait a few months"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-18",
+        "explanation": "Changing the password immediately limits how long a possibly-leaked credential stays useful to an attacker.",
+        "topic": "breach-response"
+      },
+      {
+        "id": "pretest-pretest-choice-21",
+        "text": "Why is a multi-word passphrase like \"sunset-coffee-bridge-winter\" strong against brute-force attacks?",
+        "choices": [
+          {
+            "id": "pretest-choice-21",
+            "text": "Its substantial length creates exponentially more combinations for attackers to test"
+          },
+          {
+            "id": "pretest-choice-22",
+            "text": "It requires an internet connection to decrypt"
+          },
+          {
+            "id": "pretest-choice-23",
+            "text": "It expires automatically after 30 days"
+          },
+          {
+            "id": "pretest-choice-24",
+            "text": "It uses dictionary words that are easy to guess"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-21",
+        "explanation": "Length provides exponential combinatorial strength against automated password-cracking software.",
+        "topic": "password-strength"
+      },
+      {
+        "id": "pretest-pretest-choice-25",
+        "text": "Why is using an authenticator app generally more secure than receiving 2FA codes via SMS text message?",
+        "choices": [
+          {
+            "id": "pretest-choice-25",
+            "text": "SMS text messages cost money to send"
+          },
+          {
+            "id": "pretest-choice-26",
+            "text": "Authenticator apps can only be used on computers"
+          },
+          {
+            "id": "pretest-choice-27",
+            "text": "Authenticator apps do not need phone batteries"
+          },
+          {
+            "id": "pretest-choice-28",
+            "text": "SMS messages can be intercepted or stolen through SIM swapping attacks"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-28",
+        "explanation": "SMS-based 2FA is susceptible to SIM-swapping and carrier interception, whereas app-based TOTP tokens remain stored securely on your device.",
+        "topic": "mfa"
+      },
+      {
+        "id": "pretest-pretest-choice-29",
+        "text": "What is the main security advantage of using a reputable password manager?",
+        "choices": [
+          {
+            "id": "pretest-choice-29",
+            "text": "It prevents all phishing websites automatically"
+          },
+          {
+            "id": "pretest-choice-30",
+            "text": "It allows you to use one simple password everywhere"
+          },
+          {
+            "id": "pretest-choice-31",
+            "text": "It generates and securely stores unique, complex passwords for every single service"
+          },
+          {
+            "id": "pretest-choice-32",
+            "text": "It eliminates the need for two-factor authentication"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-31",
+        "explanation": "Password managers solve password reuse by creating and remembering distinct, high-entropy passwords for all your accounts.",
+        "topic": "password-reuse"
+      }
+    ],
+    "quiz": [
+      {
+        "order": 1,
+        "id": "question-seed-1-Which ",
+        "text": "Which of the following is the strongest password?",
+        "choices": [
+          {
+            "id": "choice-1",
+            "text": "password123"
+          },
+          {
+            "id": "choice-2",
+            "text": "Tr0ub4dor&3"
+          },
+          {
+            "id": "choice-3",
+            "text": "correct-horse-battery-staple-42"
+          },
+          {
+            "id": "choice-4",
+            "text": "P@ssw0rd"
+          }
+        ],
+        "correctChoiceId": "choice-3",
+        "explanation": "Length and unpredictability matter more than symbol substitution — a long passphrase is harder to crack than a short, \"complex\" password.",
+        "difficulty": "Easy",
+        "topic": "password-strength"
+      },
+      {
+        "order": 2,
+        "id": "question-seed-5-What i",
+        "text": "What is credential stuffing?",
+        "choices": [
+          {
+            "id": "choice-5",
+            "text": "Reusing leaked username/password pairs against other sites"
+          },
+          {
+            "id": "choice-6",
+            "text": "Guessing a password one character at a time"
+          },
+          {
+            "id": "choice-7",
+            "text": "A type of phishing email"
+          },
+          {
+            "id": "choice-8",
+            "text": "A password recovery technique"
+          }
+        ],
+        "correctChoiceId": "choice-5",
+        "explanation": "Credential stuffing automates trying leaked credentials from one breach against many other services, exploiting password reuse.",
+        "difficulty": "Medium",
+        "topic": "credential-attacks"
+      },
+      {
+        "order": 3,
+        "id": "question-seed-9-Why sh",
+        "text": "Why should you enable multi-factor authentication (MFA)?",
+        "choices": [
+          {
+            "id": "choice-9",
+            "text": "It replaces the need for a password"
+          },
+          {
+            "id": "choice-10",
+            "text": "It blocks all phishing emails"
+          },
+          {
+            "id": "choice-11",
+            "text": "It adds a second layer of protection beyond your password"
+          },
+          {
+            "id": "choice-12",
+            "text": "It automatically generates strong passwords"
+          }
+        ],
+        "correctChoiceId": "choice-11",
+        "explanation": "MFA requires a second factor — like a code or approval on another device — so a stolen password alone is not enough to log in.",
+        "difficulty": "Easy",
+        "topic": "mfa"
+      },
+      {
+        "order": 4,
+        "id": "question-seed-13-What s",
+        "text": "What should you do first if a service you use reports a data breach?",
+        "choices": [
+          {
+            "id": "choice-13",
+            "text": "Wait to see if you are affected before doing anything"
+          },
+          {
+            "id": "choice-14",
+            "text": "Change your password for that service immediately"
+          },
+          {
+            "id": "choice-15",
+            "text": "Delete your account without changing anything"
+          },
+          {
+            "id": "choice-16",
+            "text": "Ignore it since breaches are common"
+          }
+        ],
+        "correctChoiceId": "choice-14",
+        "explanation": "Changing the password right away limits how long a potentially leaked credential remains useful to an attacker.",
+        "difficulty": "Medium",
+        "topic": "breach-response"
+      },
+      {
+        "order": 5,
+        "id": "question-seed-17-What m",
+        "text": "What makes a passphrase like 'correct horse battery staple' strong?",
+        "choices": [
+          {
+            "id": "choice-17",
+            "text": "It uses special characters"
+          },
+          {
+            "id": "choice-18",
+            "text": "It is short and easy to type"
+          },
+          {
+            "id": "choice-19",
+            "text": "It is long and hard to guess despite being memorable"
+          },
+          {
+            "id": "choice-20",
+            "text": "It is based on a single dictionary word"
+          }
+        ],
+        "correctChoiceId": "choice-19",
+        "explanation": "Length is the dominant factor in resisting brute-force attacks, and a memorable passphrase avoids the temptation to write it down or reuse it.",
+        "difficulty": "Hard",
+        "topic": "password-strength"
+      },
+      {
+        "order": 6,
+        "id": "question-seed-21-Why is",
+        "text": "Why is using an authenticator app (TOTP) safer than receiving 2FA codes via SMS?",
+        "choices": [
+          {
+            "id": "choice-21",
+            "text": "SMS codes expire too quickly to type"
+          },
+          {
+            "id": "choice-22",
+            "text": "SMS can be intercepted through SIM swapping or mobile network spoofing"
+          },
+          {
+            "id": "choice-23",
+            "text": "Authenticator apps automatically change your password every hour"
+          },
+          {
+            "id": "choice-24",
+            "text": "SMS messages are blocked by all web browsers"
+          }
+        ],
+        "correctChoiceId": "choice-22",
+        "explanation": "SIM-swap fraud allows criminals to redirect your SMS messages to their own device, bypassing text-based 2FA.",
+        "difficulty": "Medium",
+        "topic": "mfa"
+      },
+      {
+        "order": 7,
+        "id": "question-seed-25-What i",
+        "text": "What is the primary role of a master password in a password manager?",
+        "choices": [
+          {
+            "id": "choice-25",
+            "text": "It is sent to every website you log into"
+          },
+          {
+            "id": "choice-26",
+            "text": "It is the single strong key used locally to encrypt and unlock your entire password vault"
+          },
+          {
+            "id": "choice-27",
+            "text": "It allows tech support to access your accounts if you forget your details"
+          },
+          {
+            "id": "choice-28",
+            "text": "It disables the need for device encryption"
+          }
+        ],
+        "correctChoiceId": "choice-26",
+        "explanation": "A strong master password encrypts your password database so that only you can decrypt the stored credentials.",
+        "difficulty": "Easy",
+        "topic": "password-strength"
+      },
+      {
+        "order": 8,
+        "id": "question-seed-29-What p",
+        "text": "What physical security threat involves someone looking over your shoulder to see you type your PIN or password?",
+        "choices": [
+          {
+            "id": "choice-29",
+            "text": "Shoulder surfing"
+          },
+          {
+            "id": "choice-30",
+            "text": "Dumpster diving"
+          },
+          {
+            "id": "choice-31",
+            "text": "Tailgating"
+          },
+          {
+            "id": "choice-32",
+            "text": "Watering hole attack"
+          }
+        ],
+        "correctChoiceId": "choice-29",
+        "explanation": "Shoulder surfing is a direct observation technique used by attackers in public or crowded areas to steal credentials.",
+        "difficulty": "Easy",
+        "topic": "password-strength"
+      },
+      {
+        "order": 9,
+        "id": "question-seed-33-If you",
+        "text": "If you discover one of your accounts was breached, why must you also change passwords on other accounts that shared that password?",
+        "choices": [
+          {
+            "id": "choice-33",
+            "text": "Breached companies automatically notify all other websites"
+          },
+          {
+            "id": "choice-34",
+            "text": "Automated credential stuffing bots will try the exposed password across hundreds of popular services"
+          },
+          {
+            "id": "choice-35",
+            "text": "Your internet connection will be suspended otherwise"
+          },
+          {
+            "id": "choice-36",
+            "text": "Password hashing algorithms expire after a breach"
+          }
+        ],
+        "correctChoiceId": "choice-34",
+        "explanation": "Attackers immediately run leaked email/password pairs through credential stuffing scripts against other platforms.",
+        "difficulty": "Hard",
+        "topic": "password-reuse"
+      },
+      {
+        "order": 10,
+        "id": "question-seed-37-Which ",
+        "text": "Which factor represents \"something you are\" in Multi-Factor Authentication?",
+        "choices": [
+          {
+            "id": "choice-37",
+            "text": "A physical hardware security key (FIDO token)"
+          },
+          {
+            "id": "choice-38",
+            "text": "A fingerprint or facial biometric scan"
+          },
+          {
+            "id": "choice-39",
+            "text": "A PIN number known only to you"
+          },
+          {
+            "id": "choice-40",
+            "text": "An SMS verification code"
+          }
+        ],
+        "correctChoiceId": "choice-38",
+        "explanation": "Biometrics (fingerprints, facial recognition, iris scans) represent the \"inherence\" factor (\"something you are\").",
+        "difficulty": "Medium",
+        "topic": "mfa"
+      }
+    ]
+  },
+  "phishing-awareness": {
+    "pretest": [
+      {
+        "id": "pretest-pretest-choice-33",
+        "text": "What is phishing?",
+        "choices": [
+          {
+            "id": "pretest-choice-33",
+            "text": "A firewall misconfiguration"
+          },
+          {
+            "id": "pretest-choice-34",
+            "text": "A fraudulent attempt to trick someone into revealing sensitive information"
+          },
+          {
+            "id": "pretest-choice-35",
+            "text": "A type of antivirus scan"
+          },
+          {
+            "id": "pretest-choice-36",
+            "text": "A slow internet connection"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-34",
+        "explanation": "Phishing impersonates a trusted sender to trick you into giving up credentials or clicking a malicious link.",
+        "topic": "phishing-basics"
+      },
+      {
+        "id": "pretest-pretest-choice-37",
+        "text": "Which is a common red flag in a phishing email?",
+        "choices": [
+          {
+            "id": "pretest-choice-37",
+            "text": "A short subject line"
+          },
+          {
+            "id": "pretest-choice-38",
+            "text": "A company logo"
+          },
+          {
+            "id": "pretest-choice-39",
+            "text": "A greeting with your name"
+          },
+          {
+            "id": "pretest-choice-40",
+            "text": "A sender address that does not match the real company"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-40",
+        "explanation": "A mismatched sender address is one of the most reliable signs of a spoofed email.",
+        "topic": "phishing-red-flags"
+      },
+      {
+        "id": "pretest-pretest-choice-41",
+        "text": "Is it safe to click a link in an urgent \"verify your account now\" email?",
+        "choices": [
+          {
+            "id": "pretest-choice-41",
+            "text": "Yes, if the email looks professional"
+          },
+          {
+            "id": "pretest-choice-42",
+            "text": "Only if it has your name in it"
+          },
+          {
+            "id": "pretest-choice-43",
+            "text": "Yes, urgency means it is important"
+          },
+          {
+            "id": "pretest-choice-44",
+            "text": "No — verify through a separately-trusted channel first"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-44",
+        "explanation": "Urgency is a manipulation tactic — verifying through a channel you already trust is much safer.",
+        "topic": "link-verification"
+      },
+      {
+        "id": "pretest-pretest-choice-45",
+        "text": "What should you do with an unexpected attachment from an unknown sender?",
+        "choices": [
+          {
+            "id": "pretest-choice-45",
+            "text": "Save it for later"
+          },
+          {
+            "id": "pretest-choice-46",
+            "text": "Open it to see what it is"
+          },
+          {
+            "id": "pretest-choice-47",
+            "text": "Avoid opening it and report it"
+          },
+          {
+            "id": "pretest-choice-48",
+            "text": "Forward it to a coworker first"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-47",
+        "explanation": "Reporting an unopened suspicious attachment protects you and anyone else who received the same email.",
+        "topic": "attachment-handling"
+      },
+      {
+        "id": "pretest-pretest-choice-49",
+        "text": "Why do phishing emails often create a sense of urgency?",
+        "choices": [
+          {
+            "id": "pretest-choice-49",
+            "text": "It is required by email providers"
+          },
+          {
+            "id": "pretest-choice-50",
+            "text": "To pressure you into acting before you think it through"
+          },
+          {
+            "id": "pretest-choice-51",
+            "text": "To make the email load faster"
+          },
+          {
+            "id": "pretest-choice-52",
+            "text": "It has no real purpose"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-50",
+        "explanation": "Urgency pushes victims to act quickly, before they can carefully evaluate the request.",
+        "topic": "social-engineering-tactics"
+      },
+      {
+        "id": "pretest-pretest-choice-53",
+        "text": "What distinguishes \"spear phishing\" from ordinary mass phishing emails?",
+        "choices": [
+          {
+            "id": "pretest-choice-53",
+            "text": "Spear phishing is tailored with specific personal or organizational details to deceive a targeted individual"
+          },
+          {
+            "id": "pretest-choice-54",
+            "text": "Spear phishing never contains links or attachments"
+          },
+          {
+            "id": "pretest-choice-55",
+            "text": "Spear phishing is sent exclusively through physical postal mail"
+          },
+          {
+            "id": "pretest-choice-56",
+            "text": "Spear phishing only targets government agencies"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-53",
+        "explanation": "Spear phishing leverages researched personal or job-related information to make fraudulent communications appear genuine.",
+        "topic": "social-engineering-tactics"
+      },
+      {
+        "id": "pretest-pretest-choice-57",
+        "text": "How can you safely inspect the true destination of a hyperlink in an email before clicking it?",
+        "choices": [
+          {
+            "id": "pretest-choice-57",
+            "text": "Right-click and bookmark the link"
+          },
+          {
+            "id": "pretest-choice-58",
+            "text": "Reply to the sender asking where it leads"
+          },
+          {
+            "id": "pretest-choice-59",
+            "text": "Click it and quickly close the browser tab"
+          },
+          {
+            "id": "pretest-choice-60",
+            "text": "Hover your cursor over the link to preview the actual destination URL in the status bar or tooltip"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-60",
+        "explanation": "Hovering allows you to inspect the real destination domain without triggering any network requests to the target server.",
+        "topic": "link-verification"
+      },
+      {
+        "id": "pretest-pretest-choice-61",
+        "text": "Which attachment file extension typically presents the highest immediate risk of executing malware?",
+        "choices": [
+          {
+            "id": "pretest-choice-61",
+            "text": "An audio file (.mp3)"
+          },
+          {
+            "id": "pretest-choice-62",
+            "text": "A plain text file (.txt)"
+          },
+          {
+            "id": "pretest-choice-63",
+            "text": "An executable or macro script file (.exe, .scr, or .vbs)"
+          },
+          {
+            "id": "pretest-choice-64",
+            "text": "An image file (.png)"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-63",
+        "explanation": "Executable binaries and script extensions can directly run malicious instructions on your operating system upon opening.",
+        "topic": "attachment-handling"
+      }
+    ],
+    "quiz": [
+      {
+        "order": 1,
+        "id": "question-seed-41-What i",
+        "text": "What is the safest way to verify a suspicious payment request email?",
+        "choices": [
+          {
+            "id": "choice-41",
+            "text": "Reply to the email asking for confirmation"
+          },
+          {
+            "id": "choice-42",
+            "text": "Call the vendor using a known, trusted phone number"
+          },
+          {
+            "id": "choice-43",
+            "text": "Click the link to see where it leads"
+          },
+          {
+            "id": "choice-44",
+            "text": "Forward it to a coworker for their opinion"
+          }
+        ],
+        "correctChoiceId": "choice-42",
+        "explanation": "Verifying through a channel you already trust — not the email itself — confirms whether the request is real.",
+        "difficulty": "Easy",
+        "topic": "link-verification"
+      },
+      {
+        "order": 2,
+        "id": "question-seed-45-Which ",
+        "text": "Which of these is a common sign of a phishing email?",
+        "choices": [
+          {
+            "id": "choice-45",
+            "text": "A sender address that does not match the real company"
+          },
+          {
+            "id": "choice-46",
+            "text": "A professional-looking logo"
+          },
+          {
+            "id": "choice-47",
+            "text": "Correct spelling and grammar"
+          },
+          {
+            "id": "choice-48",
+            "text": "An email signature"
+          }
+        ],
+        "correctChoiceId": "choice-45",
+        "explanation": "Mismatched sender domains are one of the most reliable signs of a spoofed or phishing email.",
+        "difficulty": "Easy",
+        "topic": "phishing-red-flags"
+      },
+      {
+        "order": 3,
+        "id": "question-seed-49-What s",
+        "text": "What should you do with an unexpected attachment from an unknown sender?",
+        "choices": [
+          {
+            "id": "choice-49",
+            "text": "Open it to see what it is"
+          },
+          {
+            "id": "choice-50",
+            "text": "Avoid opening it and report it"
+          },
+          {
+            "id": "choice-51",
+            "text": "Forward it to IT after opening"
+          },
+          {
+            "id": "choice-52",
+            "text": "Save it for later"
+          }
+        ],
+        "correctChoiceId": "choice-50",
+        "explanation": "Reporting an unopened suspicious attachment protects both you and anyone else who may have received the same email.",
+        "difficulty": "Medium",
+        "topic": "attachment-handling"
+      },
+      {
+        "order": 4,
+        "id": "question-seed-53-What i",
+        "text": "What is a fake login page designed to do?",
+        "choices": [
+          {
+            "id": "choice-53",
+            "text": "Speed up your login"
+          },
+          {
+            "id": "choice-54",
+            "text": "Steal your entered credentials"
+          },
+          {
+            "id": "choice-55",
+            "text": "Save your password securely"
+          },
+          {
+            "id": "choice-56",
+            "text": "Verify your identity"
+          }
+        ],
+        "correctChoiceId": "choice-54",
+        "explanation": "A convincing lookalike login page exists solely to capture whatever credentials are typed into it.",
+        "difficulty": "Medium",
+        "topic": "phishing-basics"
+      },
+      {
+        "order": 5,
+        "id": "question-seed-57-Why is",
+        "text": "Why is verifying through a known channel better than replying to a suspicious email?",
+        "choices": [
+          {
+            "id": "choice-57",
+            "text": "It is faster"
+          },
+          {
+            "id": "choice-58",
+            "text": "It confirms you are talking to the real organization, not the attacker"
+          },
+          {
+            "id": "choice-59",
+            "text": "It is required by law"
+          },
+          {
+            "id": "choice-60",
+            "text": "It automatically blocks the sender"
+          }
+        ],
+        "correctChoiceId": "choice-58",
+        "explanation": "Replying only keeps the conversation with whoever sent the email — which may be the attacker. A known channel bypasses them entirely.",
+        "difficulty": "Hard",
+        "topic": "social-engineering-tactics"
+      },
+      {
+        "order": 6,
+        "id": "question-seed-61-What i",
+        "text": "What is \"spear phishing\"?",
+        "choices": [
+          {
+            "id": "choice-61",
+            "text": "Phishing emails broadcast randomly to millions of inboxes"
+          },
+          {
+            "id": "choice-62",
+            "text": "Highly tailored attacks targeting a specific individual using customized background information"
+          },
+          {
+            "id": "choice-63",
+            "text": "A denial-of-service attack targeting email servers"
+          },
+          {
+            "id": "choice-64",
+            "text": "A hardware attack carried out through Ethernet cables"
+          }
+        ],
+        "correctChoiceId": "choice-62",
+        "explanation": "Spear phishing targets specific individuals or roles using research gathered about the victim to increase credibility.",
+        "difficulty": "Medium",
+        "topic": "social-engineering-tactics"
+      },
+      {
+        "order": 7,
+        "id": "question-seed-65-In the",
+        "text": "In the URL \"https://login.microsoft.com.account-verify-365.net/auth\", what is the actual domain hosting the page?",
+        "choices": [
+          {
+            "id": "choice-65",
+            "text": "microsoft.com"
+          },
+          {
+            "id": "choice-66",
+            "text": "login.microsoft.com"
+          },
+          {
+            "id": "choice-67",
+            "text": "account-verify-365.net"
+          },
+          {
+            "id": "choice-68",
+            "text": "auth.net"
+          }
+        ],
+        "correctChoiceId": "choice-67",
+        "explanation": "The domain immediately preceding the top-level domain and first single slash is the true host: account-verify-365.net.",
+        "difficulty": "Hard",
+        "topic": "link-verification"
+      },
+      {
+        "order": 8,
+        "id": "question-seed-69-What i",
+        "text": "What is \"smishing\"?",
+        "choices": [
+          {
+            "id": "choice-69",
+            "text": "Phishing attacks conducted via SMS text messages"
+          },
+          {
+            "id": "choice-70",
+            "text": "Malicious ads displayed inside social media apps"
+          },
+          {
+            "id": "choice-71",
+            "text": "Phishing conducted entirely through voice phone calls"
+          },
+          {
+            "id": "choice-72",
+            "text": "Eavesdropping on public Bluetooth connections"
+          }
+        ],
+        "correctChoiceId": "choice-69",
+        "explanation": "Smishing (SMS phishing) sends deceptive text messages with malicious links or urgent demands to mobile users.",
+        "difficulty": "Easy",
+        "topic": "phishing-basics"
+      },
+      {
+        "order": 9,
+        "id": "question-seed-73-Why do",
+        "text": "Why do malicious Word or Excel attachments often prompt users to \"Enable Macros\" or \"Enable Content\"?",
+        "choices": [
+          {
+            "id": "choice-73",
+            "text": "To decrypt the document font files"
+          },
+          {
+            "id": "choice-74",
+            "text": "To execute embedded automated script code that downloads and installs malware"
+          },
+          {
+            "id": "choice-75",
+            "text": "To verify the reader has an active Office license"
+          },
+          {
+            "id": "choice-76",
+            "text": "To connect the document to cloud storage"
+          }
+        ],
+        "correctChoiceId": "choice-74",
+        "explanation": "Macros are programs embedded in documents; enabling them allows malicious scripts to download and execute payloads.",
+        "difficulty": "Medium",
+        "topic": "attachment-handling"
+      },
+      {
+        "order": 10,
+        "id": "question-seed-77-What s",
+        "text": "What should you do immediately if you realize you entered your corporate password into a fake login page?",
+        "choices": [
+          {
+            "id": "choice-77",
+            "text": "Wait to see if unauthorized logins occur over the weekend"
+          },
+          {
+            "id": "choice-78",
+            "text": "Immediately change your password and report the incident to your security/IT team"
+          },
+          {
+            "id": "choice-79",
+            "text": "Delete your browser history and restart your device"
+          },
+          {
+            "id": "choice-80",
+            "text": "Send an angry reply to the phishing email"
+          }
+        ],
+        "correctChoiceId": "choice-78",
+        "explanation": "Immediate password changes and prompt reporting enable the security team to revoke active sessions and contain compromise.",
+        "difficulty": "Medium",
+        "topic": "phishing-red-flags"
+      }
+    ]
+  },
+  "malware-awareness": {
+    "pretest": [
+      {
+        "id": "pretest-pretest-choice-65",
+        "text": "What is malware?",
+        "choices": [
+          {
+            "id": "pretest-choice-65",
+            "text": "Software that speeds up your computer"
+          },
+          {
+            "id": "pretest-choice-66",
+            "text": "Malicious software designed to damage, steal, or hold data hostage"
+          },
+          {
+            "id": "pretest-choice-67",
+            "text": "A built-in Windows tool"
+          },
+          {
+            "id": "pretest-choice-68",
+            "text": "A type of web browser"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-66",
+        "explanation": "Malware is a broad category covering viruses, ransomware, trojans, and spyware.",
+        "topic": "malware-basics"
+      },
+      {
+        "id": "pretest-pretest-choice-69",
+        "text": "What is ransomware?",
+        "choices": [
+          {
+            "id": "pretest-choice-69",
+            "text": "A discount coupon scam"
+          },
+          {
+            "id": "pretest-choice-70",
+            "text": "Free antivirus software"
+          },
+          {
+            "id": "pretest-choice-71",
+            "text": "A password manager"
+          },
+          {
+            "id": "pretest-choice-72",
+            "text": "Malware that locks your files and demands payment"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-72",
+        "explanation": "Ransomware encrypts a victim's files and demands payment for the (unguaranteed) key to unlock them.",
+        "topic": "ransomware"
+      },
+      {
+        "id": "pretest-pretest-choice-73",
+        "text": "Is downloading free software from an unofficial website risky?",
+        "choices": [
+          {
+            "id": "pretest-choice-73",
+            "text": "Only on old computers"
+          },
+          {
+            "id": "pretest-choice-74",
+            "text": "Only if you have no antivirus"
+          },
+          {
+            "id": "pretest-choice-75",
+            "text": "No, free is always safe"
+          },
+          {
+            "id": "pretest-choice-76",
+            "text": "Yes — it is often bundled with malware"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-76",
+        "explanation": "Unofficial download sources frequently bundle malicious software alongside the free tool being offered.",
+        "topic": "download-sources"
+      },
+      {
+        "id": "pretest-pretest-choice-77",
+        "text": "What is one of the best defenses against malware?",
+        "choices": [
+          {
+            "id": "pretest-choice-77",
+            "text": "Using the same password everywhere"
+          },
+          {
+            "id": "pretest-choice-78",
+            "text": "Never restarting your computer"
+          },
+          {
+            "id": "pretest-choice-79",
+            "text": "Keeping your software and operating system updated"
+          },
+          {
+            "id": "pretest-choice-80",
+            "text": "Disabling your internet permanently"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-79",
+        "explanation": "Updates close the security holes that malware relies on to spread.",
+        "topic": "patching"
+      },
+      {
+        "id": "pretest-pretest-choice-81",
+        "text": "What should you do if you find an unknown USB drive?",
+        "choices": [
+          {
+            "id": "pretest-choice-81",
+            "text": "Plug it in to see who owns it"
+          },
+          {
+            "id": "pretest-choice-82",
+            "text": "Give it to IT without plugging it in"
+          },
+          {
+            "id": "pretest-choice-83",
+            "text": "Use it for personal storage"
+          },
+          {
+            "id": "pretest-choice-84",
+            "text": "Format it immediately yourself"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-82",
+        "explanation": "Unknown USB drives are a known malware delivery method — IT can inspect them safely.",
+        "topic": "removable-media"
+      },
+      {
+        "id": "pretest-pretest-choice-85",
+        "text": "What is spyware designed to do without the computer owner's knowledge?",
+        "choices": [
+          {
+            "id": "pretest-choice-85",
+            "text": "Quietly monitor keystrokes, browsing habits, and credentials to send to an attacker"
+          },
+          {
+            "id": "pretest-choice-86",
+            "text": "Display harmless desktop wallpaper notifications"
+          },
+          {
+            "id": "pretest-choice-87",
+            "text": "Optimize operating system battery health"
+          },
+          {
+            "id": "pretest-choice-88",
+            "text": "Speed up hard drive performance"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-85",
+        "explanation": "Spyware stealthily tracks sensitive user inputs, web sessions, and saved passwords to exfiltrate to malicious operators.",
+        "topic": "malware-basics"
+      },
+      {
+        "id": "pretest-pretest-choice-89",
+        "text": "Why is applying operating system and software security patches promptly so critical?",
+        "choices": [
+          {
+            "id": "pretest-choice-89",
+            "text": "Software companies disable devices that miss an update"
+          },
+          {
+            "id": "pretest-choice-90",
+            "text": "Patches clean all temporary browser cookies"
+          },
+          {
+            "id": "pretest-choice-91",
+            "text": "Patches always add new graphical themes"
+          },
+          {
+            "id": "pretest-choice-92",
+            "text": "Patches fix discovered security flaws before attackers can exploit them"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-92",
+        "explanation": "Unpatched software leaves known security holes open to exploitation by automated malware tools.",
+        "topic": "patching"
+      },
+      {
+        "id": "pretest-pretest-choice-93",
+        "text": "Why are isolated, offline backups essential for recovering from a ransomware infection?",
+        "choices": [
+          {
+            "id": "pretest-choice-93",
+            "text": "Offline backups delete the virus automatically"
+          },
+          {
+            "id": "pretest-choice-94",
+            "text": "Offline backups load web pages faster"
+          },
+          {
+            "id": "pretest-choice-95",
+            "text": "Ransomware cannot reach or encrypt storage media physically disconnected from the network"
+          },
+          {
+            "id": "pretest-choice-96",
+            "text": "Cloud backups are always corrupted by firewalls"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-95",
+        "explanation": "An offline (air-gapped) backup guarantees a clean, unencrypted copy of your critical data that the malware could not access.",
+        "topic": "ransomware"
+      }
+    ],
+    "quiz": [
+      {
+        "order": 1,
+        "id": "question-seed-81-Why ar",
+        "text": "Why are free downloads from unofficial websites risky?",
+        "choices": [
+          {
+            "id": "choice-81",
+            "text": "They are always slower"
+          },
+          {
+            "id": "choice-82",
+            "text": "They are often bundled with malware"
+          },
+          {
+            "id": "choice-83",
+            "text": "They cost more later"
+          },
+          {
+            "id": "choice-84",
+            "text": "They require an account"
+          }
+        ],
+        "correctChoiceId": "choice-82",
+        "explanation": "Unofficial download sources frequently bundle malicious software alongside the free tool being offered.",
+        "difficulty": "Easy",
+        "topic": "download-sources"
+      },
+      {
+        "order": 2,
+        "id": "question-seed-85-What s",
+        "text": "What should you do if you find an unknown USB drive?",
+        "choices": [
+          {
+            "id": "choice-85",
+            "text": "Plug it in to see who owns it"
+          },
+          {
+            "id": "choice-86",
+            "text": "Give it to IT without plugging it in"
+          },
+          {
+            "id": "choice-87",
+            "text": "Use it for personal storage"
+          },
+          {
+            "id": "choice-88",
+            "text": "Throw it away immediately"
+          }
+        ],
+        "correctChoiceId": "choice-86",
+        "explanation": "Unknown USB drives are a known malware delivery method — IT can safely inspect them without exposing your device.",
+        "difficulty": "Easy",
+        "topic": "removable-media"
+      },
+      {
+        "order": 3,
+        "id": "question-seed-89-What i",
+        "text": "What is ransomware?",
+        "choices": [
+          {
+            "id": "choice-89",
+            "text": "Software that speeds up your computer"
+          },
+          {
+            "id": "choice-90",
+            "text": "Malware that locks your files and demands payment"
+          },
+          {
+            "id": "choice-91",
+            "text": "A type of antivirus"
+          },
+          {
+            "id": "choice-92",
+            "text": "A firewall setting"
+          }
+        ],
+        "correctChoiceId": "choice-90",
+        "explanation": "Ransomware encrypts a victim's files and demands payment for the (unguaranteed) key to unlock them.",
+        "difficulty": "Medium",
+        "topic": "malware-basics"
+      },
+      {
+        "order": 4,
+        "id": "question-seed-93-What i",
+        "text": "What is the recommended response to a ransomware pop-up?",
+        "choices": [
+          {
+            "id": "choice-93",
+            "text": "Pay immediately to avoid losing files"
+          },
+          {
+            "id": "choice-94",
+            "text": "Disconnect from the network and contact IT"
+          },
+          {
+            "id": "choice-95",
+            "text": "Restart the computer repeatedly"
+          },
+          {
+            "id": "choice-96",
+            "text": "Ignore it and keep working"
+          }
+        ],
+        "correctChoiceId": "choice-94",
+        "explanation": "Disconnecting limits further spread while IT investigates and restores from backup.",
+        "difficulty": "Medium",
+        "topic": "ransomware"
+      },
+      {
+        "order": 5,
+        "id": "question-seed-97-Why do",
+        "text": "Why doesn't paying a ransomware demand guarantee your files back?",
+        "choices": [
+          {
+            "id": "choice-97",
+            "text": "Attackers are legally required to unlock files"
+          },
+          {
+            "id": "choice-98",
+            "text": "There is no guarantee the attacker will restore access after payment"
+          },
+          {
+            "id": "choice-99",
+            "text": "Payment is always refunded"
+          },
+          {
+            "id": "choice-100",
+            "text": "Ransomware deletes files instead of encrypting them"
+          }
+        ],
+        "correctChoiceId": "choice-98",
+        "explanation": "Paying funds the attacker with no enforceable guarantee that access will actually be restored.",
+        "difficulty": "Hard",
+        "topic": "ransomware"
+      },
+      {
+        "order": 6,
+        "id": "question-seed-101-What i",
+        "text": "What is a \"Trojan\" in computer security?",
+        "choices": [
+          {
+            "id": "choice-101",
+            "text": "Malware disguised as legitimate or useful software to trick users into running it"
+          },
+          {
+            "id": "choice-102",
+            "text": "A hardware device that intercepts wireless signals"
+          },
+          {
+            "id": "choice-103",
+            "text": "A security patch released by an operating system vendor"
+          },
+          {
+            "id": "choice-104",
+            "text": "An antivirus program that has expired"
+          }
+        ],
+        "correctChoiceId": "choice-101",
+        "explanation": "A Trojan conceals its malicious payload inside what appears to be a normal utility, game, or document.",
+        "difficulty": "Easy",
+        "topic": "malware-basics"
+      },
+      {
+        "order": 7,
+        "id": "question-seed-105-What t",
+        "text": "What type of malware silently records every keystroke typed on a keyboard to capture passwords and card numbers?",
+        "choices": [
+          {
+            "id": "choice-105",
+            "text": "Keylogger"
+          },
+          {
+            "id": "choice-106",
+            "text": "Adware"
+          },
+          {
+            "id": "choice-107",
+            "text": "Defragmenter"
+          },
+          {
+            "id": "choice-108",
+            "text": "Boot sector scanner"
+          }
+        ],
+        "correctChoiceId": "choice-105",
+        "explanation": "Keyloggers capture hardware keystrokes and software inputs, transmitting credentials directly to cybercriminals.",
+        "difficulty": "Easy",
+        "topic": "malware-basics"
+      },
+      {
+        "order": 8,
+        "id": "question-seed-109-Why is",
+        "text": "Why is enabling automatic software updates strongly recommended for operating systems and browsers?",
+        "choices": [
+          {
+            "id": "choice-109",
+            "text": "It speeds up device battery charging times"
+          },
+          {
+            "id": "choice-110",
+            "text": "It patches known vulnerabilities before automated exploit kits can weaponize them against your device"
+          },
+          {
+            "id": "choice-111",
+            "text": "It prevents all spam emails from reaching your inbox"
+          },
+          {
+            "id": "choice-112",
+            "text": "It clears device physical memory on startup"
+          }
+        ],
+        "correctChoiceId": "choice-110",
+        "explanation": "Attackers scan for unpatched software; automatic updates ensure security vulnerabilities are fixed as soon as patches exist.",
+        "difficulty": "Medium",
+        "topic": "patching"
+      },
+      {
+        "order": 9,
+        "id": "question-seed-113-Why is",
+        "text": "Why is maintaining an offline (\"air-gapped\") backup crucial for recovering from modern ransomware attacks?",
+        "choices": [
+          {
+            "id": "choice-113",
+            "text": "Offline backups process data faster than cloud backups"
+          },
+          {
+            "id": "choice-114",
+            "text": "Ransomware cannot reach or encrypt storage drives that are physically disconnected from the network"
+          },
+          {
+            "id": "choice-115",
+            "text": "Cloud storage providers delete backups after three days"
+          },
+          {
+            "id": "choice-116",
+            "text": "Offline backups prevent hardware overheating"
+          }
+        ],
+        "correctChoiceId": "choice-114",
+        "explanation": "Modern ransomware actively searches network shares and connected drives to encrypt backups; offline media remains immune.",
+        "difficulty": "Hard",
+        "topic": "ransomware"
+      },
+      {
+        "order": 10,
+        "id": "question-seed-117-Why is",
+        "text": "Why is disabling the \"AutoRun\" or \"AutoPlay\" feature on operating systems a sound security defense?",
+        "choices": [
+          {
+            "id": "choice-117",
+            "text": "It stops USB drives from running potentially malicious programs automatically upon insertion"
+          },
+          {
+            "id": "choice-118",
+            "text": "It saves battery power when playing music"
+          },
+          {
+            "id": "choice-119",
+            "text": "It prevents flash drives from running out of storage"
+          },
+          {
+            "id": "choice-120",
+            "text": "It makes copying files three times faster"
+          }
+        ],
+        "correctChoiceId": "choice-117",
+        "explanation": "Disabling AutoRun ensures code on removable media cannot execute without explicit user confirmation.",
+        "difficulty": "Medium",
+        "topic": "removable-media"
+      }
+    ]
+  },
+  "safe-browsing": {
+    "pretest": [
+      {
+        "id": "pretest-pretest-choice-97",
+        "text": "Does seeing \"HTTPS\" and a padlock mean a website is completely safe?",
+        "choices": [
+          {
+            "id": "pretest-choice-97",
+            "text": "Yes, always"
+          },
+          {
+            "id": "pretest-choice-98",
+            "text": "No — it only means the connection is encrypted, not that the site is trustworthy"
+          },
+          {
+            "id": "pretest-choice-99",
+            "text": "It means the site is government-approved"
+          },
+          {
+            "id": "pretest-choice-100",
+            "text": "It means the site has no ads"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-98",
+        "explanation": "HTTPS encrypts the connection, but attackers can obtain valid certificates for malicious sites too.",
+        "topic": "https-misconceptions"
+      },
+      {
+        "id": "pretest-pretest-choice-101",
+        "text": "Is public Wi-Fi safe for logging into sensitive accounts without protection?",
+        "choices": [
+          {
+            "id": "pretest-choice-101",
+            "text": "No — traffic can potentially be intercepted by others on the network"
+          },
+          {
+            "id": "pretest-choice-102",
+            "text": "Only at coffee shops"
+          },
+          {
+            "id": "pretest-choice-103",
+            "text": "Only if the network has a password"
+          },
+          {
+            "id": "pretest-choice-104",
+            "text": "Yes, always"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-101",
+        "explanation": "Open or shared networks make it easier for others on the same Wi-Fi to intercept unencrypted traffic.",
+        "topic": "public-wifi"
+      },
+      {
+        "id": "pretest-pretest-choice-105",
+        "text": "What is a common warning sign of a scam shopping website?",
+        "choices": [
+          {
+            "id": "pretest-choice-105",
+            "text": "Product photos"
+          },
+          {
+            "id": "pretest-choice-106",
+            "text": "A working search bar"
+          },
+          {
+            "id": "pretest-choice-107",
+            "text": "Extreme discounts like 90% off on an unfamiliar site"
+          },
+          {
+            "id": "pretest-choice-108",
+            "text": "A visible contact page"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-107",
+        "explanation": "Unrealistic discounts on unfamiliar sites are a common tactic used to harvest payment details.",
+        "topic": "scam-sites"
+      },
+      {
+        "id": "pretest-pretest-choice-109",
+        "text": "What should you do about an unexpected \"your browser is out of date\" pop-up with a download button?",
+        "choices": [
+          {
+            "id": "pretest-choice-109",
+            "text": "Ignore it, it will go away in a week"
+          },
+          {
+            "id": "pretest-choice-110",
+            "text": "Click it immediately to stay safe"
+          },
+          {
+            "id": "pretest-choice-111",
+            "text": "Avoid clicking it — it is a common malware trick"
+          },
+          {
+            "id": "pretest-choice-112",
+            "text": "Restart your computer instead"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-111",
+        "explanation": "Fake update pop-ups are a common way to trick visitors into downloading malware.",
+        "topic": "fake-updates"
+      },
+      {
+        "id": "pretest-pretest-choice-113",
+        "text": "What helps protect sensitive logins while using public Wi-Fi?",
+        "choices": [
+          {
+            "id": "pretest-choice-113",
+            "text": "A VPN or a trusted, private network"
+          },
+          {
+            "id": "pretest-choice-114",
+            "text": "A stronger Wi-Fi password only"
+          },
+          {
+            "id": "pretest-choice-115",
+            "text": "Using an older browser"
+          },
+          {
+            "id": "pretest-choice-116",
+            "text": "Disabling your antivirus"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-113",
+        "explanation": "A VPN or trusted network protects sensitive traffic from others who may share the same public Wi-Fi.",
+        "topic": "network-protection"
+      },
+      {
+        "id": "pretest-pretest-choice-117",
+        "text": "What does a browser certificate error such as \"Your connection is not private\" typically warn you about?",
+        "choices": [
+          {
+            "id": "pretest-choice-117",
+            "text": "The web server identity cannot be verified or the connection might be intercepted"
+          },
+          {
+            "id": "pretest-choice-118",
+            "text": "The website has too many animated images"
+          },
+          {
+            "id": "pretest-choice-119",
+            "text": "Your home Wi-Fi router is turned off"
+          },
+          {
+            "id": "pretest-choice-120",
+            "text": "Your monitor display resolution is too low"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-117",
+        "explanation": "Certificate errors indicate potential man-in-the-middle attacks, invalid encryption, or expired domain credentials.",
+        "topic": "https-misconceptions"
+      },
+      {
+        "id": "pretest-pretest-choice-121",
+        "text": "What is \"typosquatting\" (URL hijacking)?",
+        "choices": [
+          {
+            "id": "pretest-choice-121",
+            "text": "Purchasing domain names for non-profit organizations"
+          },
+          {
+            "id": "pretest-choice-122",
+            "text": "A tool used by web designers to test typography"
+          },
+          {
+            "id": "pretest-choice-123",
+            "text": "Registering misspelled variants of popular domain names to mislead visitors to fake sites"
+          },
+          {
+            "id": "pretest-choice-124",
+            "text": "Typing a search query too quickly in a search engine"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-124",
+        "explanation": "Attackers register common spelling errors of popular sites (e.g., paypa1.com or examp1e.com) to catch accidental mistypes.",
+        "topic": "scam-sites"
+      },
+      {
+        "id": "pretest-pretest-choice-125",
+        "text": "Why should you avoid accessing sensitive accounts on open, password-free public Wi-Fi hotspots without a VPN?",
+        "choices": [
+          {
+            "id": "pretest-choice-125",
+            "text": "Search engines block all searches on public Wi-Fi"
+          },
+          {
+            "id": "pretest-choice-126",
+            "text": "Public Wi-Fi networks disconnect every five minutes"
+          },
+          {
+            "id": "pretest-choice-127",
+            "text": "Unencrypted local network traffic can be monitored or spoofed by other devices on the same access point"
+          },
+          {
+            "id": "pretest-choice-128",
+            "text": "Public Wi-Fi charges hidden fees per website visited"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-127",
+        "explanation": "Open access points allow malicious peers on the same wireless network to analyze broadcast packets or launch spoofing attacks.",
+        "topic": "public-wifi"
+      }
+    ],
+    "quiz": [
+      {
+        "order": 1,
+        "id": "question-seed-121-Why is",
+        "text": "Why is public Wi-Fi risky for sensitive logins?",
+        "choices": [
+          {
+            "id": "choice-121",
+            "text": "It is usually slower"
+          },
+          {
+            "id": "choice-122",
+            "text": "Traffic can potentially be intercepted by others on the network"
+          },
+          {
+            "id": "choice-123",
+            "text": "It costs more data"
+          },
+          {
+            "id": "choice-124",
+            "text": "It blocks secure websites"
+          }
+        ],
+        "correctChoiceId": "choice-122",
+        "explanation": "Open networks let others sharing the same Wi-Fi potentially intercept unencrypted traffic.",
+        "difficulty": "Easy",
+        "topic": "public-wifi"
+      },
+      {
+        "order": 2,
+        "id": "question-seed-125-What s",
+        "text": "What should you do before entering payment details on an unfamiliar site?",
+        "choices": [
+          {
+            "id": "choice-125",
+            "text": "Trust it if the discount is large"
+          },
+          {
+            "id": "choice-126",
+            "text": "Check reviews and the site's reputation first"
+          },
+          {
+            "id": "choice-127",
+            "text": "Enter details quickly before the deal ends"
+          },
+          {
+            "id": "choice-128",
+            "text": "Ask a friend to enter it for you"
+          }
+        ],
+        "correctChoiceId": "choice-126",
+        "explanation": "A quick reputation check can reveal a scam site before any payment details are entered.",
+        "difficulty": "Medium",
+        "topic": "scam-sites"
+      },
+      {
+        "order": 3,
+        "id": "question-seed-129-What i",
+        "text": "What is a warning sign of a scam shopping site?",
+        "choices": [
+          {
+            "id": "choice-129",
+            "text": "Extreme discounts like 90% off on an unfamiliar site"
+          },
+          {
+            "id": "choice-130",
+            "text": "A working contact page"
+          },
+          {
+            "id": "choice-131",
+            "text": "HTTPS in the address bar"
+          },
+          {
+            "id": "choice-132",
+            "text": "Product photos"
+          }
+        ],
+        "correctChoiceId": "choice-129",
+        "explanation": "Unrealistic discounts on unfamiliar sites are a common tactic used to harvest payment details.",
+        "difficulty": "Easy",
+        "topic": "scam-sites"
+      },
+      {
+        "order": 4,
+        "id": "question-seed-133-Why sh",
+        "text": "Why should you be cautious about browser extensions demanded by a random website?",
+        "choices": [
+          {
+            "id": "choice-133",
+            "text": "They always slow down your browser"
+          },
+          {
+            "id": "choice-134",
+            "text": "They can be a way to deliver malware"
+          },
+          {
+            "id": "choice-135",
+            "text": "They are always free"
+          },
+          {
+            "id": "choice-136",
+            "text": "They require a restart"
+          }
+        ],
+        "correctChoiceId": "choice-134",
+        "explanation": "Extensions demanded by an unrelated site are a common malware delivery method disguised as a requirement.",
+        "difficulty": "Medium",
+        "topic": "fake-updates"
+      },
+      {
+        "order": 5,
+        "id": "question-seed-137-What i",
+        "text": "What is the safest way to access a sensitive account like banking?",
+        "choices": [
+          {
+            "id": "choice-137",
+            "text": "Any public Wi-Fi network"
+          },
+          {
+            "id": "choice-138",
+            "text": "A trusted network or a VPN"
+          },
+          {
+            "id": "choice-139",
+            "text": "Any browser extension that promises security"
+          },
+          {
+            "id": "choice-140",
+            "text": "A shared computer"
+          }
+        ],
+        "correctChoiceId": "choice-138",
+        "explanation": "A trusted network or VPN protects sensitive traffic from others who may share the same public Wi-Fi.",
+        "difficulty": "Hard",
+        "topic": "network-protection"
+      },
+      {
+        "order": 6,
+        "id": "question-seed-141-What i",
+        "text": "What is 'typosquatting' (also known as URL hijacking)?",
+        "choices": [
+          {
+            "id": "choice-141",
+            "text": "Registering misspelled domain names of popular sites to deceive visitors"
+          },
+          {
+            "id": "choice-142",
+            "text": "A tool that automatically corrects typing errors in search queries"
+          },
+          {
+            "id": "choice-143",
+            "text": "A browser extension that compresses website source code"
+          },
+          {
+            "id": "choice-144",
+            "text": "A technique that boosts download speeds across networks"
+          }
+        ],
+        "correctChoiceId": "choice-141",
+        "explanation": "Typosquatters register misspelled variants of familiar websites to trick users into visiting phishing or malware-hosting pages.",
+        "difficulty": "Easy",
+        "topic": "scam-sites"
+      },
+      {
+        "order": 7,
+        "id": "question-seed-145-Does a",
+        "text": "Does a padlock icon (HTTPS) next to a URL mean the website is completely trustworthy?",
+        "choices": [
+          {
+            "id": "choice-145",
+            "text": "Yes, malicious actors and scam websites are strictly barred from getting SSL certificates"
+          },
+          {
+            "id": "choice-146",
+            "text": "No, HTTPS only encrypts the connection; malicious and scam websites can also have HTTPS"
+          },
+          {
+            "id": "choice-147",
+            "text": "Yes, but only when accessed from desktop computers"
+          },
+          {
+            "id": "choice-148",
+            "text": "No, HTTPS actually disables encryption for external third-party content"
+          }
+        ],
+        "correctChoiceId": "choice-146",
+        "explanation": "HTTPS ensures communication between your device and the website is encrypted, but scam and phishing websites can also acquire valid SSL certificates.",
+        "difficulty": "Medium",
+        "topic": "https-misconceptions"
+      },
+      {
+        "order": 8,
+        "id": "question-seed-149-When y",
+        "text": "When your browser displays a full-page red warning stating 'Your connection is not private' (SSL/TLS certificate error), what should you do?",
+        "choices": [
+          {
+            "id": "choice-149",
+            "text": "Ignore the alert and proceed immediately to log in"
+          },
+          {
+            "id": "choice-150",
+            "text": "Do not bypass the warning or submit confidential data on that connection"
+          },
+          {
+            "id": "choice-151",
+            "text": "Turn off your device antivirus software and refresh"
+          },
+          {
+            "id": "choice-152",
+            "text": "Disable your firewall permanently"
+          }
+        ],
+        "correctChoiceId": "choice-150",
+        "explanation": "A certificate mismatch or error can signal an insecure connection or man-in-the-middle attack; you should avoid sending personal data.",
+        "difficulty": "Medium",
+        "topic": "https-misconceptions"
+      },
+      {
+        "order": 9,
+        "id": "question-seed-153-If an ",
+        "text": "If an urgent browser pop-up freezes your screen claiming 'VIRUS DETECTED! CALL TECH SUPPORT NOW', what is the safest action?",
+        "choices": [
+          {
+            "id": "choice-153",
+            "text": "Call the helpline number shown on the screen immediately"
+          },
+          {
+            "id": "choice-154",
+            "text": "Close the tab or browser process via Task Manager and avoid calling the number"
+          },
+          {
+            "id": "choice-155",
+            "text": "Download the cleanup software linked in the pop-up"
+          },
+          {
+            "id": "choice-156",
+            "text": "Provide your remote desktop credentials so they can inspect your computer"
+          }
+        ],
+        "correctChoiceId": "choice-154",
+        "explanation": "Legitimate operating systems do not display browser pop-ups demanding you call a phone number. These are tech-support scam pages designed to gain remote access.",
+        "difficulty": "Medium",
+        "topic": "fake-updates"
+      },
+      {
+        "order": 10,
+        "id": "question-seed-157-What d",
+        "text": "What does 'Incognito' or 'Private Browsing' mode actually do?",
+        "choices": [
+          {
+            "id": "choice-157",
+            "text": "It makes your activity completely anonymous to network admins and internet providers"
+          },
+          {
+            "id": "choice-158",
+            "text": "It prevents your local browser from saving browsing history, cookies, and form data after closing the session"
+          },
+          {
+            "id": "choice-159",
+            "text": "It acts as an impenetrable VPN that conceals your real physical location"
+          },
+          {
+            "id": "choice-160",
+            "text": "It automatically cleanses downloaded files of all viruses and malware"
+          }
+        ],
+        "correctChoiceId": "choice-158",
+        "explanation": "Private browsing only keeps your local device from recording session history and cookies; school/work networks and visited websites can still observe your traffic.",
+        "difficulty": "Hard",
+        "topic": "https-misconceptions"
+      }
+    ]
+  },
+  "data-privacy": {
+    "pretest": [
+      {
+        "id": "pretest-pretest-choice-129",
+        "text": "What is data privacy primarily concerned with?",
+        "choices": [
+          {
+            "id": "pretest-choice-129",
+            "text": "Making apps load faster"
+          },
+          {
+            "id": "pretest-choice-130",
+            "text": "Protecting personal information from unauthorized access or misuse"
+          },
+          {
+            "id": "pretest-choice-131",
+            "text": "Increasing storage space"
+          },
+          {
+            "id": "pretest-choice-132",
+            "text": "Blocking all advertising"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-130",
+        "explanation": "Data privacy is about controlling who can access, use, or misuse your personal information.",
+        "topic": "privacy-basics"
+      },
+      {
+        "id": "pretest-pretest-choice-133",
+        "text": "Should an app always be granted every permission it requests?",
+        "choices": [
+          {
+            "id": "pretest-choice-133",
+            "text": "No — only permissions the app actually needs for its function"
+          },
+          {
+            "id": "pretest-choice-134",
+            "text": "Yes, if it is a popular app"
+          },
+          {
+            "id": "pretest-choice-135",
+            "text": "Only on new phones"
+          },
+          {
+            "id": "pretest-choice-136",
+            "text": "Yes, apps need full access to work"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-133",
+        "explanation": "Many apps request more access than they need — granting only what is necessary limits data exposure.",
+        "topic": "app-permissions"
+      },
+      {
+        "id": "pretest-pretest-choice-137",
+        "text": "What is a risk of oversharing personal details on social media?",
+        "choices": [
+          {
+            "id": "pretest-choice-137",
+            "text": "It slows down the app"
+          },
+          {
+            "id": "pretest-choice-138",
+            "text": "There is no real risk"
+          },
+          {
+            "id": "pretest-choice-139",
+            "text": "It can give attackers information useful for scams or impersonation"
+          },
+          {
+            "id": "pretest-choice-140",
+            "text": "It uses more phone storage"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-139",
+        "explanation": "Details like routines, travel plans, or family info can be pieced together and used against you.",
+        "topic": "oversharing"
+      },
+      {
+        "id": "pretest-pretest-choice-141",
+        "text": "Can data collected by a free app ever be sold to other companies?",
+        "choices": [
+          {
+            "id": "pretest-choice-141",
+            "text": "Only if you pay for the app"
+          },
+          {
+            "id": "pretest-choice-142",
+            "text": "No, that would be illegal everywhere"
+          },
+          {
+            "id": "pretest-choice-143",
+            "text": "Yes — this happens and is a real risk to be aware of"
+          },
+          {
+            "id": "pretest-choice-144",
+            "text": "Only for banking apps"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-143",
+        "explanation": "Some apps monetize by selling collected data to third parties like data brokers.",
+        "topic": "data-brokers"
+      },
+      {
+        "id": "pretest-pretest-choice-145",
+        "text": "What is a good everyday privacy habit?",
+        "choices": [
+          {
+            "id": "pretest-choice-145",
+            "text": "Never using any apps at all"
+          },
+          {
+            "id": "pretest-choice-146",
+            "text": "Periodically reviewing app permissions and privacy settings"
+          },
+          {
+            "id": "pretest-choice-147",
+            "text": "Sharing your location publicly for convenience"
+          },
+          {
+            "id": "pretest-choice-148",
+            "text": "Using the same password for every account"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-146",
+        "explanation": "Regularly auditing permissions and privacy settings limits what apps and services can collect over time.",
+        "topic": "privacy-habits"
+      },
+      {
+        "id": "pretest-pretest-choice-149",
+        "text": "Which of the following is categorized as sensitive Personally Identifiable Information (PII)?",
+        "choices": [
+          {
+            "id": "pretest-choice-149",
+            "text": "Your government ID number, banking credentials, and medical history"
+          },
+          {
+            "id": "pretest-choice-150",
+            "text": "The current weather forecast in your city"
+          },
+          {
+            "id": "pretest-choice-151",
+            "text": "A public library open hours schedule"
+          },
+          {
+            "id": "pretest-choice-152",
+            "text": "Your favorite movie genre"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-149",
+        "explanation": "Sensitive PII comprises data that directly identifies an individual and presents serious identity theft or fraud risks if compromised.",
+        "topic": "privacy-basics"
+      },
+      {
+        "id": "pretest-pretest-choice-153",
+        "text": "What hidden metadata (EXIF data) is frequently stored in digital photos taken on smartphones?",
+        "choices": [
+          {
+            "id": "pretest-choice-153",
+            "text": "The names of everyone appearing in the photo"
+          },
+          {
+            "id": "pretest-choice-154",
+            "text": "The home Wi-Fi password of the user"
+          },
+          {
+            "id": "pretest-choice-155",
+            "text": "The brand of printer connected to the phone"
+          },
+          {
+            "id": "pretest-choice-156",
+            "text": "Precise GPS location coordinates and timestamp information"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-156",
+        "explanation": "EXIF tags embedded in smartphone photos often store accurate geographic coordinates and device timestamps, revealing where you were.",
+        "topic": "oversharing"
+      },
+      {
+        "id": "pretest-pretest-choice-157",
+        "text": "What is the main function of third-party tracking cookies across multiple websites?",
+        "choices": [
+          {
+            "id": "pretest-choice-157",
+            "text": "Encrypting your computer hard drive"
+          },
+          {
+            "id": "pretest-choice-158",
+            "text": "Storing the website color scheme"
+          },
+          {
+            "id": "pretest-choice-159",
+            "text": "Constructing detailed behavioral profiles of your browsing habits across different web domains"
+          },
+          {
+            "id": "pretest-choice-160",
+            "text": "Speeding up internet connection bandwidth"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-159",
+        "explanation": "Third-party tracking cookies follow users across diverse websites to aggregate personal interests and consumer profiles.",
+        "topic": "data-brokers"
+      }
+    ],
+    "quiz": [
+      {
+        "order": 1,
+        "id": "question-seed-161-Why sh",
+        "text": "Why should a flashlight app not need access to your contacts?",
+        "choices": [
+          {
+            "id": "choice-161",
+            "text": "It needs contacts to work properly"
+          },
+          {
+            "id": "choice-162",
+            "text": "That permission has no legitimate connection to its function"
+          },
+          {
+            "id": "choice-163",
+            "text": "All apps need contacts access"
+          },
+          {
+            "id": "choice-164",
+            "text": "It improves battery life"
+          }
+        ],
+        "correctChoiceId": "choice-162",
+        "explanation": "A flashlight app has no legitimate reason to need your contacts — that request goes beyond the app's actual function.",
+        "difficulty": "Easy",
+        "topic": "app-permissions"
+      },
+      {
+        "order": 2,
+        "id": "question-seed-165-What i",
+        "text": "What is a risk of posting travel dates and your address publicly?",
+        "choices": [
+          {
+            "id": "choice-165",
+            "text": "It signals when your home may be empty"
+          },
+          {
+            "id": "choice-166",
+            "text": "It uses too much data"
+          },
+          {
+            "id": "choice-167",
+            "text": "It slows down your phone"
+          },
+          {
+            "id": "choice-168",
+            "text": "It violates copyright"
+          }
+        ],
+        "correctChoiceId": "choice-165",
+        "explanation": "Combining public travel details with an address can indicate exactly when a home is unoccupied.",
+        "difficulty": "Medium",
+        "topic": "oversharing"
+      },
+      {
+        "order": 3,
+        "id": "question-seed-169-What s",
+        "text": "What should you do with app permission requests that seem unnecessary?",
+        "choices": [
+          {
+            "id": "choice-169",
+            "text": "Always accept them"
+          },
+          {
+            "id": "choice-170",
+            "text": "Deny them and see if the app still works"
+          },
+          {
+            "id": "choice-171",
+            "text": "Uninstall the app immediately without checking"
+          },
+          {
+            "id": "choice-172",
+            "text": "Ignore the prompt"
+          }
+        ],
+        "correctChoiceId": "choice-170",
+        "explanation": "Only granting permissions an app actually needs limits what data it can collect.",
+        "difficulty": "Easy",
+        "topic": "app-permissions"
+      },
+      {
+        "order": 4,
+        "id": "question-seed-173-What i",
+        "text": "What is one benefit of requesting data deletion from unused accounts?",
+        "choices": [
+          {
+            "id": "choice-173",
+            "text": "It speeds up the app"
+          },
+          {
+            "id": "choice-174",
+            "text": "It limits what could be exposed in a future breach"
+          },
+          {
+            "id": "choice-175",
+            "text": "It is required every month"
+          },
+          {
+            "id": "choice-176",
+            "text": "It changes your password automatically"
+          }
+        ],
+        "correctChoiceId": "choice-174",
+        "explanation": "Removing data from accounts you no longer use limits what a future breach could expose.",
+        "difficulty": "Medium",
+        "topic": "data-brokers"
+      },
+      {
+        "order": 5,
+        "id": "question-seed-177-Why is",
+        "text": "Why is limiting your audience when sharing photos a good privacy habit?",
+        "choices": [
+          {
+            "id": "choice-177",
+            "text": "It reduces what a stranger can learn and act on"
+          },
+          {
+            "id": "choice-178",
+            "text": "It makes photos load faster"
+          },
+          {
+            "id": "choice-179",
+            "text": "It is required by most platforms"
+          },
+          {
+            "id": "choice-180",
+            "text": "It improves photo quality"
+          }
+        ],
+        "correctChoiceId": "choice-177",
+        "explanation": "Limiting who can see personal photos and their timing reduces what an unknown viewer can learn and act on.",
+        "difficulty": "Hard",
+        "topic": "privacy-habits"
+      },
+      {
+        "order": 6,
+        "id": "question-seed-181-When a",
+        "text": "When a simple calculator app asks for permission to access your device's camera, microphone, and contacts, what is the best privacy decision?",
+        "choices": [
+          {
+            "id": "choice-181",
+            "text": "Grant all permissions so the calculator can run at maximum performance"
+          },
+          {
+            "id": "choice-182",
+            "text": "Deny the permissions because a calculator has no genuine need for camera or contact data"
+          },
+          {
+            "id": "choice-183",
+            "text": "Grant permissions only while using the square root function"
+          },
+          {
+            "id": "choice-184",
+            "text": "Share your device screen with the developer instead"
+          }
+        ],
+        "correctChoiceId": "choice-182",
+        "explanation": "Adhering to the principle of least privilege means refusing permissions that bear no connection to the core function of the app.",
+        "difficulty": "Easy",
+        "topic": "app-permissions"
+      },
+      {
+        "order": 7,
+        "id": "question-seed-185-What s",
+        "text": "What sensitive information can EXIF metadata embedded in photos accidentally reveal?",
+        "choices": [
+          {
+            "id": "choice-185",
+            "text": "The exact GPS coordinates of where the picture was taken and the exact date and time"
+          },
+          {
+            "id": "choice-186",
+            "text": "The private Wi-Fi network key where the picture was captured"
+          },
+          {
+            "id": "choice-187",
+            "text": "The user’s linked bank account and credit score details"
+          },
+          {
+            "id": "choice-188",
+            "text": "The entire text message history stored on the smartphone"
+          }
+        ],
+        "correctChoiceId": "choice-185",
+        "explanation": "Digital cameras and smartphones embed EXIF metadata including geographic coordinates and timestamps, potentially exposing your home or daily routines.",
+        "difficulty": "Medium",
+        "topic": "oversharing"
+      },
+      {
+        "order": 8,
+        "id": "question-seed-189-What i",
+        "text": "What is a 'data broker' and why does their activity matter for your privacy?",
+        "choices": [
+          {
+            "id": "choice-189",
+            "text": "A technician who repairs damaged data cables for public internet service providers"
+          },
+          {
+            "id": "choice-190",
+            "text": "A commercial entity that compiles, analyzes, and sells personal dossiers gathered from multiple online and offline records"
+          },
+          {
+            "id": "choice-191",
+            "text": "An open-source utility that purges cookies and caches from web browsers"
+          },
+          {
+            "id": "choice-192",
+            "text": "A government agency that provides free encrypted cloud backup storage"
+          }
+        ],
+        "correctChoiceId": "choice-190",
+        "explanation": "Data brokers collect, bundle, and sell consumer details to advertisers, insurers, and other parties without the consumer directly interacting with them.",
+        "difficulty": "Hard",
+        "topic": "data-brokers"
+      },
+      {
+        "order": 9,
+        "id": "question-seed-193-Why is",
+        "text": "Why is using factual personal answers (e.g., mother's maiden name, primary school) for password reset questions dangerous?",
+        "choices": [
+          {
+            "id": "choice-193",
+            "text": "Special characters are strictly forbidden in security answers"
+          },
+          {
+            "id": "choice-194",
+            "text": "Biographical facts can often be discovered through social media, family records, or basic research"
+          },
+          {
+            "id": "choice-195",
+            "text": "Answers are limited to five characters or fewer by website standards"
+          },
+          {
+            "id": "choice-196",
+            "text": "Security questions are re-randomized every twenty-four hours"
+          }
+        ],
+        "correctChoiceId": "choice-194",
+        "explanation": "Public profiles, family posts, and genealogical sites often expose biographical facts, making standard recovery question answers guessable.",
+        "difficulty": "Medium",
+        "topic": "privacy-habits"
+      },
+      {
+        "order": 10,
+        "id": "question-seed-197-Why sh",
+        "text": "Why should you formally delete unused accounts rather than merely uninstalling the app from your device?",
+        "choices": [
+          {
+            "id": "choice-197",
+            "text": "Your profile, contact information, and personal history remain preserved on the provider’s servers until the account itself is closed"
+          },
+          {
+            "id": "choice-198",
+            "text": "Uninstalling an app automatically makes your account public on search engines"
+          },
+          {
+            "id": "choice-199",
+            "text": "Mobile operating systems refuse to let deleted apps be re-downloaded later"
+          },
+          {
+            "id": "choice-200",
+            "text": "Uninstalled apps continue consuming your local device storage"
+          }
+        ],
+        "correctChoiceId": "choice-197",
+        "explanation": "Uninstalling only deletes local files from your phone; your account and records persist in the provider’s database and remain vulnerable to breaches until deleted.",
+        "difficulty": "Medium",
+        "topic": "privacy-habits"
+      }
+    ]
+  },
+  "online-safety": {
+    "pretest": [
+      {
+        "id": "pretest-pretest-choice-161",
+        "text": "Is public Wi-Fi equally safe for all everyday browsing?",
+        "choices": [
+          {
+            "id": "pretest-choice-161",
+            "text": "Yes, always"
+          },
+          {
+            "id": "pretest-choice-162",
+            "text": "It is riskier for sensitive tasks like logins or banking"
+          },
+          {
+            "id": "pretest-choice-163",
+            "text": "It is only unsafe for gaming"
+          },
+          {
+            "id": "pretest-choice-164",
+            "text": "It is only unsafe on phones"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-162",
+        "explanation": "Public Wi-Fi is generally fine for casual browsing but riskier for anything sensitive without extra protection.",
+        "topic": "public-wifi"
+      },
+      {
+        "id": "pretest-pretest-choice-165",
+        "text": "What should you do if you witness cyberbullying in a group chat?",
+        "choices": [
+          {
+            "id": "pretest-choice-165",
+            "text": "Leave and report it to a trusted adult or moderator"
+          },
+          {
+            "id": "pretest-choice-166",
+            "text": "Ignore it completely"
+          },
+          {
+            "id": "pretest-choice-167",
+            "text": "Share it with more people"
+          },
+          {
+            "id": "pretest-choice-168",
+            "text": "Join in since others are doing it"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-165",
+        "explanation": "Reporting gives someone with authority the chance to step in and stop the harm.",
+        "topic": "cyberbullying"
+      },
+      {
+        "id": "pretest-pretest-choice-169",
+        "text": "How should you handle a friend request from a stranger with no mutual connections?",
+        "choices": [
+          {
+            "id": "pretest-choice-169",
+            "text": "Share your full profile with them right away"
+          },
+          {
+            "id": "pretest-choice-170",
+            "text": "Ask them for personal details first"
+          },
+          {
+            "id": "pretest-choice-171",
+            "text": "Accept it to be polite"
+          },
+          {
+            "id": "pretest-choice-172",
+            "text": "Be cautious — consider declining or reviewing your visibility settings"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-172",
+        "explanation": "Being cautious with unknown requests reduces exposure to accounts with no real connection to you.",
+        "topic": "stranger-contact"
+      },
+      {
+        "id": "pretest-pretest-choice-173",
+        "text": "Is peer pressure encountered online less impactful than peer pressure in person?",
+        "choices": [
+          {
+            "id": "pretest-choice-173",
+            "text": "It only affects adults"
+          },
+          {
+            "id": "pretest-choice-174",
+            "text": "Yes, online pressure is not real"
+          },
+          {
+            "id": "pretest-choice-175",
+            "text": "No — it can push someone toward unsafe choices just as effectively"
+          },
+          {
+            "id": "pretest-choice-176",
+            "text": "Yes, because you cannot see the other person"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-175",
+        "explanation": "Peer pressure online can be just as influential as in-person pressure, and just as risky to give in to.",
+        "topic": "peer-pressure"
+      },
+      {
+        "id": "pretest-pretest-choice-177",
+        "text": "What is a good first step if you are being harassed online?",
+        "choices": [
+          {
+            "id": "pretest-choice-177",
+            "text": "Respond angrily to defend yourself"
+          },
+          {
+            "id": "pretest-choice-178",
+            "text": "Report it to a trusted adult or platform moderator"
+          },
+          {
+            "id": "pretest-choice-179",
+            "text": "Delete all your accounts immediately"
+          },
+          {
+            "id": "pretest-choice-180",
+            "text": "Keep it to yourself"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-178",
+        "explanation": "Reporting to a trusted adult or moderator gets help involved rather than escalating things alone.",
+        "topic": "harassment-response"
+      },
+      {
+        "id": "pretest-pretest-choice-181",
+        "text": "What is \"catfishing\" in the context of online relationships and social platforms?",
+        "choices": [
+          {
+            "id": "pretest-choice-181",
+            "text": "Fabricating a false online identity to deceive, exploit, or emotionally manipulate another person"
+          },
+          {
+            "id": "pretest-choice-182",
+            "text": "Reporting abusive spam comments on social media"
+          },
+          {
+            "id": "pretest-choice-183",
+            "text": "Setting up multiple email addresses for school"
+          },
+          {
+            "id": "pretest-choice-184",
+            "text": "Catching fish using specialized digital sensors"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-181",
+        "explanation": "Catfishing involves adopting a deceptive online persona with stolen photos or false information to manipulate victims.",
+        "topic": "stranger-contact"
+      },
+      {
+        "id": "pretest-pretest-choice-185",
+        "text": "Why should you remember that \"private\" group messages and photos can easily become public?",
+        "choices": [
+          {
+            "id": "pretest-choice-185",
+            "text": "Messaging apps automatically publish group chats to web search engines"
+          },
+          {
+            "id": "pretest-choice-186",
+            "text": "Private chats can only be viewed on desktop computers"
+          },
+          {
+            "id": "pretest-choice-187",
+            "text": "Computers delete all group chats after twenty-four hours"
+          },
+          {
+            "id": "pretest-choice-188",
+            "text": "Any chat participant can take screenshots, download media, or forward messages to anyone outside the group"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-188",
+        "explanation": "Recipients have full capability to copy, screenshot, or distribute content you shared, eliminating any guarantee of secrecy.",
+        "topic": "cyberbullying"
+      },
+      {
+        "id": "pretest-pretest-choice-189",
+        "text": "What is an effective way to protect your personal safety on online gaming platforms?",
+        "choices": [
+          {
+            "id": "pretest-choice-189",
+            "text": "Clicking any game credit links posted by unfamiliar players in lobby chats"
+          },
+          {
+            "id": "pretest-choice-190",
+            "text": "Giving out your home address so other players can send gifts"
+          },
+          {
+            "id": "pretest-choice-191",
+            "text": "Using a pseudonym, keeping voice lobbies friend-only, and never sharing your school or location"
+          },
+          {
+            "id": "pretest-choice-192",
+            "text": "Allowing all players to view your phone number in your profile"
+          }
+        ],
+        "correctChoiceId": "pretest-choice-191",
+        "explanation": "Maintaining pseudonymity and withholding identifying details keeps gaming accounts and real-world safety protected.",
+        "topic": "stranger-contact"
+      }
+    ],
+    "quiz": [
+      {
+        "order": 1,
+        "id": "question-seed-201-What s",
+        "text": "What should you do with a friend request from a stranger with no mutual connections?",
+        "choices": [
+          {
+            "id": "choice-201",
+            "text": "Accept it to be polite"
+          },
+          {
+            "id": "choice-202",
+            "text": "Decline and review your profile visibility settings"
+          },
+          {
+            "id": "choice-203",
+            "text": "Share your full profile with them"
+          },
+          {
+            "id": "choice-204",
+            "text": "Ask them for personal information first"
+          }
+        ],
+        "correctChoiceId": "choice-202",
+        "explanation": "Declining and tightening visibility settings reduces exposure to accounts with no real connection to you.",
+        "difficulty": "Easy",
+        "topic": "stranger-contact"
+      },
+      {
+        "order": 2,
+        "id": "question-seed-205-Why is",
+        "text": "Why is it okay to skip a risky viral challenge?",
+        "choices": [
+          {
+            "id": "choice-205",
+            "text": "Challenges are illegal"
+          },
+          {
+            "id": "choice-206",
+            "text": "Choosing not to participate protects you without needing anyone else's approval"
+          },
+          {
+            "id": "choice-207",
+            "text": "It is required by platform rules"
+          },
+          {
+            "id": "choice-208",
+            "text": "It has no real risk anyway"
+          }
+        ],
+        "correctChoiceId": "choice-206",
+        "explanation": "Opting out of unsafe viral trends is always a valid choice, regardless of peer pressure.",
+        "difficulty": "Medium",
+        "topic": "peer-pressure"
+      },
+      {
+        "order": 3,
+        "id": "question-seed-209-What i",
+        "text": "What is the right response to seeing cyberbullying in a group chat?",
+        "choices": [
+          {
+            "id": "choice-209",
+            "text": "Join in since everyone else is"
+          },
+          {
+            "id": "choice-210",
+            "text": "Leave and report it to a trusted adult or moderator"
+          },
+          {
+            "id": "choice-211",
+            "text": "Ignore it completely"
+          },
+          {
+            "id": "choice-212",
+            "text": "Share it with more people"
+          }
+        ],
+        "correctChoiceId": "choice-210",
+        "explanation": "Reporting gives someone with authority the chance to step in and stop the harm being done.",
+        "difficulty": "Easy",
+        "topic": "cyberbullying"
+      },
+      {
+        "order": 4,
+        "id": "question-seed-213-Why ca",
+        "text": "Why can peer pressure online still be harmful even though it is not in person?",
+        "choices": [
+          {
+            "id": "choice-213",
+            "text": "It can encourage unsafe behavior just like in-person pressure"
+          },
+          {
+            "id": "choice-214",
+            "text": "Online pressure is not real"
+          },
+          {
+            "id": "choice-215",
+            "text": "It only affects adults"
+          },
+          {
+            "id": "choice-216",
+            "text": "It has no lasting effect"
+          }
+        ],
+        "correctChoiceId": "choice-213",
+        "explanation": "Peer pressure online can push someone into unsafe choices just as effectively as in-person pressure.",
+        "difficulty": "Medium",
+        "topic": "peer-pressure"
+      },
+      {
+        "order": 5,
+        "id": "question-seed-217-What i",
+        "text": "What is a good first step if you are being harassed online?",
+        "choices": [
+          {
+            "id": "choice-217",
+            "text": "Screenshot the conversation, profile, and timestamps before anything else"
+          },
+          {
+            "id": "choice-218",
+            "text": "Report it to a trusted adult or platform moderator right away"
+          },
+          {
+            "id": "choice-219",
+            "text": "Block the person immediately"
+          },
+          {
+            "id": "choice-220",
+            "text": "Delete all your accounts"
+          }
+        ],
+        "correctChoiceId": "choice-217",
+        "explanation": "Screenshotting first means you still have the evidence after you block. The safe order is screenshot, then block, then report.",
+        "difficulty": "Hard",
+        "topic": "harassment-response"
+      },
+      {
+        "order": 6,
+        "id": "question-seed-221-What i",
+        "text": "What is 'catfishing' in online interactions?",
+        "choices": [
+          {
+            "id": "choice-221",
+            "text": "Using automation bots to artificially inflate follower counts and video views"
+          },
+          {
+            "id": "choice-222",
+            "text": "Creating a fabricated or misleading online persona to deceive others into trust or relationships"
+          },
+          {
+            "id": "choice-223",
+            "text": "Distributing bulk unsolicited promotional emails to random mailing lists"
+          },
+          {
+            "id": "choice-224",
+            "text": "Brute-forcing account credentials to steal administrative access"
+          }
+        ],
+        "correctChoiceId": "choice-222",
+        "explanation": "Catfishing involves creating deceptive online profiles with stolen or fabricated identities to manipulate, exploit, or mislead people.",
+        "difficulty": "Easy",
+        "topic": "stranger-contact"
+      },
+      {
+        "order": 7,
+        "id": "question-seed-225-If you",
+        "text": "If you notice a classmate being attacked with malicious comments on a social platform, what is a constructive bystander action?",
+        "choices": [
+          {
+            "id": "choice-225",
+            "text": "Retaliate in public comments with aggressive insults against the harasser"
+          },
+          {
+            "id": "choice-226",
+            "text": "Reach out privately to offer support to the classmate and report the harassing comments through platform tools"
+          },
+          {
+            "id": "choice-227",
+            "text": "Forward the hostile messages to wider group chats to show everyone what happened"
+          },
+          {
+            "id": "choice-228",
+            "text": "Like and react to the abusive posts so the attackers stop posting"
+          }
+        ],
+        "correctChoiceId": "choice-226",
+        "explanation": "Offering direct personal support to the person being targeted and using official reporting channels addresses the issue safely without escalating drama.",
+        "difficulty": "Medium",
+        "topic": "cyberbullying"
+      },
+      {
+        "order": 8,
+        "id": "question-seed-229-When p",
+        "text": "When participating in open voice chat lobbies or gaming servers, what personal information should you never disclose?",
+        "choices": [
+          {
+            "id": "choice-229",
+            "text": "Your preferred playing style, tactics, or character loadout"
+          },
+          {
+            "id": "choice-230",
+            "text": "Your full real name, school, home neighborhood, or age"
+          },
+          {
+            "id": "choice-231",
+            "text": "Your gaming headset manufacturer and graphics settings"
+          },
+          {
+            "id": "choice-232",
+            "text": "Your ping rate and preferred server region"
+          }
+        ],
+        "correctChoiceId": "choice-230",
+        "explanation": "Public voice channels can be joined by anyone; sharing real names, schools, or locations exposes you to real-world stalking, doxxing, or harassment.",
+        "difficulty": "Easy",
+        "topic": "stranger-contact"
+      },
+      {
+        "order": 9,
+        "id": "question-seed-233-What s",
+        "text": "What should you do if an online contact threatens to release private photos or chats unless you send money or more media?",
+        "choices": [
+          {
+            "id": "choice-233",
+            "text": "Immediately pay the requested amount so they promise to delete the files"
+          },
+          {
+            "id": "choice-234",
+            "text": "Refuse to comply, preserve the evidence, block the sender, and report to a trusted adult or law enforcement"
+          },
+          {
+            "id": "choice-235",
+            "text": "Send counter-threats demanding they apologize and delete their account"
+          },
+          {
+            "id": "choice-236",
+            "text": "Factory reset your phone and keep the situation completely secret"
+          }
+        ],
+        "correctChoiceId": "choice-234",
+        "explanation": "Giving in to extortion demands rarely stops blackmailers and often invites further demands. The right response is to stop communicating, save evidence, and notify trusted adults or authorities.",
+        "difficulty": "Hard",
+        "topic": "peer-pressure"
+      },
+      {
+        "order": 10,
+        "id": "question-seed-237-Why do",
+        "text": "Why does sending photos on 'ephemeral' or disappearing-message apps still present digital permanence risks?",
+        "choices": [
+          {
+            "id": "choice-237",
+            "text": "Disappearing messages are automatically indexed by public search engines"
+          },
+          {
+            "id": "choice-238",
+            "text": "Recipients can capture screenshots, record the screen, or take photos with a second device before messages vanish"
+          },
+          {
+            "id": "choice-239",
+            "text": "Ephemeral apps store all photos in public cloud repositories permanently"
+          },
+          {
+            "id": "choice-240",
+            "text": "Disappearing media erases all saved contacts from your mobile phone"
+          }
+        ],
+        "correctChoiceId": "choice-238",
+        "explanation": "Even when an application guarantees automatic deletion, the recipient can save the content using screenshots, screen capture tools, or another camera.",
+        "difficulty": "Medium",
+        "topic": "harassment-response"
+      }
+    ]
+  }
+}

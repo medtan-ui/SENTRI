@@ -1,3 +1,4 @@
+import { expandModuleBank } from '../../shared/expandModuleBank'
 /**
  * modules/assessment/repository.ts
  * All direct Firestore access for the pre-test / post-test pair and the
@@ -13,7 +14,7 @@ import { AssessmentConfig, QuizResponseDoc } from './models'
  */
 export async function getAssessmentConfig(moduleId: string): Promise<AssessmentConfig | null> {
   const snap = await db.collection(COLLECTIONS.MODULE_PRETESTS).doc(moduleId).get()
-  return snap.exists ? (snap.data() as AssessmentConfig) : null
+  return expandModuleBank(snap.exists ? (snap.data() as AssessmentConfig) : null, moduleId, 'pretest')
 }
 
 /** A fresh, unwritten attempt id — generated outside any transaction. */

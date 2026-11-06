@@ -1,3 +1,4 @@
+import { expandModuleBank } from '../../functions/src/shared/expandModuleBank'
 /**
  * quizService.js
  * Firestore-backed access to the `moduleQuizzes` collection — one
@@ -29,7 +30,7 @@ const COLLECTION = 'moduleQuizzes'
  * @returns {Promise<import('../features/admin/quiz-config/types/quizConfigAdmin.types').QuizConfig | null>}
  */
 export async function getQuiz(moduleId) {
-  const doc = await getOrSeedDoc(COLLECTION, moduleId, getDefaultQuizConfig(moduleId))
+  const doc = expandModuleBank(await getOrSeedDoc(COLLECTION, moduleId, getDefaultQuizConfig(moduleId)), moduleId, 'quiz')
   if (doc && doc.settings) {
     doc.settings.available = true
   }

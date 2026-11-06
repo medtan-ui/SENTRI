@@ -1,10 +1,11 @@
+import { expandModuleBank } from '../../shared/expandModuleBank'
 import { db } from '../../shared/admin'
 import { COLLECTIONS } from '../../shared/constants'
 import { QuizConfig } from './models'
 
 export async function getQuizConfig(moduleId: string): Promise<QuizConfig | null> {
   const snap = await db.collection(COLLECTIONS.MODULE_QUIZZES).doc(moduleId).get()
-  return snap.exists ? (snap.data() as QuizConfig) : null
+  return expandModuleBank(snap.exists ? (snap.data() as QuizConfig) : null, moduleId, 'quiz')
 }
 
 /** A fresh, unwritten ref for the new attempt doc — created outside the

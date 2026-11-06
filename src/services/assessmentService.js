@@ -1,3 +1,4 @@
+import { expandModuleBank } from '../../functions/src/shared/expandModuleBank'
 /**
  * assessmentService.js
  * The per-module pre-test — the ungraded baseline a student answers once,
@@ -30,7 +31,7 @@ const COLLECTION = 'modulePretests'
  * @returns {Promise<{moduleId:string, title:string, questions:Array} | null>}
  */
 export async function getAssessment(moduleId) {
-  return getOrSeedDoc(COLLECTION, moduleId, getDefaultPretest(moduleId))
+  return expandModuleBank(await getOrSeedDoc(COLLECTION, moduleId, getDefaultPretest(moduleId)), moduleId, 'pretest')
 }
 
 async function callGetAssessmentForStudent(moduleId) {
