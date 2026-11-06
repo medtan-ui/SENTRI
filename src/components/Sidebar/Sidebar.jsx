@@ -21,7 +21,6 @@ const STUDENT_NAV = [
     ],
   },
   {
-    title: 'You',
     items: [
       { label: 'Progress', path: '/student/progress', icon: 'chart' },
       { label: 'Profile', path: '/student/profile', icon: 'user' },
@@ -47,7 +46,6 @@ const ADMIN_NAV = [
     ],
   },
   {
-    title: 'People',
     items: [
       { label: 'Accounts', path: '/admin/accounts', icon: 'users' },
       { label: 'Profile', path: '/admin/profile', icon: 'user' },
