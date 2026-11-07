@@ -98,6 +98,7 @@ async function _resolveUserProfile(firebaseUser) {
     displayName: data.displayName || firebaseUser.displayName || firebaseUser.email,
     nickname: data.nickname || data.displayName || firebaseUser.displayName || firebaseUser.email,
     emailVerified: firebaseUser.emailVerified,
+    verificationDeadline: data.verificationDeadline ?? null,
     mustChangePassword: !!data.mustChangePassword,
   }
 }
