@@ -8,15 +8,14 @@ function findChoiceId(scenario, targetName) {
 }
 
 const PRIOR_MESSAGES = [
-  { from: 'them', text: 'hey! sorry, been busy with school this week' },
-  { from: 'me', text: 'no worries, same here lol' },
-  { from: 'them', text: "we've been talking a while now, feel like i finally wanna meet you" },
+  { from: 'them', text: "What's up dude, nice to meet you! I go to the same university you're going to." },
+  { from: 'me', text: "Oh really? Nice to meet you too dude!" },
 ]
 
 /**
  * ChatEscalationScene — Module 6, Scenario 2 (consequence scenario)
- * A friendly chat thread, several messages in. The last incoming message
- * suggests meeting alone at a quiet spot near campus, today. Three real
+ * A chat thread with an online contact named Jamie. The incoming message
+ * asks for a live location and suggests meeting today. Three real
  * elements: two quick-reply chips above the (decorative) keyboard, and a
  * ← back control that closes the chat without replying.
  */
@@ -35,7 +34,7 @@ export default function ChatEscalationScene({ scenario, interactive, onResolve }
             <InteractiveTarget targetId="leave-on-read" label="Back" onActivate={() => handleChoice('leave-on-read')} disabled={!interactive}>
               <span className={styles.backBtn} aria-hidden="true">←</span>
             </InteractiveTarget>
-            <span className={`${styles.threadTitle} ${styles.decorative}`}>Angel_Reyes04</span>
+            <span className={`${styles.threadTitle} ${styles.decorative}`}>Jamie</span>
           </div>
 
           <div className={`${styles.messages} ${styles.decorative}`}>
@@ -46,7 +45,7 @@ export default function ChatEscalationScene({ scenario, interactive, onResolve }
             ))}
             <div className={styles.bubbleRowReceived}>
               <div className={styles.bubbleReceived}>
-                are you free today? there's a quiet spot behind the old gym near campus, less crowded there 😊
+                why don't we meet up today? send me your location so we can link up 😊
               </div>
             </div>
           </div>
@@ -54,19 +53,19 @@ export default function ChatEscalationScene({ scenario, interactive, onResolve }
           <div className={styles.quickReplies}>
             <InteractiveTarget
               targetId="agree-to-meet"
-              label='Reply "Sure, see you there"'
+              label='Reply "Sure, here is my location — see you there"'
               onActivate={() => handleChoice('agree-to-meet')}
               disabled={!interactive}
             >
-              <span className={styles.quickReplyChip}>Sure, see you there</span>
+              <span className={styles.quickReplyChip}>Sure, here's my location — see you there</span>
             </InteractiveTarget>
             <InteractiveTarget
               targetId="suggest-public"
-              label={`Reply "Let's meet at the mall instead — I'll bring a friend"`}
+              label={`Reply "Let's meet at the student mall instead — I'll bring a friend"`}
               onActivate={() => handleChoice('suggest-public')}
               disabled={!interactive}
             >
-              <span className={styles.quickReplyChip}>Let's meet at the mall instead — I'll bring a friend</span>
+              <span className={styles.quickReplyChip}>Let's meet at the student mall instead — I'll bring a friend</span>
             </InteractiveTarget>
           </div>
 

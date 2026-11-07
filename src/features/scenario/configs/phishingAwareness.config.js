@@ -22,18 +22,18 @@ export const phishingAwarenessConfig = {
       scenarioOrder: 1,
       scenarioTitle: 'A Message About Your Submission',
       scenarioDescription:
-        'A ClassDeck notification about an activity submission is waiting in your Campus Mail inbox.',
-      videoAvailable: false,
-      materialUrl: null,
-      posterCaption: 'Something in your inbox needs a decision.',
+        'An assignment notification about an activity submission is waiting in your email inbox.',
+      videoAvailable: true,
+      materialUrl: '/videos/module-2/module-2-intro.mp4',
+      posterCaption: 'Alex receives an unexpected assignment email.',
       scene: 'InboxScene',
       contextPopup: {
         title: "An Assignment Email Arrives",
-        narrative: "Alex opens Campus Mail and finds a ClassDeck notification about an activity supposedly posted by his instructor. The message asks him to submit his work through a link, but he is unsure whether the request is genuine. You are now in his inbox. How will you respond?",
+        narrative: "Alex checks his email and finds an assignment notification for IT1S1. He doesn't remember hearing about this in class and notices the email address looks different from the school's emails. You are now in his inbox. How will you respond?",
       },
       coachTarget: 'submit-link',
       postCompletionReflection:
-        "One message to the person who supposedly sent it settled the whole thing. That habit costs about ten seconds.",
+        "One message to the professor who supposedly sent it settled the whole thing. That habit costs about ten seconds.",
       choices: [
         {
           scenarioChoiceId: 'ph-01-a',
@@ -43,9 +43,9 @@ export const phishingAwarenessConfig = {
           outcomeTitle: 'That Button Leads Somewhere Else',
           consequenceType: 'none',
           feedbackText:
-            "That button doesn't go to ClassDeck — it opens a lookalike login page built to capture what you type. Hovering over a link before clicking it would have shown you the real destination, and asking your instructor would have settled it before any of that mattered.",
+            "That button doesn't go to your real class portal — it opens a lookalike login page built to capture what you type. Hovering over a link before clicking it would have shown you the real destination, and asking your instructor would have settled it before any of that mattered.",
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          consequenceVideoUrl: '/videos/module-2/module-2-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'ph-01-b',
@@ -57,7 +57,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             'Replying tells whoever sent this that your address is active and someone is reading it — that makes you a more attractive target, and it does nothing to verify whether the email itself is real.',
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          consequenceVideoUrl: '/videos/module-2/module-2-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'ph-01-c',
@@ -67,7 +67,7 @@ export const phishingAwarenessConfig = {
           outcomeTitle: 'Checked With the Person Who Supposedly Sent It',
           consequenceType: 'none',
           feedbackText:
-            "Prof. Reyes never posted an activity. Asking through a channel you already trust — a chat you use with them every week — is the one check an attacker cannot fake, because they do not control it. Notice you never had to judge the email itself: you went around it. Report or delete it now and it is done.",
+            "Prof. Romeo never posted that assignment. Asking through a channel you already trust — a chat you use with your instructor — is the one check an attacker cannot fake, because they do not control it. Notice you never had to judge the email itself: you went around it and verified directly.",
           feedbackMediaUrl: null,
         },
       ],
@@ -96,7 +96,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             'The page at classdeck-submit.net just captured your email and password. Account takeover typically follows within minutes — the attacker can use these same credentials to sign into your real accounts before you even notice.',
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          consequenceVideoUrl: '/videos/module-2/module-2-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'ph-02-b',
@@ -108,7 +108,7 @@ export const phishingAwarenessConfig = {
           feedbackText:
             "Forgot password? on a fake site doesn't recover anything real — you're still interacting with the attacker's page, and whatever you enter next can be captured just the same.",
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          consequenceVideoUrl: '/videos/module-2/module-2-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'ph-02-c',

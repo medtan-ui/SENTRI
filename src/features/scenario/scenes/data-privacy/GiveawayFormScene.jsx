@@ -89,7 +89,7 @@ export default function GiveawayFormScene({ scenario, interactive, onResolve }) 
               value={fields.name}
               onChange={(e) => updateField('name', e.target.value)}
               disabled={!interactive}
-              placeholder="Juan Dela Cruz"
+              placeholder="Marie Joy Punzalan"
             />
           </InteractiveTarget>
 
@@ -101,7 +101,7 @@ export default function GiveawayFormScene({ scenario, interactive, onResolve }) 
               value={fields.email}
               onChange={(e) => updateField('email', e.target.value)}
               disabled={!interactive}
-              placeholder="you@example.com"
+              placeholder="marie.punzalan@gmail.com"
             />
           </InteractiveTarget>
 
@@ -112,7 +112,7 @@ export default function GiveawayFormScene({ scenario, interactive, onResolve }) 
               value={fields.address}
               onChange={(e) => updateField('address', e.target.value)}
               disabled={!interactive}
-              placeholder="Street, Barangay, City"
+              placeholder="2190 Block 3 Sampaloc St, Tondo, Manila"
             />
           </InteractiveTarget>
 
@@ -124,7 +124,7 @@ export default function GiveawayFormScene({ scenario, interactive, onResolve }) 
               value={fields.phone}
               onChange={(e) => updateField('phone', e.target.value)}
               disabled={!interactive}
-              placeholder="09XX XXX XXXX"
+              placeholder="0926-784-6279"
             />
           </InteractiveTarget>
 

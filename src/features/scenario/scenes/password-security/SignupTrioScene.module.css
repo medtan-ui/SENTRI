@@ -1,207 +1,330 @@
-/**
- * Deliberately ordinary — plain corporate signup cards, not SENTRI's
- * gold theme. This is the cloned interface itself.
- *
- * Each card is themed by two custom properties set inline from the CARDS
- * table (`--brand`, `--brand-soft`), so the three services differ the way
- * three real services would: different mark, different accent, different
- * button. That difference is load-bearing rather than decorative — a
- * student who cannot see that these are three unrelated accounts has no
- * reason to think reusing one password across them is a risk, which is
- * the entire point of the scenario.
- */
+/* ── Scene wrapper ── */
 .scene {
   width: 100%;
-  font-family: var(--sketch-font);
+  font-family: var(--sketch-font, system-ui, sans-serif);
 }
 
-.decorative {
-  pointer-events: none;
+/* ── Laptop Mockup Shell ── */
+.laptopFrame {
+  position: relative;
+  background: #25282d;
+  border-radius: 18px 18px 10px 10px;
+  padding: 10px 12px 14px 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.25);
+  border: 2px solid #3c4048;
+}
+
+.laptopBezelTop {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 14px;
+  margin-bottom: 6px;
+}
+
+.webcamDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #111316;
+  border: 1px solid #3d424b;
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.laptopScreen {
+  background: #18191d;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #333740;
+}
+
+/* ── Browser chrome ── */
+.browserHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #2a2d35;
+  padding: 5px 10px 0 10px;
+  border-bottom: 1px solid #3a3e49;
+  min-height: 32px;
+}
+
+.browserTabs {
+  display: flex;
+  gap: 4px;
+}
+
+.browserTab {
+  display: flex;
+  align-items: center;
+  padding: 5px 14px;
+  background: #544747;
+  border: 1px solid #6e5c5c;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+}
+
+.tabTitle {
+  font-size: 0.8rem;
+  color: #d6cece;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.browserControls {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+
+.winBtn {
+  font-size: 0.75rem;
+  color: #9ba3af;
+  padding: 1px 5px;
+  cursor: default;
   user-select: none;
 }
 
-.instructions {
-  text-align: center;
-  font-size: 1.125rem;
-  color: var(--sketch-ink);
-  margin-bottom: var(--space-3);
-}
-
-.cardRow {
-  display: flex;
-  gap: var(--space-4);
-  align-items: stretch;
-  justify-content: center;
-}
-
-.card {
-  flex: 1;
-  min-width: 0;
-  max-width: none;
-  display: flex;
-  flex-direction: column;
-  background: var(--sketch-paper);
-  border: 2px solid var(--sketch-line);
-  /* The brand colour as a top rule: the fastest way to read "these are
-     three different things" without looking at a single word. */
-  border-top: 2px solid var(--sketch-line);
-  border-radius: var(--sketch-radius-a);
-  padding: var(--space-4);
-  box-shadow: var(--sketch-shadow-sm);
-}
-
-.cardHeader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-3);
-  border-bottom: 2px solid var(--sketch-line);
-}
-
-/* A letter tile, the way a real service logo looks at this size. The
-   three cards used to share one padlock emoji, which made them look like
-   three copies of the same form. */
-.cardMark {
+/* ── Browser body — dark brown portal page ── */
+.browserContent {
+  /* Matching the dark brown/taupe from the video screenshot */
+  background: #544747;
+  min-height: 340px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: var(--sketch-radius-b);
-  background: var(--brand, #2e5fa3);
-  color: var(--sketch-paper);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1;
+  padding: 28px 20px 24px 20px;
 }
 
-.cardHeading {
+/* ── EBP Wallet Hint Box (floating top-right) ── */
+.walletHintBox {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 190px;
+  background: #f0f4fa;
+  border: 2px solid #38BDF8;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  animation: hintGlow 2.8s infinite ease-in-out;
+}
+
+@keyframes hintGlow {
+  0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35); border-color: #38BDF8; }
+  50%       { box-shadow: 0 4px 22px rgba(56, 189, 248, 0.5); border-color: #7dd3fc; }
+}
+
+.walletHintHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.walletHintTitle {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #1E3A5F;
+  line-height: 1.1;
+}
+
+.walletHintBody {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  gap: 3px;
+  margin-bottom: 8px;
 }
 
-.cardName {
-  font-size: 1.125rem;
+.walletHintLabel {
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--sketch-ink);
-  line-height: 1.25;
-}
-
-.cardTagline {
-  font-size: 0.9375rem;
-  color: var(--sketch-ink-soft);
-  line-height: 1.3;
-}
-
-/* What this account is actually worth. The wallet saying "Real money"
-   next to the portal saying "Your academic record" is what makes reuse
-   across them feel different, which no amount of styling alone conveys. */
-/* Two lines' worth of height is reserved whether or not the copy needs
-   it. Without this the one card whose text wraps pushes its own
-   Username and Password fields lower than the other two, and three forms
-   that should read as a row read as a stagger. */
-.stakes {
-  font-size: 0.9375rem;
-  line-height: 1.4;
-  min-height: 54px;
-  color: var(--brand, #2e5fa3);
-  background: var(--brand-soft, #eef3f9);
-  border-radius: var(--sketch-radius-b);
-  padding: 7px 9px;
-}
-
-.stakesLabel {
-  display: block;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.65;
-  margin-bottom: 1px;
+  letter-spacing: 0.05em;
+  color: #475569;
+}
+
+.walletHintPw {
+  font-family: monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e3a5f;
+  background: #dbeafe;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px dashed #38BDF8;
+  word-break: break-all;
+  user-select: all;
+}
+
+.walletHintNote {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+.walletHintBtnWrap {
+  display: block;
+}
+
+.walletHintBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1E3A5F;
+  background: #bae6fd;
+  border: 1px solid #38BDF8;
+  border-radius: 6px;
+  padding: 5px 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+  box-sizing: border-box;
+}
+
+.walletHintBtn:hover {
+  background: #7dd3fc;
+}
+
+.walletHintBtnUsed {
+  background: #bbf7d0;
+  border-color: #34d399;
+  color: #065f46;
+}
+
+/* ── Sign-Up Form Card ── */
+.formCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 220px;
+}
+
+.crestRow {
+  margin-bottom: 8px;
+}
+
+.signupHeading {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #e8d8d8;
+  letter-spacing: 0.12em;
+  margin: 0 0 14px 0;
+  text-align: center;
+  font-family: var(--sketch-font, system-ui, sans-serif);
+}
+
+/* ── Form fields ── */
+.fieldGroup {
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .fieldLabel {
   display: block;
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--sketch-ink-soft);
+  color: #c8b8b8;
   margin-bottom: 4px;
-  margin-top: var(--space-3);
+  text-align: center;
 }
 
-.usernameDisplay {
-  font-size: 1.125rem;
-  color: var(--sketch-ink);
-  background: var(--sketch-paper-alt);
-  border: 2px solid var(--sketch-line);
-  border-radius: var(--sketch-radius-b);
-  padding: 8px 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* Portal ID read-only display */
+.idDisplay {
+  width: 100%;
+  background: #6b5757;
+  border: 1px solid #876969;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  color: #e8d8d8;
+  font-family: monospace;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  box-sizing: border-box;
 }
 
+/* Password input */
 .passwordInput {
   width: 100%;
-  font-size: 1.125rem;
-  color: var(--sketch-ink);
-  background: var(--sketch-paper);
-  border: 2px solid var(--sketch-line);
-  border-radius: var(--sketch-radius-b);
-  padding: 8px 10px;
-  font-family: var(--sketch-font);
+  background: #6b5757;
+  border: 1px solid #876969;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  color: #e8d8d8;
+  font-family: monospace;
+  text-align: center;
+  box-sizing: border-box;
+  transition: border-color 150ms ease;
+}
+
+.passwordInput::placeholder {
+  color: #a08888;
+  letter-spacing: 0.15em;
 }
 
 .passwordInput:focus {
   outline: none;
-  border-color: var(--brand, #2e5fa3);
+  border-color: #c26b6b;
+  box-shadow: 0 0 0 2px rgba(194, 107, 107, 0.25);
 }
 
 .emptyWarning {
   display: block;
-  font-size: 0.9375rem;
-  color: var(--sketch-red);
+  font-size: 0.775rem;
+  color: #fca5a5;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* ── Enter Button ── */
+.enterBtnWrap {
+  display: block;
+  width: 100%;
   margin-top: 4px;
 }
 
-.saveBtnWrap {
-  display: block;
-  width: 100%;
-  margin-top: auto;
-  padding-top: var(--space-4);
-}
-
-.saveBtn {
+.enterBtn {
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  color: var(--sketch-paper);
-  background: var(--brand, #2e5fa3);
-  padding: 9px 6px;
-  border-radius: var(--sketch-radius-b);
-  transition: background var(--transition-fast);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #3d2e2e;
+  background: #c8b4b4;
+  border: 1px solid #a89090;
+  border-radius: 20px;
+  padding: 6px 24px;
+  cursor: pointer;
+  transition: background 150ms ease, transform 100ms ease;
+  box-sizing: border-box;
+  letter-spacing: 0.04em;
 }
 
-.saveBtn[data-saved] {
-  background: var(--sketch-green);
-  border: 2px solid var(--sketch-line);
+.enterBtn:hover {
+  background: #d9c8c8;
+  transform: translateY(-1px);
 }
 
-@media (max-width: 760px) {
-  .cardRow {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .card {
-    max-width: none;
-  }
-  .saveBtnWrap {
-    margin-top: var(--space-2);
-  }
+/* ── Laptop bottom edge ── */
+.laptopDeckBottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 12px;
+  background: #2c3037;
+  border-radius: 0 0 10px 10px;
+  margin-top: 6px;
+}
+
+.laptopHinge {
+  width: 80px;
+  height: 4px;
+  background: #1e2126;
+  border-radius: 2px;
 }

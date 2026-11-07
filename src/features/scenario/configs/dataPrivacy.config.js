@@ -35,14 +35,14 @@ export const dataPrivacyConfig = {
       scenarioId: 'dp-01',
       scenarioOrder: 1,
       scenarioTitle: 'A Giveaway in the Feed',
-      scenarioDescription: 'A "₱5,000 giveaway" post is sitting in her feed.',
-      videoAvailable: false,
-      materialUrl: null,
-      posterCaption: 'A post in the feed is asking for a decision.',
+      scenarioDescription: 'A raffle giveaway post is sitting in Marie\'s phone feed.',
+      videoAvailable: true,
+      materialUrl: '/videos/module-5/module-5-intro.mp4',
+      posterCaption: 'Marie spots a giveaway notification on her phone.',
       scene: 'GiveawayPostScene',
       contextPopup: {
         title: "A Giveaway Catches Her Attention",
-        narrative: "A student checks her social feed and spots a post from Reminder-78 advertising a ₱5,000 giveaway. The JOIN NOW link makes entering look quick and easy. You are now viewing the post on her phone. What will you do before deciding whether to join?",
+        narrative: "Marie checks her phone and spots a raffle giveaway post with a good prize. The JOIN NOW link makes entering look quick and easy. You are now viewing the post on her phone. What will you do before deciding whether to join?",
       },
       choices: [
         {
@@ -55,7 +55,7 @@ export const dataPrivacyConfig = {
           feedbackText:
             "Reminder-78 has no verification badge, was created days ago, and has almost no post history — the hallmarks of a throwaway account built to run a scheme like this one, not a real sponsor with a prize to give away.",
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          consequenceVideoUrl: '/videos/module-5/module-5-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'dp-01-c',
@@ -85,14 +85,14 @@ export const dataPrivacyConfig = {
       scenarioId: 'dp-02',
       scenarioOrder: 2,
       scenarioTitle: 'Claim Your Prize',
-      scenarioDescription: 'A form is asking for her information to send the prize.',
-      videoAvailable: false,
-      materialUrl: null,
-      posterCaption: 'A form wants some information before it continues.',
+      scenarioDescription: 'A form is asking for her information to enter the raffle.',
+      videoAvailable: true,
+      materialUrl: '/videos/module-5/module-5-scene-2-intro.mp4',
+      posterCaption: 'A raffle form wants personal information before it continues.',
       scene: 'GiveawayFormScene',
       contextPopup: {
         title: "A Prize Form Wants Personal Details",
-        narrative: "In this scene, the giveaway link has opened a form asking for the student's details, including her birthday, home address, and phone number. She is tempted to fill it in to claim the prize. You are taking over before anything is submitted. What, if anything, will you share?",
+        narrative: "In this scene, the giveaway link has opened a form asking for Marie's details, including her birthday, home address, and phone number. Excited by the prize, she is tempted to fill it in. You are taking over before anything is submitted. What, if anything, will you share?",
       },
       choices: [
         {
@@ -105,7 +105,8 @@ export const dataPrivacyConfig = {
           feedbackText:
             "You entered your birthdate. That's an identity-verification factor at almost every bank in the country — combined with your name, it's often enough to pass a security check as you. A raffle has no legitimate reason to ask for it.",
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          failVideoUrl: '/videos/module-5/module-5-fail-video.mp4',
+          consequenceVideoUrl: '/videos/module-5/module-5-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'dp-02-a-address',
@@ -117,7 +118,8 @@ export const dataPrivacyConfig = {
           feedbackText:
             'You entered your home address. A raffle has no legitimate use for it — whoever has it now knows exactly where you live, tied to your real name and email.',
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          failVideoUrl: '/videos/module-5/module-5-fail-video.mp4',
+          consequenceVideoUrl: '/videos/module-5/module-5-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'dp-02-a-phone',
@@ -127,9 +129,10 @@ export const dataPrivacyConfig = {
           outcomeTitle: 'Your information is being resold.',
           consequenceType: 'data_exposure',
           feedbackText:
-            "You entered your phone number. It's now tied to your real name and can be resold directly to whoever wants to reach you next — including the messages that are about to start arriving.",
+            "You entered your phone number. It's now tied to your real name and can be resold directly to whoever wants to reach you next — leading to the spam calls and messages that soon flooded Marie's phone.",
           feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
+          failVideoUrl: '/videos/module-5/module-5-fail-video.mp4',
+          consequenceVideoUrl: '/videos/module-5/module-5-tutorial.mp4',
         },
         {
           scenarioChoiceId: 'dp-02-c',
@@ -151,57 +154,6 @@ export const dataPrivacyConfig = {
           consequenceType: 'none',
           feedbackText:
             "Leaving the form entirely is the safest option of all — a legitimate giveaway can't resell information you never typed in.",
-          feedbackMediaUrl: null,
-        },
-      ],
-    },
-    {
-      scenarioId: 'dp-03',
-      scenarioOrder: 3,
-      scenarioTitle: "The Messages Won't Stop",
-      scenarioDescription: 'Spam texts have started arriving on her phone.',
-      videoAvailable: false,
-      materialUrl: null,
-      posterCaption: 'Her phone keeps buzzing with messages from unknown numbers.',
-      scene: 'SpamFloodScene',
-      contextPopup: {
-        title: "Messages from Unknown Numbers",
-        narrative: "In this scene, a few days have passed since the student shared her details with the giveaway. Her phone now keeps buzzing with messages from unknown numbers. You are taking over in her messages app. How will you respond and deal with the information she shared?",
-      },
-      choices: [
-        {
-          scenarioChoiceId: 'dp-03-a',
-          target: 'reply-stop',
-          choiceText: 'Open the spam message and reply STOP',
-          isSafeChoice: false,
-          outcomeTitle: 'That Reply Confirmed the Number Is Live',
-          consequenceType: 'data_exposure',
-          feedbackText:
-            "Replying — even just \"STOP\" — tells whoever's sending these that a real person reads this number. That confirmation makes it more valuable on the same lists that sold it in the first place, not less.",
-          feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
-        },
-        {
-          scenarioChoiceId: 'dp-03-b',
-          target: 'change-number',
-          choiceText: 'Go to Settings and change her phone number',
-          isSafeChoice: false,
-          outcomeTitle: 'A New Number, Same Leaked Data',
-          consequenceType: 'financial_loss',
-          feedbackText:
-            "Changing the number stops these specific messages, but the information that leaked — name, address, and birthday — hasn't gone anywhere and is still linked to her. A new number doesn't undo what a resold identity can still be used for.",
-          feedbackMediaUrl: null,
-          consequenceVideoUrl: null,
-        },
-        {
-          scenarioChoiceId: 'dp-03-c',
-          target: 'block-and-report',
-          choiceText: 'Block & report the number, then check accounts using it in Settings',
-          isSafeChoice: true,
-          outcomeTitle: 'Blocked, Reported, and Checked',
-          consequenceType: 'none',
-          feedbackText:
-            "Blocking and reporting the number stops it specifically, and checking which accounts use this number is the step that actually deals with the leak itself — instead of just reacting to the latest message.",
           feedbackMediaUrl: null,
         },
       ],

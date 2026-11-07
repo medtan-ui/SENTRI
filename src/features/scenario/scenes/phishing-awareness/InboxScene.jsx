@@ -132,7 +132,7 @@ export default function InboxScene({ scenario, interactive, phase, onResolve }) 
                     <span className={styles.senderName}>ClassDeck</span>
                   </InteractiveTarget>
                   <span className={`${styles.onBehalf} ${styles.decorative}`}>
-                    on behalf of Prof. J. Reyes
+                    on behalf of Prof. Romeo Rodolfo
                   </span>
                   {senderExpanded && <span className={styles.senderFullAddress}>{FAKE_SENDER}</span>}
                   {showCallouts && (
@@ -193,30 +193,30 @@ export default function InboxScene({ scenario, interactive, phase, onResolve }) 
           </div>
 
           {chatOpen && (
-            <div className={styles.chatPanel} role="group" aria-label="Campus Chat with Prof. J. Reyes">
+            <div className={styles.chatPanel} role="group" aria-label="Campus Chat with Prof. Romeo Rodolfo">
               <div className={styles.chatHeader}>
-                <span className={styles.chatAvatar} aria-hidden="true">JR</span>
-                <span className={styles.chatName}>Prof. J. Reyes</span>
+                <span className={styles.chatAvatar} aria-hidden="true">RR</span>
+                <span className={styles.chatName}>Prof. Romeo Rodolfo</span>
               </div>
 
               <div className={styles.chatThread}>
                 <p className={`${styles.chatIn} ${styles.decorative}`}>
-                  Reminder, the quiz is still on Friday.
+                  Reminder, our IT1S1 quiz is still on Friday.
                 </p>
 
                 {asked ? (
                   <>
-                    <p className={styles.chatOut}>Sir, did you post an activity for us earlier?</p>
-                    <p className={styles.chatIn}>No, I didn't post any activity for you guys.</p>
+                    <p className={styles.chatOut}>Sir, did you publish an assignment earlier?</p>
+                    <p className={styles.chatIn}>No Alex, I didn't publish an assignment for you guys earlier.</p>
                   </>
                 ) : (
                   <div className={styles.chatComposer}>
                     <span className={styles.chatDraft}>
-                      Sir, did you post an activity for us earlier?
+                      Sir, did you publish an assignment earlier?
                     </span>
                     <InteractiveTarget
                       targetId="chat-send"
-                      label="Send the question to Prof. J. Reyes"
+                      label="Send the question to Prof. Romeo Rodolfo"
                       onActivate={handleAsk}
                       disabled={!interactive}
                     >

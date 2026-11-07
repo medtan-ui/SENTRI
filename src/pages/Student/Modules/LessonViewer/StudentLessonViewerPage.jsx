@@ -172,7 +172,7 @@ export default function StudentLessonViewerPage() {
     navigate(`/student/modules/${moduleId}/scenario`)
   }
 
-  const lessonComplete = furthestIndex === totalSections - 1
+  const lessonComplete = true // reading is optional — button always enabled
 
   return (
     <DashboardLayout role="student">
@@ -233,7 +233,6 @@ export default function StudentLessonViewerPage() {
             <Card className={styles.sectionCard}>
               <div className={styles.sectionCardTop}>
                 <span className={styles.sectionCount}>Section {currentIndex + 1} of {totalSections}</span>
-                <span className={styles.requiredBadge}><Icon name="lock" size={12} /> Required</span>
               </div>
               <h2 className={styles.sectionTitle}>{activeSection.title}</h2>
               <p className={styles.sectionContent}>{activeSection.content}</p>
@@ -282,14 +281,6 @@ export default function StudentLessonViewerPage() {
               </ul>
             </Card>
 
-            <div className={styles.unlockNotice} data-complete={lessonComplete}>
-              {lessonComplete ? (
-                <><Icon name="check" size={15} /> Reading complete, the interactive scenario is unlocked.</>
-              ) : (
-                <><Icon name="lock" size={15} /> <strong>Required reading:</strong> go through every section above to unlock the interactive scenario.</>
-              )}
-            </div>
-
             <div className={styles.bottomActions}>
               <Button
                 variant="ghost"
@@ -299,16 +290,13 @@ export default function StudentLessonViewerPage() {
               >
                 ← Previous Lesson
               </Button>
-              <Tooltip label={!lessonComplete ? 'Read through to the last section to unlock the simulation' : null}>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={handleStartSimulation}
-                  disabled={!lessonComplete}
-                >
-                  Start Interactive Simulation →
-                </Button>
-              </Tooltip>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleStartSimulation}
+              >
+                Start Interactive Simulation →
+              </Button>
             </div>
           </div>
 

@@ -36,9 +36,10 @@ const COLLECTION = 'moduleScenarios'
 
 /** Bumped whenever the persisted scenario shape changes incompatibly.
  *
- * v4: Module videos wired to per-module folders in public/videos/ (module-1, module-3, module-4).
- * Stored v3 documents with null consequenceVideoUrl are refreshed to authored videos. */
-export const SCENARIO_CONTENT_VERSION = 4
+ * v5: Updated videos wired across all modules 1-6 from public/Update Videos,
+ * with streamlined scenes, accurate narrative intros, fail consequence videos,
+ * and mascot tutorial videos. */
+export const SCENARIO_CONTENT_VERSION = 5
 
 /** Scenario-level fields an admin may edit. Everything else is structural. */
 export const EDITABLE_SCENARIO_FIELDS = [

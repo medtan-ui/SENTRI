@@ -194,22 +194,26 @@
 .senderRow {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: var(--space-3);
 }
 
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--sketch-paper-dim);
-  color: var(--sketch-ink);
+.avatarWrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.125rem;
-  font-weight: 700;
   flex-shrink: 0;
+}
+
+.alertBanner {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #991b1b;
+  background: #fee2e2;
+  border-left: 4px solid #dc2626;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: var(--space-3);
 }
 
 .senderMeta {
