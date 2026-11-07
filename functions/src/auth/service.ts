@@ -102,6 +102,7 @@ export async function registerStudentAccount(input: RegisterStudentAccountInput)
       email: normalizedEmail,
       status: 'active',
       mustChangePassword: false,
+      verificationDeadline: Date.now() + 24 * 60 * 60 * 1000,
     })
   } catch (err) {
     console.error(

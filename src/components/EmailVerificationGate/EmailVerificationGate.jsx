@@ -68,6 +68,14 @@ export default function EmailVerificationGate() {
             {' '}with the subject <strong>“Verify your email for project-339169954192”</strong>.
           </p>
 
+          {user?.verificationDeadline && (
+            <p className={styles.body}>
+              You have 24 hours from registration to verify your email. Your deadline is{' '}
+              <strong>{new Date(user.verificationDeadline).toLocaleString()}</strong>.
+              After that, unverified accounts are deleted and you’ll need to register again.
+            </p>
+          )}
+
           {message && (
             <div
               className={status === 'error' ? styles.errorBanner : styles.infoBanner}

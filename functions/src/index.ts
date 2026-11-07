@@ -12,6 +12,8 @@ import './shared/admin'
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 10 })
 
+export { expireUnverifiedRegistrations } from './auth/verificationExpiry'
+
 export {
   changeOwnPassword,
   createUserAccount,

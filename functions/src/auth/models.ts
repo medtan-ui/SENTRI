@@ -7,6 +7,7 @@ export interface UserProfile {
   email: string
   status: 'active' | 'disabled'
   mustChangePassword: boolean
+  verificationDeadline?: number
   createdAt?: FirebaseFirestore.FieldValue | FirebaseFirestore.Timestamp
 }
 

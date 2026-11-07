@@ -107,7 +107,7 @@ export default function RegisterAccountPage() {
             <img src={logo} alt="SENTRI logo" className={styles.logo} />
             <h1 className={styles.title}>Register Student Account</h1>
             <p className={styles.tagline}>
-              Creates a new student account. You'll verify your school email with Firebase before signing in.
+              Verify your school email within 24 hours of registering. After that, unverified accounts are deleted and you’ll need to register again.
             </p>
           </div>
 
