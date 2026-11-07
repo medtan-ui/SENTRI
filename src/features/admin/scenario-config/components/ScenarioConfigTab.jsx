@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Button from '../../../../components/Button/Button'
 import LoadingSkeleton from '../../../../components/LoadingSkeleton/LoadingSkeleton'
 import ErrorState from '../../../../components/ErrorState/ErrorState'
 import { useScenario } from '../../../../hooks/useScenario'
 import ScenarioOverviewCard from './ScenarioOverviewCard'
 import ScenarioCard from './ScenarioCard'
-import ScenarioFlowView from './ScenarioFlowView'
 import styles from './ScenarioConfigTab.module.css'
 
 /**
@@ -28,7 +27,6 @@ import styles from './ScenarioConfigTab.module.css'
 export default function ScenarioConfigTab({ moduleId, moduleName, overview }) {
   const { status, errorMessage, retry, draft, validations, isValid, dirty, saveState, notice, actions } =
     useScenario(moduleId)
-  const [viewMode, setViewMode] = useState('edit') // 'edit' | 'flow'
 
   if (status === 'loading') {
     return <LoadingSkeleton blocks={3} rows={4} />
@@ -49,12 +47,8 @@ export default function ScenarioConfigTab({ moduleId, moduleName, overview }) {
           <Button variant="ghost" onClick={actions.resetToDefaults} disabled={saveState === 'saving'}>
             Reset to Defaults
           </Button>
-          <Button variant="ghost" onClick={() => setViewMode((v) => (v === 'edit' ? 'flow' : 'edit'))}>
-            {viewMode === 'edit' ? '🔀 View Scenario Flow' : '✎ Back to Editing'}
-          </Button>
         </div>
-        {viewMode === 'edit' && (
-          <div className={styles.topActionsRight}>
+        <div className={styles.topActionsRight}>
             <Button variant="ghost" onClick={actions.cancel} disabled={!dirty || saveState === 'saving'}>
               Cancel
             </Button>
@@ -65,52 +59,45 @@ export default function ScenarioConfigTab({ moduleId, moduleName, overview }) {
             >
               {saveState === 'saving' ? 'Saving…' : 'Save'}
             </Button>
-          </div>
-        )}
+        </div>
       </div>
 
-      {viewMode === 'flow' ? (
-        <ScenarioFlowView scenarios={draft.scenarios} />
-      ) : (
-        <>
-          {notice && (
-            <div className={styles.notice} role="status">
-              <span aria-hidden="true">✓</span> {notice}
-            </div>
-          )}
-
-          {!isValid && (
-            <div className={styles.blockingBanner} role="alert">
-              Fix the issues marked below before saving.
-            </div>
-          )}
-
-          <p className={styles.liveNote}>
-            Saved changes go live for students the next time they open this module's simulation.
-          </p>
-
-          <ScenarioOverviewCard
-            moduleName={moduleName}
-            overviewDescription={overview?.description}
-            scenarios={draft.scenarios}
-            validations={validations}
-          />
-
-          <div className={styles.cardList}>
-            {draft.scenarios.map((scenario) => (
-              <ScenarioCard
-                key={scenario.scenarioId}
-                scenario={scenario}
-                validation={validations.find((v) => v.scenarioId === scenario.scenarioId)}
-                onUpdateScenario={(patch) => actions.updateScenario(scenario.scenarioId, patch)}
-                onUpdateChoice={(choiceId, patch) =>
-                  actions.updateChoice(scenario.scenarioId, choiceId, patch)
-                }
-              />
-            ))}
-          </div>
-        </>
+      {notice && (
+        <div className={styles.notice} role="status">
+          <span aria-hidden="true">✓</span> {notice}
+        </div>
       )}
+
+      {!isValid && (
+        <div className={styles.blockingBanner} role="alert">
+          Fix the issues marked below before saving.
+        </div>
+      )}
+
+      <p className={styles.liveNote}>
+        Saved changes go live for students the next time they open this module's simulation.
+      </p>
+
+      <ScenarioOverviewCard
+        moduleName={moduleName}
+        overviewDescription={overview?.description}
+        scenarios={draft.scenarios}
+        validations={validations}
+      />
+
+      <div className={styles.cardList}>
+        {draft.scenarios.map((scenario) => (
+          <ScenarioCard
+            key={scenario.scenarioId}
+            scenario={scenario}
+            validation={validations.find((v) => v.scenarioId === scenario.scenarioId)}
+            onUpdateScenario={(patch) => actions.updateScenario(scenario.scenarioId, patch)}
+            onUpdateChoice={(choiceId, patch) =>
+              actions.updateChoice(scenario.scenarioId, choiceId, patch)
+            }
+          />
+        ))}
+      </div>
     </div>
   )
 }

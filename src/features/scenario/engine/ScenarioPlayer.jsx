@@ -33,6 +33,7 @@ export default function ScenarioPlayer({
   scenarioTitle,
   onStart,
   isReview = false,
+  onWatched,
 }) {
   const [clipEnded, setClipEnded] = useState(false)
   const [trackingUnavailable, setTrackingUnavailable] = useState(false)
@@ -67,7 +68,7 @@ export default function ScenarioPlayer({
               videoId={youTubeId}
               title={scenarioTitle}
               autoplay
-              onEnded={() => setClipEnded(true)}
+              onEnded={() => { setClipEnded(true); onWatched?.() }}
               onTrackingUnavailable={() => setTrackingUnavailable(true)}
             />
           ) : (
@@ -78,7 +79,7 @@ export default function ScenarioPlayer({
               autoPlay
               playsInline
               controls
-              onEnded={() => setClipEnded(true)}
+              onEnded={() => { setClipEnded(true); onWatched?.() }}
               onError={() => setTrackingUnavailable(true)}
             />
           )}
@@ -88,7 +89,7 @@ export default function ScenarioPlayer({
           <div className={styles.startRow}>
             <p className={styles.startNote}>
               {isReview
-                ? "Reviewing scene setup. Watch through or proceed when you're ready."
+                ? "You have already watched this setup. Watch again or skip to the scenario."
                 : canStart
                   ? "That's the setup. Go in when you're ready."
                   : "Watch the clip through first. It sets up what you're walking into."}

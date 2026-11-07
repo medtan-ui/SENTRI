@@ -54,6 +54,7 @@ const mockConfig = {
 
 describe('Scenario incremental navigation & video playback', () => {
   beforeEach(() => {
+    sessionStorage.clear()
     vi.useFakeTimers()
   })
 

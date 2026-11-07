@@ -8,11 +8,9 @@ const ADVANCING_MS = 600
 
 const PULSE_IDLE_MS = 15000
 
-// States that are safe to restore directly after a page refresh.
-// Mid-transition states (loading, resolving, advancing) are normalised
-// to paused_interactive so the student never wakes up in a half-baked
-// machine transition.
-const RESTORABLE_STATES = new Set(['paused_interactive', 'feedback', 'playing', 'complete'])
+// Persist progress through feedback and transitions. Unfinished runs reopen
+// through the intro because scene fields and selected choices are transient.
+const RESTORABLE_STATES = new Set(['paused_interactive', 'feedback', 'playing', 'complete', 'resolving', 'consequence', 'advancing'])
 
 function makeStorageKey(moduleId, userId) {
   return `sentri:scenario:${moduleId}:${userId ?? 'anon'}`
@@ -83,10 +81,16 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
 
   const [state, setState] = useState(() => {
     if (!snapshot) return 'loading'
-    // Never restore a mid-transition state — map to the nearest safe one.
-    return RESTORABLE_STATES.has(snapshot.state) ? snapshot.state : 'paused_interactive'
+    // An unfinished feedback screen cannot be restored without its choice.
+    return snapshot.state === 'complete' ? 'complete' : 'loading'
   })
   const [scenarioIndex, setScenarioIndex] = useState(() => snapshot?.scenarioIndex ?? 0)
+  const [watchedScenarioIds, setWatchedScenarioIds] = useState(() => {
+    const ids = snapshot?.watchedScenarioIds ?? []
+    const entered = ['paused_interactive', 'feedback', 'resolving', 'consequence', 'advancing'].includes(snapshot?.state)
+    const id = config.scenarios[snapshot?.scenarioIndex ?? 0]?.scenarioId
+    return entered && id ? [...new Set([...ids, id])] : ids
+  })
   const [attemptCount, setAttemptCount] = useState(() => snapshot?.attemptCount ?? 0)
   const [selectedChoice, setSelectedChoice] = useState(null) // transient — not persisted
   const [completedScenarioIds, setCompletedScenarioIds] = useState(
@@ -138,8 +142,9 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
       completedScenarioIds,
       cleanScenarioIds,
       failedScenarioIds,
+      watchedScenarioIds,
     })
-  }, [state, scenarioIndex, attemptCount, completedScenarioIds, cleanScenarioIds, failedScenarioIds, storageKey])
+  }, [state, scenarioIndex, attemptCount, completedScenarioIds, cleanScenarioIds, failedScenarioIds, watchedScenarioIds, storageKey])
 
   // ── Target registry (for AffordanceCoach to find a target's DOM node) ──
   const registerTarget = useCallback((id, node) => {
@@ -232,6 +237,12 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
       const startedAt = decisionStartedAtRef.current
       const durationMs = startedAt ? Date.now() - startedAt : null
 
+      if (!choice.isSafeChoice) {
+        setAttemptCount((n) => n + 1)
+        setFailedScenarioIds((prev) =>
+          prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
+        )
+      }
       setSelectedChoice(choice)
       setState('resolving')
 
@@ -260,10 +271,6 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     if (state !== 'resolving' || !selectedChoice) return undefined
     const t = setTimeout(() => {
       if (!selectedChoice.isSafeChoice) {
-        setAttemptCount((n) => n + 1)
-        setFailedScenarioIds((prev) =>
-          prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId],
-        )
         if (selectedChoice.failVideoUrl) {
           setState('consequence')
           return
@@ -302,22 +309,20 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
   }, [currentScenario, attemptCount, isReplay, failedScenarioIds])
 
   // ── Incremental navigation actions (reviewing previous/next scenes) ──
-  // All nav actions go straight to paused_interactive — the video is
-  // skipped so the student lands on the interactive scene immediately.
-  // The "Replay Video" button is the explicit way to re-watch an intro.
+  // Revisiting a scene reopens its introduction; watched clips can be skipped.
   const goToPrevious = useCallback(() => {
     if (state === 'complete') {
       setScenarioIndex(totalScenarios - 1)
       setSelectedChoice(null)
       setAttemptCount(0)
-      setState('paused_interactive')
+      setState('loading')
       return
     }
     if (scenarioIndex > 0) {
       setScenarioIndex((i) => i - 1)
       setSelectedChoice(null)
       setAttemptCount(0)
-      setState('paused_interactive')
+      setState('loading')
     }
   }, [state, scenarioIndex, totalScenarios])
 
@@ -326,7 +331,7 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
       setScenarioIndex((i) => i + 1)
       setSelectedChoice(null)
       setAttemptCount(0)
-      setState('paused_interactive')
+      setState('loading')
     } else if (completedScenarioIds.length >= totalScenarios) {
       setState('complete')
     }
@@ -338,7 +343,7 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
         setScenarioIndex(targetIndex)
         setSelectedChoice(null)
         setAttemptCount(0)
-        setState('paused_interactive')
+        setState('loading')
       }
     },
     [totalScenarios],
@@ -351,6 +356,9 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     }
   }, [hasIntroClip])
 
+  const markIntroWatched = useCallback(() => {
+    setWatchedScenarioIds(prev => prev.includes(currentScenario.scenarioId) ? prev : [...prev, currentScenario.scenarioId])
+  }, [currentScenario.scenarioId])
   const canGoBack = scenarioIndex > 0 || state === 'complete'
   const canGoNext =
     state !== 'complete' &&
@@ -378,6 +386,7 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     isReplay,
     currentScenario,
     hasIntroClip,
+    introWatched: watchedScenarioIds.includes(currentScenario.scenarioId),
     // True while the opening clip is on screen waiting to be started.
     awaitingStart: state === 'playing' && hasIntroClip,
     scenarioIndex,
@@ -402,6 +411,7 @@ export function useScenarioEngine(config, userId, { isReplay = false } = {}) {
     },
     actions: {
       startScenario,
+      markIntroWatched,
       selectChoice,
       acknowledgeConsequence,
       retry,

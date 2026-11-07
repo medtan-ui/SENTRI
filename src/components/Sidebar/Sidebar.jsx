@@ -33,7 +33,6 @@ const ADMIN_NAV = [
     ],
   },
   {
-    title: 'Content',
     items: [
       { label: 'Modules', path: '/admin/modules', icon: 'book' },
       { label: 'Scenarios', path: '/admin/scenarios', icon: 'shield' },

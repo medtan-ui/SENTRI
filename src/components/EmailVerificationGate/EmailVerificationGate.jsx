@@ -63,6 +63,10 @@ export default function EmailVerificationGate() {
             Before you can continue, confirm this is really you. Send a verification link to{' '}
             <strong>{user?.email}</strong> and click it, then come back here.
           </p>
+          <p className={styles.body}>
+            After sending, check your inbox and spam folder for an email from <strong>noreply</strong>
+            {' '}with the subject <strong>“Verify your email for project-339169954192”</strong>.
+          </p>
 
           {message && (
             <div

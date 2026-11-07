@@ -1,3 +1,4 @@
+import Tooltip from '../../../components/Tooltip/Tooltip'
 import React, { useState, useEffect, useRef } from 'react'
 import Icon from '../../../components/Icon/Icon'
 import { useAuth } from '../../../context/AuthContext'
@@ -124,7 +125,8 @@ export default function ScenarioEngine({
                 posterCaption={currentScenario.posterCaption}
                 scenarioTitle={currentScenario.scenarioTitle}
                 onStart={awaitingStart ? actions.startScenario : null}
-                isReview={completedScenarioIds.includes(currentScenario.scenarioId)}
+                isReview={engine.introWatched || completedScenarioIds.includes(currentScenario.scenarioId)}
+                onWatched={actions.markIntroWatched}
               />
             </div>
           )}
@@ -246,15 +248,18 @@ export default function ScenarioEngine({
           </div>
 
           <div className={styles.actionRight}>
-            {state !== 'complete' && canGoNext && (
-              <button
-                type="button"
-                className={styles.stepForwardBtn}
-                onClick={actions.goToNext}
-                title="Move forward to next completed scene"
-              >
-                Next Scene →
-              </button>
+            {state !== 'complete' && (
+              <Tooltip label={canGoNext ? null : 'Finish this scene first to unlock Next Scene.'}>
+                <button
+                  type="button"
+                  className={styles.stepForwardBtn}
+                  onClick={actions.goToNext}
+                  disabled={!canGoNext}
+                  title={canGoNext ? "Go to the next scene" : undefined}
+                >
+                  Next Scene →
+                </button>
+              </Tooltip>
             )}
             <button
               type="button"
